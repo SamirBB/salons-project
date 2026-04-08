@@ -4,11 +4,7 @@ type ModuleItem = {
 };
 
 const modules: ModuleItem[] = [
-  {
-    title: "Kalendar",
-    description:
-      "Dnevnik dana sa filtrima, bojama zauzetosti/slobodnih termina, opcijom skrivanja kolona i prikazom otkazanih termina u izvjestajima.",
-  },
+
   {
     title: "Klijenti",
     description:
