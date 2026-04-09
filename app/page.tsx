@@ -5,17 +5,17 @@ type ModuleItem = {
 
 const modules: ModuleItem[] = [
   {
-    title: "Kalendar",
+    title: "Calendar",
     description:
       "Dnevnik dana sa filtrima, bojama zauzetosti/slobodnih termina, opcijom skrivanja kolona i prikazom otkazanih termina u izvjestajima.",
   },
   {
-    title: "Klijenti",
+    title: "Client",
     description:
       "Karton klijenta, napomene, historija dolazaka, izvoz/uvoz podataka (Excel/PDF), personalizovani podsjetnici i evidencija recenzija.",
   },
   {
-    title: "Poruke",
+    title: "Message",
     description:
       "Automatski i personalizovani email podsjetnici (3/2/1 dan), cestitke, promocije i ankete o zadovoljstvu.",
   },
