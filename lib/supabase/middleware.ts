@@ -1,7 +1,31 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { NAV_ACCESS, isValidRole, type Role } from "@/lib/roles";
 
-const PUBLIC_PATHS = ["/login", "/register", "/auth"];
+const PUBLIC_PATHS = ["/login", "/register", "/auth", "/invite"];
+
+// Mapa dashboard ruta → nav ključ
+const ROUTE_TO_NAV_KEY: Record<string, string> = {
+  "/dashboard/kalendar":     "kalendar",
+  "/dashboard/klijenti":     "klijenti",
+  "/dashboard/poruke":       "poruke",
+  "/dashboard/cjenovnik":    "cjenovnik",
+  "/dashboard/promocije":    "promocije",
+  "/dashboard/uposlenici":   "uposlenici",
+  "/dashboard/roba":         "roba",
+  "/dashboard/narudzbenice": "narudzbenice",
+  "/dashboard/izvjestaji":   "izvjestaji",
+  "/dashboard/profil":       "profil",
+};
+
+function getNavKeyForPath(pathname: string): string | null {
+  for (const [route, key] of Object.entries(ROUTE_TO_NAV_KEY)) {
+    if (pathname === route || pathname.startsWith(route + "/")) {
+      return key;
+    }
+  }
+  return null;
+}
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -41,37 +65,50 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Authenticated on public routes → check tenant
+  // Authenticated na public rutama → dashboard
   if (user && isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 
-  // Authenticated, going to dashboard or other protected route → check tenant
   if (user && !isPublic && pathname !== "/setup") {
-    const { data: tenant } = await supabase
-      .from("tenants")
-      .select("id")
-      .eq("owner_user_id", user.id)
+    // Provjeri user_tenants (tenant + rola)
+    const { data: userTenant } = await supabase
+      .from("user_tenants")
+      .select("tenant_id, role")
+      .eq("user_id", user.id)
       .single();
 
-    if (!tenant) {
+    if (!userTenant) {
       const url = request.nextUrl.clone();
       url.pathname = "/setup";
       return NextResponse.redirect(url);
     }
+
+    // Provjeri role-based pristup rutama
+    const navKey = getNavKeyForPath(pathname);
+    if (navKey) {
+      const role: Role = isValidRole(userTenant.role) ? userTenant.role : "employee";
+      const allowed = NAV_ACCESS[role];
+      if (!allowed.includes(navKey)) {
+        // Rola nema pristup — redirect na dashboard
+        const url = request.nextUrl.clone();
+        url.pathname = "/dashboard";
+        return NextResponse.redirect(url);
+      }
+    }
   }
 
-  // Authenticated with tenant on /setup → go to dashboard
+  // Korisnik s tenantom na /setup → dashboard
   if (user && pathname === "/setup") {
-    const { data: tenant } = await supabase
-      .from("tenants")
+    const { data: userTenant } = await supabase
+      .from("user_tenants")
       .select("id")
-      .eq("owner_user_id", user.id)
+      .eq("user_id", user.id)
       .single();
 
-    if (tenant) {
+    if (userTenant) {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);

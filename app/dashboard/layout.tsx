@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getSession } from "@/lib/session";
 import DashboardShell from "@/app/components/dashboard/shell";
 
 export default async function DashboardLayout({
@@ -7,24 +6,14 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
-
-  // Fetch tenant (salon) name
-  const { data: tenant } = await supabase
-    .from("tenants")
-    .select("name")
-    .eq("owner_user_id", user.id)
-    .single();
-
-  const salonName = tenant?.name ?? "Moj Salon";
+  const session = await getSession();
 
   return (
-    <DashboardShell userEmail={user.email!} salonName={salonName}>
+    <DashboardShell
+      userEmail={session.email}
+      salonName={session.salonName}
+      role={session.role}
+    >
       {children}
     </DashboardShell>
   );

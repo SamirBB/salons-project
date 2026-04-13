@@ -4,10 +4,11 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "./sidebar";
 import Topbar from "./topbar";
-import { navItems } from "./nav-items";
+import { ALL_NAV_ITEMS } from "./nav-items";
+import type { Role } from "@/lib/roles";
 
 function getPageTitle(pathname: string): string {
-  const item = navItems.find(
+  const item = ALL_NAV_ITEMS.find(
     (n) => pathname === n.href || pathname.startsWith(n.href + "/")
   );
   return item?.title ?? "Dashboard";
@@ -17,10 +18,12 @@ export default function DashboardShell({
   children,
   userEmail,
   salonName,
+  role,
 }: {
   children: React.ReactNode;
   userEmail: string;
   salonName: string;
+  role: Role;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
@@ -42,7 +45,7 @@ export default function DashboardShell({
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <Sidebar salonName={salonName} />
+        <Sidebar salonName={salonName} role={role} />
       </div>
 
       {/* Main content */}

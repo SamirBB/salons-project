@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { createTenant } from "@/app/actions/setup";
+import { logout } from "@/app/actions/auth";
 
 export default function SetupPage() {
   const [state, action, pending] = useActionState(createTenant, undefined);
@@ -105,6 +106,15 @@ export default function SetupPage() {
               className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
             >
               {pending ? "Kreiranje salona..." : "Nastavi →"}
+            </button>
+          </form>
+        </div>
+
+        <div className="text-center text-sm text-slate-500 mt-4">
+          Želite li koristiti drugi račun?{" "}
+          <form action={logout} className="inline">
+            <button type="submit" className="text-indigo-600 hover:text-indigo-500 font-medium">
+              Odjavi se
             </button>
           </form>
         </div>

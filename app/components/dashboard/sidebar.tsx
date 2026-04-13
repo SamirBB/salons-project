@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navItems } from "./nav-items";
+import { getNavItemsForRole } from "./nav-items";
+import { ROLE_LABELS, type Role } from "@/lib/roles";
 
 const icons: Record<string, React.ReactNode> = {
   calendar: (
@@ -59,8 +60,15 @@ const icons: Record<string, React.ReactNode> = {
   ),
 };
 
-export default function Sidebar({ salonName }: { salonName: string }) {
+export default function Sidebar({
+  salonName,
+  role,
+}: {
+  salonName: string;
+  role: Role;
+}) {
   const pathname = usePathname();
+  const navItems = getNavItemsForRole(role);
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-slate-200 bg-white">
@@ -73,7 +81,7 @@ export default function Sidebar({ salonName }: { salonName: string }) {
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-slate-900">{salonName}</p>
-          <p className="text-xs text-slate-500">Salon App</p>
+          <p className="text-xs text-slate-500">{ROLE_LABELS[role]}</p>
         </div>
       </div>
 
