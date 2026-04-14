@@ -89,27 +89,34 @@ export async function acceptInvite(
   if (invite.status !== "pending") return { error: "Pozivnica je već iskorištena ili je istekla." };
   if (new Date(invite.expires_at) < new Date()) return { error: "Pozivnica je istekla." };
 
-  // Registruj korisnika
-  const { data: authData, error: signUpError } = await supabase.auth.signUp({
+  // Registruj korisnika (ili prijavi ako već postoji)
+  let userId: string | undefined;
+
+  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
     email: invite.email,
     password,
     options: { data: { full_name: invite.full_name } },
   });
 
   if (signUpError) {
-    if (signUpError.message.includes("already registered")) {
-      // Korisnik već postoji — pokušaj login
-      const { error: loginError } = await supabase.auth.signInWithPassword({
+    if (
+      signUpError.message.includes("already registered") ||
+      signUpError.message.includes("User already registered")
+    ) {
+      // Korisnik već postoji — prijavi ga
+      const { data: signInData, error: loginError } = await supabase.auth.signInWithPassword({
         email: invite.email,
         password,
       });
       if (loginError) return { error: "Pogrešna lozinka za postojeći nalog." };
+      userId = signInData?.user?.id;
     } else {
       return { error: "Greška pri kreiranju naloga." };
     }
+  } else {
+    userId = signUpData?.user?.id;
   }
 
-  const userId = authData?.user?.id;
   if (!userId) return { error: "Greška pri kreiranju naloga." };
 
   // Kreiraj employee + user_tenants via SQL funkcija

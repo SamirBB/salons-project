@@ -2,17 +2,11 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Sidebar from "./sidebar";
 import Topbar from "./topbar";
 import { ALL_NAV_ITEMS } from "./nav-items";
 import type { Role } from "@/lib/roles";
-
-function getPageTitle(pathname: string): string {
-  const item = ALL_NAV_ITEMS.find(
-    (n) => pathname === n.href || pathname.startsWith(n.href + "/")
-  );
-  return item?.title ?? "Dashboard";
-}
 
 export default function DashboardShell({
   children,
@@ -27,6 +21,15 @@ export default function DashboardShell({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const tNav = useTranslations("nav");
+
+  function getPageTitle(path: string): string {
+    const item = ALL_NAV_ITEMS.find(
+      (n) => path === n.href || path.startsWith(n.href + "/")
+    );
+    return item ? tNav(item.key) : tNav("dashboard");
+  }
+
   const pageTitle = getPageTitle(pathname);
 
   return (

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
 import InviteForm from "./invite-form";
@@ -6,6 +7,7 @@ import InviteList from "./invite-list";
 export default async function UposleniciPage() {
   const session = await getSession();
   const supabase = await createClient();
+  const t = await getTranslations("uposlenici");
 
   const { data: employees } = await supabase
     .from("employees")
@@ -24,16 +26,16 @@ export default async function UposleniciPage() {
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-slate-900">Uposlenici</h2>
+        <h2 className="text-lg font-semibold text-slate-900">{t("title")}</h2>
         <p className="text-sm text-slate-500 mt-0.5">
-          {employees?.length ?? 0} uposlenik(a) u salonu
+          {t("subtitle", { count: employees?.length ?? 0 })}
         </p>
       </div>
 
       {/* Lista uposlenika */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100">
-          <h3 className="text-sm font-semibold text-slate-700">Aktivni uposlenici</h3>
+          <h3 className="text-sm font-semibold text-slate-700">{t("activeEmployees")}</h3>
         </div>
         {employees && employees.length > 0 ? (
           <ul className="divide-y divide-slate-100">
@@ -55,14 +57,14 @@ export default async function UposleniciPage() {
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                   emp.is_active ? "bg-green-50 text-green-700" : "bg-slate-100 text-slate-500"
                 }`}>
-                  {emp.is_active ? "Aktivan" : "Neaktivan"}
+                  {emp.is_active ? t("active") : t("inactive")}
                 </span>
               </li>
             ))}
           </ul>
         ) : (
           <div className="px-5 py-8 text-center text-sm text-slate-400">
-            Nema uposlenika. Pozovite prvog uposlenika ispod.
+            {t("noEmployees")}
           </div>
         )}
       </div>

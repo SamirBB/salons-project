@@ -1,5 +1,6 @@
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { ROLE_LABELS, type Role } from "@/lib/roles";
+import type { Role } from "@/lib/roles";
 import AcceptForm from "./accept-form";
 
 export default async function InvitePage({
@@ -9,12 +10,13 @@ export default async function InvitePage({
 }) {
   const { token } = await params;
   const supabase = await createClient();
+  const t = await getTranslations("invite");
+  const tRoles = await getTranslations("roles");
 
-  const { data: invite } = await supabase
-    .from("invitations")
-    .select("full_name, email, role, status, expires_at, tenants(name)")
-    .eq("token", token)
-    .single();
+  const { data: rows } = await supabase
+    .rpc("get_invite_details", { p_token: token });
+
+  const invite = rows?.[0] ?? null;
 
   // Nevažeći token
   if (!invite) {
@@ -22,14 +24,14 @@ export default async function InvitePage({
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center max-w-sm w-full">
           <p className="text-2xl mb-3">❌</p>
-          <h1 className="text-lg font-semibold text-slate-900">Pozivnica nije pronađena</h1>
-          <p className="text-sm text-slate-500 mt-1">Link je neispravan ili je pozivnica uklonjena.</p>
+          <h1 className="text-lg font-semibold text-slate-900">{t("notFound")}</h1>
+          <p className="text-sm text-slate-500 mt-1">{t("notFoundDesc")}</p>
         </div>
       </div>
     );
   }
 
-  const salonName = (invite.tenants as unknown as { name: string } | null)?.name ?? "Salon";
+  const salonName = invite.salon_name ?? "Salon";
   const isExpired = invite.status !== "pending" || new Date(invite.expires_at) < new Date();
 
   if (invite.status === "accepted") {
@@ -37,8 +39,8 @@ export default async function InvitePage({
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center max-w-sm w-full">
           <p className="text-2xl mb-3">✅</p>
-          <h1 className="text-lg font-semibold text-slate-900">Pozivnica već iskorištena</h1>
-          <p className="text-sm text-slate-500 mt-1">Ova pozivnica je već prihvaćena.</p>
+          <h1 className="text-lg font-semibold text-slate-900">{t("alreadyUsed")}</h1>
+          <p className="text-sm text-slate-500 mt-1">{t("alreadyUsedDesc")}</p>
         </div>
       </div>
     );
@@ -49,8 +51,8 @@ export default async function InvitePage({
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center max-w-sm w-full">
           <p className="text-2xl mb-3">⏰</p>
-          <h1 className="text-lg font-semibold text-slate-900">Pozivnica je istekla</h1>
-          <p className="text-sm text-slate-500 mt-1">Zamolite vlasnika salona da vam pošalje novu pozivnicu.</p>
+          <h1 className="text-lg font-semibold text-slate-900">{t("expired")}</h1>
+          <p className="text-sm text-slate-500 mt-1">{t("expiredDesc")}</p>
         </div>
       </div>
     );
@@ -66,29 +68,29 @@ export default async function InvitePage({
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">Dobrodošli!</h1>
-          <p className="text-sm text-slate-500 mt-1">Pozvani ste u salon</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t("welcome")}</h1>
+          <p className="text-sm text-slate-500 mt-1">{t("invitedTo")}</p>
         </div>
 
         {/* Invite info */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-4">
           <div className="space-y-3 mb-5">
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Salon:</span>
+              <span className="text-slate-500">{t("salonLabel")}</span>
               <span className="font-semibold text-slate-900">{salonName}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Ime:</span>
+              <span className="text-slate-500">{t("nameLabel")}</span>
               <span className="font-medium text-slate-900">{invite.full_name}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Email:</span>
+              <span className="text-slate-500">{t("emailLabel")}</span>
               <span className="font-medium text-slate-900">{invite.email}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Rola:</span>
+              <span className="text-slate-500">{t("roleLabel")}</span>
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">
-                {ROLE_LABELS[invite.role as Role] ?? invite.role}
+                {tRoles(invite.role as Role) ?? invite.role}
               </span>
             </div>
           </div>

@@ -2,13 +2,22 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { login } from "@/app/actions/auth";
+import LanguageSwitcher from "@/app/components/LanguageSwitcher";
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, undefined);
+  const t = useTranslations("auth");
+  const tCommon = useTranslations("common");
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      {/* Language switcher top-right */}
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
+
       <div className="w-full max-w-sm">
         {/* Logo / Naziv */}
         <div className="text-center mb-8">
@@ -27,8 +36,8 @@ export default function LoginPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">Salon App</h1>
-          <p className="text-sm text-slate-500 mt-1">Prijavite se na vaš nalog</p>
+          <h1 className="text-2xl font-bold text-slate-900">{tCommon("appName")}</h1>
+          <p className="text-sm text-slate-500 mt-1">{t("loginTitle")}</p>
         </div>
 
         {/* Form */}
@@ -39,7 +48,7 @@ export default function LoginPage() {
                 htmlFor="email"
                 className="block text-sm font-medium text-slate-700 mb-1.5"
               >
-                Email adresa
+                {t("emailLabel")}
               </label>
               <input
                 id="email"
@@ -47,7 +56,7 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
-                placeholder="salon@primjer.ba"
+                placeholder={t("emailPlaceholder")}
                 className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
@@ -57,7 +66,7 @@ export default function LoginPage() {
                 htmlFor="password"
                 className="block text-sm font-medium text-slate-700 mb-1.5"
               >
-                Lozinka
+                {t("passwordLabel")}
               </label>
               <input
                 id="password"
@@ -65,7 +74,7 @@ export default function LoginPage() {
                 type="password"
                 autoComplete="current-password"
                 required
-                placeholder="••••••••"
+                placeholder={t("passwordPlaceholder")}
                 className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
@@ -81,15 +90,15 @@ export default function LoginPage() {
               disabled={pending}
               className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
             >
-              {pending ? "Prijava..." : "Prijavite se"}
+              {pending ? t("loginLoading") : t("loginButton")}
             </button>
           </form>
         </div>
 
         <p className="text-center text-sm text-slate-500 mt-4">
-          Nemate nalog?{" "}
+          {t("noAccount")}{" "}
           <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Registrujte se
+            {t("registerLink")}
           </Link>
         </p>
       </div>
