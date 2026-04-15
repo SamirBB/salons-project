@@ -33,7 +33,34 @@
     "submitButton": "Nadaljuj →",
     "submitLoading": "Ustvarjanje salona...",
     "otherAccount": "Želite uporabiti drug račun?",
-    "logout": "Odjava"
+    "logout": "Odjava",
+    "step1Title": "Podatki o salonu",
+    "step2Title": "Delovni čas",
+    "step3Title": "Potrditev",
+    "stepOf": "Korak {current} od {total}",
+    "next": "Nadaljuj →",
+    "back": "← Nazaj",
+    "submit": "Ustvari salon",
+    "submitting": "Ustvarjanje salona...",
+    "workingHours": {
+      "monday": "Ponedeljek",
+      "tuesday": "Torek",
+      "wednesday": "Sreda",
+      "thursday": "Četrtek",
+      "friday": "Petek",
+      "saturday": "Sobota",
+      "sunday": "Nedelja",
+      "open": "Odprto",
+      "closed": "Zaprto",
+      "from": "Od",
+      "to": "Do"
+    },
+    "confirmation": {
+      "title": "Pregled podatkov",
+      "salonInfo": "Podatki o salonu",
+      "workingHours": "Delovni čas",
+      "createBtn": "Ustvari salon ✓"
+    }
   },
   "nav": {
     "kalendar": "Koledar",

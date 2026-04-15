@@ -33,7 +33,34 @@
     "submitButton": "Continue →",
     "submitLoading": "Creating salon...",
     "otherAccount": "Want to use a different account?",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "step1Title": "Salon details",
+    "step2Title": "Working hours",
+    "step3Title": "Confirmation",
+    "stepOf": "Step {current} of {total}",
+    "next": "Continue →",
+    "back": "← Back",
+    "submit": "Create salon",
+    "submitting": "Creating salon...",
+    "workingHours": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday",
+      "open": "Open",
+      "closed": "Closed",
+      "from": "From",
+      "to": "To"
+    },
+    "confirmation": {
+      "title": "Review details",
+      "salonInfo": "Salon details",
+      "workingHours": "Working hours",
+      "createBtn": "Create salon ✓"
+    }
   },
   "nav": {
     "kalendar": "Calendar",

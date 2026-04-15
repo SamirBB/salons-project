@@ -28,8 +28,18 @@ export async function createTenant(
   const phone = (formData.get("phone") as string)?.trim();
   const address = (formData.get("address") as string)?.trim();
   const city = (formData.get("city") as string)?.trim();
+  const workingHoursRaw = (formData.get("working_hours") as string)?.trim();
 
   if (!name) return { error: "Naziv salona je obavezan." };
+
+  let workingHours = {};
+  if (workingHoursRaw) {
+    try {
+      workingHours = JSON.parse(workingHoursRaw);
+    } catch {
+      // ignore parse errors, default to empty
+    }
+  }
 
   // Generate unique slug
   const baseSlug = slugify(name);
@@ -42,6 +52,7 @@ export async function createTenant(
     p_address: address || null,
     p_city: city || null,
     p_email: user.email ?? null,
+    p_working_hours: workingHours,
   });
 
   if (error || !tenantId) {
