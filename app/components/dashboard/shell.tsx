@@ -7,17 +7,20 @@ import Sidebar from "./sidebar";
 import Topbar from "./topbar";
 import { ALL_NAV_ITEMS } from "./nav-items";
 import type { Role } from "@/lib/roles";
+import type { Locale } from "@/lib/locale";
 
 export default function DashboardShell({
   children,
   userEmail,
   salonName,
   role,
+  locale,
 }: {
   children: React.ReactNode;
   userEmail: string;
   salonName: string;
   role: Role;
+  locale: Locale;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
@@ -56,6 +59,7 @@ export default function DashboardShell({
         <Topbar
           userEmail={userEmail}
           pageTitle={pageTitle}
+          locale={locale}
           onMenuClick={() => setSidebarOpen((v) => !v)}
         />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
