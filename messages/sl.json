@@ -160,6 +160,15 @@
     "cancel": "Prekliči",
     "appName": "Salon App"
   },
+  "salon": {
+    "settings": "Nastavitve salona",
+    "settingsSubtitle": "Uredite podatke in delovni čas vašega salona",
+    "basicInfo": "Osnovni podatki",
+    "saveButton": "Shrani spremembe",
+    "saving": "Shranjevanje...",
+    "saveSuccess": "Podatki so bili uspešno shranjeni.",
+    "editTooltip": "Uredi nastavitve salona"
+  },
   "language": {
     "label": "Jezik",
     "bs": "Bosanski",

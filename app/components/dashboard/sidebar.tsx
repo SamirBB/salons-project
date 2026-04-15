@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { getNavItemsForRole } from "./nav-items";
-import type { Role } from "@/lib/roles";
+import { ROLE_LABELS, type Role } from "@/lib/roles";
 
 const icons: Record<string, React.ReactNode> = {
   calendar: (
@@ -71,21 +71,38 @@ export default function Sidebar({
   const pathname = usePathname();
   const tNav = useTranslations("nav");
   const tRoles = useTranslations("roles");
+  const tSalon = useTranslations("salon");
   const navItems = getNavItemsForRole(role);
+  const canEditSalon = role === "owner" || role === "manager";
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-slate-200 bg-white">
       {/* Logo / Naziv salona */}
-      <div className="flex items-center gap-3 border-b border-slate-200 px-5 py-4">
+      <div className="flex items-center gap-3 border-b border-slate-200 px-4 py-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600">
           <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
           </svg>
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-slate-900">{salonName}</p>
           <p className="text-xs text-slate-500">{tRoles(role)}</p>
         </div>
+        {canEditSalon && (
+          <Link
+            href="/dashboard/postavke"
+            title={tSalon("editTooltip")}
+            className={`shrink-0 rounded-lg p-1.5 transition-colors ${
+              pathname.startsWith("/dashboard/postavke")
+                ? "bg-indigo-50 text-indigo-600"
+                : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            }`}
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            </svg>
+          </Link>
+        )}
       </div>
 
       {/* Navigation */}

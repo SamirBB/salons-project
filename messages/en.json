@@ -160,6 +160,15 @@
     "cancel": "Cancel",
     "appName": "Salon App"
   },
+  "salon": {
+    "settings": "Salon settings",
+    "settingsSubtitle": "Edit your salon's details and working hours",
+    "basicInfo": "Basic information",
+    "saveButton": "Save changes",
+    "saving": "Saving...",
+    "saveSuccess": "Changes saved successfully.",
+    "editTooltip": "Edit salon settings"
+  },
   "language": {
     "label": "Language",
     "bs": "Bosanski",

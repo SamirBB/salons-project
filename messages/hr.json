@@ -160,6 +160,15 @@
     "cancel": "Odustani",
     "appName": "Salon App"
   },
+  "salon": {
+    "settings": "Postavke salona",
+    "settingsSubtitle": "Uredite podatke i radno vrijeme vašeg salona",
+    "basicInfo": "Osnovni podaci",
+    "saveButton": "Spremi promjene",
+    "saving": "Spremanje...",
+    "saveSuccess": "Podaci su uspješno spremljeni.",
+    "editTooltip": "Uredi postavke salona"
+  },
   "language": {
     "label": "Jezik",
     "bs": "Bosanski",
