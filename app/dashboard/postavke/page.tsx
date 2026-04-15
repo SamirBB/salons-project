@@ -14,7 +14,7 @@ export default async function PostavkePage() {
   const supabase = await createClient();
   const { data: tenant } = await supabase
     .from("tenants")
-    .select("name, phone, city, address, working_hours")
+    .select("name, phone, city, address, working_hours, logo_url")
     .eq("id", session.tenantId)
     .single();
 
@@ -34,6 +34,7 @@ export default async function PostavkePage() {
           city: tenant?.city ?? "",
           address: tenant?.address ?? "",
           workingHours: tenant?.working_hours ?? {},
+          logoUrl: tenant?.logo_url ?? null,
         }}
       />
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useRef } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { updateSalon } from "@/app/actions/salon";
 
@@ -51,6 +52,7 @@ export default function SalonSettingsForm({
     city: string;
     address: string;
     workingHours: Record<string, unknown>;
+    logoUrl: string | null;
   };
 }) {
   const t = useTranslations("salon");
@@ -59,6 +61,18 @@ export default function SalonSettingsForm({
   const [hours, setHours] = useState<WorkingHours>(() =>
     mergeWithDefaults(initialData.workingHours)
   );
+  const [logoPreview, setLogoPreview] = useState<string | null>(
+    state?.logoUrl ?? initialData.logoUrl
+  );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setLogoPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  }
 
   function updateDay(key: string, field: keyof DayHours, value: string | boolean) {
     setHours((prev) => ({
@@ -68,7 +82,63 @@ export default function SalonSettingsForm({
   }
 
   return (
-    <form action={action} className="space-y-5">
+    <form action={action} className="space-y-5" encType="multipart/form-data">
+      {/* Logo */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h3 className="text-sm font-semibold text-slate-700 mb-4">{t("logo")}</h3>
+        <div className="flex items-center gap-5">
+          {/* Preview */}
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+            {logoPreview ? (
+              <Image
+                src={logoPreview}
+                alt="Logo"
+                width={80}
+                height={80}
+                className="h-full w-full object-cover"
+                unoptimized
+              />
+            ) : (
+              <svg className="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+              </svg>
+            )}
+          </div>
+
+          {/* Upload info */}
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded-lg border border-slate-300 px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              {logoPreview ? t("changeLogo") : t("uploadLogo")}
+            </button>
+            <p className="text-xs text-slate-400">{t("logoHint")}</p>
+            {logoPreview && (
+              <button
+                type="button"
+                onClick={() => {
+                  setLogoPreview(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+                className="text-xs text-red-500 hover:text-red-600"
+              >
+                {t("removeLogo")}
+              </button>
+            )}
+          </div>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          name="logo"
+          accept="image/jpeg,image/png,image/webp,image/svg+xml"
+          onChange={handleLogoChange}
+          className="hidden"
+        />
+      </div>
+
       {/* Osnovni podaci */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
         <h3 className="text-sm font-semibold text-slate-700">{t("basicInfo")}</h3>

@@ -15,12 +15,14 @@ export default function DashboardShell({
   salonName,
   role,
   locale,
+  logoUrl,
 }: {
   children: React.ReactNode;
   userEmail: string;
   salonName: string;
   role: Role;
   locale: Locale;
+  logoUrl: string | null;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
@@ -51,7 +53,7 @@ export default function DashboardShell({
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <Sidebar salonName={salonName} role={role} />
+        <Sidebar salonName={salonName} role={role} logoUrl={logoUrl} />
       </div>
 
       {/* Main content */}

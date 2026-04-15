@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { getNavItemsForRole } from "./nav-items";
@@ -64,9 +65,11 @@ const icons: Record<string, React.ReactNode> = {
 export default function Sidebar({
   salonName,
   role,
+  logoUrl,
 }: {
   salonName: string;
   role: Role;
+  logoUrl: string | null;
 }) {
   const pathname = usePathname();
   const tNav = useTranslations("nav");
@@ -79,10 +82,21 @@ export default function Sidebar({
     <aside className="flex h-full w-64 flex-col border-r border-slate-200 bg-white">
       {/* Logo / Naziv salona */}
       <div className="flex items-center gap-3 border-b border-slate-200 px-4 py-4">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600">
-          <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-          </svg>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl overflow-hidden bg-indigo-600">
+          {logoUrl ? (
+            <Image
+              src={logoUrl}
+              alt={salonName}
+              width={36}
+              height={36}
+              className="h-full w-full object-cover"
+              unoptimized
+            />
+          ) : (
+            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+            </svg>
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-slate-900">{salonName}</p>

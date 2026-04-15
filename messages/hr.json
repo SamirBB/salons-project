@@ -178,7 +178,12 @@
     "saveButton": "Spremi promjene",
     "saving": "Spremanje...",
     "saveSuccess": "Podaci su uspješno spremljeni.",
-    "editTooltip": "Uredi postavke salona"
+    "editTooltip": "Uredi postavke salona",
+    "logo": "Logo salona",
+    "uploadLogo": "Odaberi logo",
+    "changeLogo": "Promijeni logo",
+    "removeLogo": "Ukloni logo",
+    "logoHint": "PNG, JPG, WebP ili SVG · max 2MB"
   },
   "language": {
     "label": "Jezik",
