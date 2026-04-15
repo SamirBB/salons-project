@@ -104,10 +104,10 @@ export default function Sidebar({
         </div>
         {canEditSalon && (
           <Link
-            href="/dashboard/postavke"
+            href="/dashboard/profil"
             title={tSalon("editTooltip")}
             className={`shrink-0 rounded-lg p-1.5 transition-colors ${
-              pathname.startsWith("/dashboard/postavke")
+              pathname.startsWith("/dashboard/profil")
                 ? "bg-indigo-50 text-indigo-600"
                 : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
             }`}
