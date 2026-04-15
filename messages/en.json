@@ -100,7 +100,18 @@
     "roleHint": "<strong>Employee</strong> sees only their own calendar · <strong>Reception</strong> sees all appointments · <strong>Manager</strong> nearly full access",
     "createInviteButton": "Create invitation",
     "createInviteLoading": "Creating...",
-    "sentInvitations": "Sent invitations"
+    "sentInvitations": "Sent invitations",
+    "allEmployees": "All employees",
+    "searchPlaceholder": "Search by name or email...",
+    "noSearchResults": "No results found.",
+    "setActive": "Set as active",
+    "setInactive": "Set as inactive",
+    "deleteEmployee": "Delete employee",
+    "confirmDelete": "Are you sure?",
+    "yes": "Yes",
+    "no": "No",
+    "copyInviteLink": "Copy invite link",
+    "copyLink": "Copy link"
   },
   "inviteStatus": {
     "pending": "Pending",

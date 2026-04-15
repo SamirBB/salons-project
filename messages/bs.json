@@ -134,7 +134,18 @@
     "roleHint": "<strong>Radnik</strong> vidi samo vlastiti kalendar · <strong>Recepcija</strong> vidi sve termine · <strong>Menadžer</strong> skoro pun pristup",
     "createInviteButton": "Kreiraj pozivnicu",
     "createInviteLoading": "Kreiranje...",
-    "sentInvitations": "Poslane pozivnice"
+    "sentInvitations": "Poslane pozivnice",
+    "allEmployees": "Svi uposlenici",
+    "searchPlaceholder": "Pretraži po imenu ili emailu...",
+    "noSearchResults": "Nema rezultata pretrage.",
+    "setActive": "Postavi kao aktivan",
+    "setInactive": "Postavi kao neaktivan",
+    "deleteEmployee": "Obriši uposlenika",
+    "confirmDelete": "Sigurno?",
+    "yes": "Da",
+    "no": "Ne",
+    "copyInviteLink": "Kopiraj link pozivnice",
+    "copyLink": "Kopiraj link"
   },
   "inviteStatus": {
     "pending": "Na čekanju",

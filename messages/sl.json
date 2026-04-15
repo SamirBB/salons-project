@@ -100,7 +100,18 @@
     "roleHint": "<strong>Zaposleni</strong> vidi samo lasten koledar · <strong>Recepcija</strong> vidi vse termine · <strong>Vodja</strong> skoraj poln dostop",
     "createInviteButton": "Ustvari povabilo",
     "createInviteLoading": "Ustvarjanje...",
-    "sentInvitations": "Poslana povabila"
+    "sentInvitations": "Poslana povabila",
+    "allEmployees": "Vsi zaposleni",
+    "searchPlaceholder": "Išči po imenu ali e-pošti...",
+    "noSearchResults": "Ni rezultatov iskanja.",
+    "setActive": "Nastavi kot aktivnega",
+    "setInactive": "Nastavi kot neaktivnega",
+    "deleteEmployee": "Izbriši zaposlenega",
+    "confirmDelete": "Ste prepričani?",
+    "yes": "Da",
+    "no": "Ne",
+    "copyInviteLink": "Kopiraj povezavo povabila",
+    "copyLink": "Kopiraj povezavo"
   },
   "inviteStatus": {
     "pending": "V čakanju",
