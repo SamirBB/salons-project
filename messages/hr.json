@@ -49,7 +49,8 @@
     "dashboard": "Dashboard"
   },
   "topbar": {
-    "logout": "Odjava"
+    "logout": "Odjava",
+    "clockAria": "Trenutni datum, dan u tjednu i sat"
   },
   "uposlenici": {
     "title": "Zaposlenici",

@@ -1,26 +1,106 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { logout } from "@/app/actions/auth";
 import LanguageSwitcher from "@/app/components/LanguageSwitcher";
+import type { Locale } from "@/lib/locale";
+
+function capitalizeWeekdayLong(name: string, intlLocale: string): string {
+  if (!name) return name;
+  const first = name.charAt(0).toLocaleUpperCase(intlLocale);
+  return first + name.slice(1);
+}
+
+function capitalizeFirstLetter(value: string, intlLocale: string): string {
+  if (!value) return value;
+  const first = value.charAt(0).toLocaleUpperCase(intlLocale);
+  return first + value.slice(1);
+}
+
+function intlLocaleForApp(locale: Locale): string {
+  switch (locale) {
+    case "bs":
+      return "bs-BA";
+    case "hr":
+      return "hr-HR";
+    case "sl":
+      return "sl-SI";
+    default:
+      return "en-GB";
+  }
+}
 
 export default function Topbar({
   userEmail,
   pageTitle,
+  locale,
   onMenuClick,
 }: {
   userEmail: string;
   pageTitle: string;
+  locale: Locale;
   onMenuClick: () => void;
 }) {
   const t = useTranslations("topbar");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const clock = useMemo(() => {
+    const iso = now.toISOString();
+    const dow = now.getDay();
+    const dayNum = now.getDate();
+    const monthIndex = now.getMonth();
+    const yearNum = now.getFullYear();
+    const pad2 = (n: number) => String(n).padStart(2, "0");
+    const timeDigits = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+
+    if (locale === "bs") {
+      const monthName = capitalizeFirstLetter(
+        t(`clock.month.${monthIndex}` as "clock.month.0"),
+        "bs-BA"
+      );
+      return {
+        weekdayLong: t(`clock.weekdayLong.${dow}` as "clock.weekdayLong.0"),
+        weekdayShort: t(`clock.weekdayShort.${dow}` as "clock.weekdayShort.0"),
+        dateStr: `${dayNum}. ${monthName} ${yearNum}.`,
+        timeStr: timeDigits,
+        iso,
+      };
+    }
+
+    const loc = intlLocaleForApp(locale);
+    let weekdayLong = new Intl.DateTimeFormat(loc, { weekday: "long" }).format(now);
+    if (locale === "hr" || locale === "sl") {
+      weekdayLong = capitalizeWeekdayLong(weekdayLong, loc);
+    }
+    const weekdayShort = new Intl.DateTimeFormat(loc, { weekday: "short" }).format(now);
+    const dateParts = new Intl.DateTimeFormat(loc, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).formatToParts(now);
+    const dateStr = dateParts
+      .map((part) =>
+        part.type === "month" ? capitalizeFirstLetter(part.value, loc) : part.value
+      )
+      .join("");
+    const timeStr = new Intl.DateTimeFormat(loc, {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(now);
+    return { weekdayLong, weekdayShort, dateStr, timeStr, iso };
+  }, [now, locale, t]);
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4">
+    <header className="flex h-14 shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 sm:px-4">
       {/* Left: mobile menu + page title */}
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
         <button
           type="button"
           onClick={onMenuClick}
@@ -30,11 +110,32 @@ export default function Topbar({
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
           </svg>
         </button>
-        <h1 className="text-sm font-semibold text-slate-900">{pageTitle}</h1>
+        <h1 className="truncate text-sm font-semibold text-slate-900">{pageTitle}</h1>
+      </div>
+
+      {/* Center: weekday, calendar date, clock */}
+      <div className="flex min-w-0 flex-1 items-center justify-center px-1">
+        <time
+          dateTime={clock.iso}
+          suppressHydrationWarning
+          className="max-w-full truncate text-center text-[11px] leading-tight text-slate-600 tabular-nums sm:text-xs md:text-sm"
+          aria-label={t("clockAria")}
+        >
+          <span className="text-slate-500 sm:hidden">{clock.weekdayShort}</span>
+          <span className="hidden text-slate-500 sm:inline">{clock.weekdayLong}</span>
+          <span className="text-slate-300" aria-hidden="true">
+            {" · "}
+          </span>
+          <span className="font-medium text-slate-800">{clock.dateStr}</span>
+          <span className="text-slate-300" aria-hidden="true">
+            {" · "}
+          </span>
+          <span>{clock.timeStr}</span>
+        </time>
       </div>
 
       {/* Right: language switcher + user menu */}
-      <div className="flex items-center gap-1">
+      <div className="flex shrink-0 items-center gap-1">
         <LanguageSwitcher />
 
         <div className="relative">
