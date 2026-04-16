@@ -82,7 +82,7 @@ export default function SalonSettingsForm({
   }
 
   return (
-    <form action={action} className="space-y-5" encType="multipart/form-data">
+    <form action={action} className="space-y-5">
       {/* Logo */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
         <h3 className="text-sm font-semibold text-slate-700 mb-4">{t("logo")}</h3>
