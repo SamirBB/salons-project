@@ -79,6 +79,23 @@
     "logout": "Odjava",
     "clockAria": "Trenutni datum, dan u tjednu i sat"
   },
+  "employeeDetail": {
+    "employeeDetails": "Detalji zaposlenika",
+    "basicInfo": "Osnovno",
+    "workSchedule": "Radni raspored",
+    "workingDays": "Radni dani",
+    "fullName": "Ime i prezime",
+    "phone": "Telefon",
+    "position": "Pozicija",
+    "color": "Boja",
+    "bio": "Bio/Napomena",
+    "save": "Spremi",
+    "saving": "Spremanje...",
+    "changesSaved": "Promjene spremljene.",
+    "inviteEmployee": "Pozovi zaposlenika",
+    "newEmployee": "Novi zaposlenik",
+    "newEmployeeSubtitle": "Pošaljite pozivnicu novom zaposleniku"
+  },
   "uposlenici": {
     "title": "Zaposlenici",
     "subtitle": "{count} zaposlenik(a) u salonu",
@@ -111,7 +128,8 @@
     "yes": "Da",
     "no": "Ne",
     "copyInviteLink": "Kopiraj link pozivnice",
-    "copyLink": "Kopiraj link"
+    "copyLink": "Kopiraj link",
+    "inviteEmployee": "Pozovi zaposlenika"
   },
   "inviteStatus": {
     "pending": "Na čekanju",

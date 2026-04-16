@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { toggleEmployeeStatus, removeEmployee } from "@/app/actions/employees";
 
 type Employee = {
@@ -21,6 +22,7 @@ export default function EmployeeList({
   canManage: boolean;
 }) {
   const t = useTranslations("uposlenici");
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -33,7 +35,8 @@ export default function EmployeeList({
       (e.job_title ?? "").toLowerCase().includes(search.toLowerCase())
   );
 
-  function handleToggle(emp: Employee) {
+  function handleToggle(e: React.MouseEvent, emp: Employee) {
+    e.stopPropagation();
     setLoadingId(emp.id);
     startTransition(async () => {
       await toggleEmployeeStatus(emp.id, emp.is_active);
@@ -41,13 +44,24 @@ export default function EmployeeList({
     });
   }
 
-  function handleDelete(empId: string) {
+  function handleDeleteClick(e: React.MouseEvent, empId: string) {
+    e.stopPropagation();
+    setConfirmDeleteId(empId);
+  }
+
+  function handleDeleteConfirm(e: React.MouseEvent, empId: string) {
+    e.stopPropagation();
     setLoadingId(empId);
     startTransition(async () => {
       await removeEmployee(empId);
       setLoadingId(null);
       setConfirmDeleteId(null);
     });
+  }
+
+  function handleDeleteCancel(e: React.MouseEvent) {
+    e.stopPropagation();
+    setConfirmDeleteId(null);
   }
 
   return (
@@ -75,7 +89,11 @@ export default function EmployeeList({
       {filtered.length > 0 ? (
         <ul className="divide-y divide-slate-100">
           {filtered.map((emp) => (
-            <li key={emp.id} className="flex items-center gap-3 px-5 py-3.5">
+            <li
+              key={emp.id}
+              onClick={() => router.push(`/dashboard/uposlenici/${emp.id}`)}
+              className="flex items-center gap-3 px-5 py-3.5 cursor-pointer hover:bg-slate-50 transition-colors group"
+            >
               {/* Avatar */}
               <div
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
@@ -99,7 +117,7 @@ export default function EmployeeList({
                 <button
                   type="button"
                   disabled={loadingId === emp.id || isPending}
-                  onClick={() => handleToggle(emp)}
+                  onClick={(e) => handleToggle(e, emp)}
                   title={emp.is_active ? t("setInactive") : t("setActive")}
                   className={`text-xs px-2.5 py-1 rounded-full font-medium border transition-colors disabled:opacity-50 ${
                     emp.is_active
@@ -120,19 +138,19 @@ export default function EmployeeList({
               {/* Delete */}
               {canManage && (
                 confirmDeleteId === emp.id ? (
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                     <span className="text-xs text-slate-500">{t("confirmDelete")}</span>
                     <button
                       type="button"
                       disabled={loadingId === emp.id}
-                      onClick={() => handleDelete(emp.id)}
+                      onClick={(e) => handleDeleteConfirm(e, emp.id)}
                       className="text-xs font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
                     >
                       {t("yes")}
                     </button>
                     <button
                       type="button"
-                      onClick={() => setConfirmDeleteId(null)}
+                      onClick={handleDeleteCancel}
                       className="text-xs font-medium text-slate-500 hover:text-slate-700"
                     >
                       {t("no")}
@@ -141,7 +159,7 @@ export default function EmployeeList({
                 ) : (
                   <button
                     type="button"
-                    onClick={() => setConfirmDeleteId(emp.id)}
+                    onClick={(e) => handleDeleteClick(e, emp.id)}
                     title={t("deleteEmployee")}
                     className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
                   >
@@ -151,6 +169,14 @@ export default function EmployeeList({
                   </button>
                 )
               )}
+
+              {/* Chevron */}
+              <svg
+                className="h-4 w-4 text-slate-300 group-hover:text-slate-400 shrink-0 transition-colors"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
             </li>
           ))}
         </ul>

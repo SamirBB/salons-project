@@ -79,6 +79,23 @@
     "logout": "Esci",
     "clockAria": "Data corrente, giorno della settimana e ora"
   },
+  "employeeDetail": {
+    "employeeDetails": "Dettagli dipendente",
+    "basicInfo": "Informazioni base",
+    "workSchedule": "Orario di lavoro",
+    "workingDays": "Giorni lavorativi",
+    "fullName": "Nome e cognome",
+    "phone": "Telefono",
+    "position": "Posizione",
+    "color": "Colore",
+    "bio": "Bio/Note",
+    "save": "Salva",
+    "saving": "Salvataggio...",
+    "changesSaved": "Modifiche salvate.",
+    "inviteEmployee": "Invita dipendente",
+    "newEmployee": "Nuovo dipendente",
+    "newEmployeeSubtitle": "Invia un invito a un nuovo dipendente"
+  },
   "uposlenici": {
     "title": "Dipendenti",
     "subtitle": "{count} dipendente/i nel salone",
@@ -111,7 +128,8 @@
     "yes": "Sì",
     "no": "No",
     "copyInviteLink": "Copia link invito",
-    "copyLink": "Copia link"
+    "copyLink": "Copia link",
+    "inviteEmployee": "Invita dipendente"
   },
   "inviteStatus": {
     "pending": "In attesa",

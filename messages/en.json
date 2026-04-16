@@ -79,6 +79,23 @@
     "logout": "Sign out",
     "clockAria": "Current date, weekday and time"
   },
+  "employeeDetail": {
+    "employeeDetails": "Employee details",
+    "basicInfo": "Basic info",
+    "workSchedule": "Work schedule",
+    "workingDays": "Working days",
+    "fullName": "Full name",
+    "phone": "Phone",
+    "position": "Position",
+    "color": "Color",
+    "bio": "Notes",
+    "save": "Save",
+    "saving": "Saving...",
+    "changesSaved": "Changes saved.",
+    "inviteEmployee": "Invite employee",
+    "newEmployee": "New employee",
+    "newEmployeeSubtitle": "Send an invitation to a new employee"
+  },
   "uposlenici": {
     "title": "Employees",
     "subtitle": "{count} employee(s) in salon",
@@ -111,7 +128,8 @@
     "yes": "Yes",
     "no": "No",
     "copyInviteLink": "Copy invite link",
-    "copyLink": "Copy link"
+    "copyLink": "Copy link",
+    "inviteEmployee": "Invite employee"
   },
   "inviteStatus": {
     "pending": "Pending",

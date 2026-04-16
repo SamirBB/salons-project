@@ -113,6 +113,23 @@
       }
     }
   },
+  "employeeDetail": {
+    "employeeDetails": "Detalji uposlenika",
+    "basicInfo": "Osnovno",
+    "workSchedule": "Radni raspored",
+    "workingDays": "Radni dani",
+    "fullName": "Ime i prezime",
+    "phone": "Telefon",
+    "position": "Pozicija",
+    "color": "Boja",
+    "bio": "Bio/Napomena",
+    "save": "Spremi",
+    "saving": "Spremanje...",
+    "changesSaved": "Promjene spremljene.",
+    "inviteEmployee": "Pozovi uposlenika",
+    "newEmployee": "Novi uposlenik",
+    "newEmployeeSubtitle": "Pošaljite pozivnicu novom uposleniku"
+  },
   "uposlenici": {
     "title": "Uposlenici",
     "subtitle": "{count} uposlenik(a) u salonu",
@@ -145,7 +162,8 @@
     "yes": "Da",
     "no": "Ne",
     "copyInviteLink": "Kopiraj link pozivnice",
-    "copyLink": "Kopiraj link"
+    "copyLink": "Kopiraj link",
+    "inviteEmployee": "Pozovi uposlenika"
   },
   "inviteStatus": {
     "pending": "Na čekanju",

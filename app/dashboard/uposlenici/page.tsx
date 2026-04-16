@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
-import InviteForm from "./invite-form";
+import Link from "next/link";
 import InviteList from "./invite-list";
 import EmployeeList from "./employee-list";
 
@@ -26,11 +26,24 @@ export default async function UposleniciPage() {
 
   return (
     <div className="max-w-4xl space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold text-slate-900">{t("title")}</h2>
-        <p className="text-sm text-slate-500 mt-0.5">
-          {t("subtitle", { count: employees?.length ?? 0 })}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">{t("title")}</h2>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {t("subtitle", { count: employees?.length ?? 0 })}
+          </p>
+        </div>
+        {canManage && (
+          <Link
+            href="/dashboard/uposlenici/novi"
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            {t("inviteEmployee")}
+          </Link>
+        )}
       </div>
 
       <EmployeeList
@@ -38,13 +51,8 @@ export default async function UposleniciPage() {
         canManage={canManage}
       />
 
-      {canManage && (
-        <>
-          <InviteForm />
-          {invitations && invitations.length > 0 && (
-            <InviteList invitations={invitations} />
-          )}
-        </>
+      {canManage && invitations && invitations.length > 0 && (
+        <InviteList invitations={invitations} />
       )}
     </div>
   );
