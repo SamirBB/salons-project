@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import EmployeeBasicForm from "./employee-basic-form";
 import EmployeeScheduleForm from "./employee-schedule-form";
+import EmployeeServicesForm from "./employee-services-form";
 import type { WorkingHours } from "@/app/actions/employees";
 
 export default async function EmployeeDetailPage({
@@ -36,6 +37,29 @@ export default async function EmployeeDetailPage({
   const canManage = session.role === "owner" || session.role === "manager";
   const salonSchedule = (tenant?.working_hours ?? {}) as WorkingHours;
   const employeeSchedule = (employee.working_hours ?? {}) as WorkingHours;
+
+  // Fetch services for assignment (owner/manager only)
+  let allServices: { id: string; name: string; color: string | null; category: string | null }[] = [];
+  let assignedServiceIds: string[] = [];
+
+  if (canManage) {
+    const { data: services } = await supabase
+      .from("services")
+      .select("id, name, color, category")
+      .eq("tenant_id", session.tenantId)
+      .eq("is_active", true)
+      .order("category", { nullsFirst: true })
+      .order("name");
+
+    allServices = services ?? [];
+
+    const { data: assigned } = await supabase
+      .from("employee_services")
+      .select("service_id")
+      .eq("employee_id", id);
+
+    assignedServiceIds = (assigned ?? []).map((r) => r.service_id);
+  }
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -89,6 +113,15 @@ export default async function EmployeeDetailPage({
         employeeSchedule={employeeSchedule}
         salonSchedule={salonSchedule}
       />
+
+      {/* Section C: Services */}
+      {canManage && (
+        <EmployeeServicesForm
+          employeeId={employee.id}
+          allServices={allServices}
+          assignedIds={assignedServiceIds}
+        />
+      )}
     </div>
   );
 }
