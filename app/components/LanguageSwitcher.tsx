@@ -6,11 +6,13 @@ import { useLocale, useTranslations } from "next-intl";
 import { setLocale } from "@/app/actions/locale";
 import { SUPPORTED_LOCALES, type Locale } from "@/lib/locale";
 
-const LOCALE_CONFIG: Record<Locale, { flag: string; label: string }> = {
-  bs: { flag: "🇧🇦", label: "Bosanski" },
-  hr: { flag: "🇭🇷", label: "Hrvatski" },
-  en: { flag: "🇬🇧", label: "English" },
-  sl: { flag: "🇸🇮", label: "Slovenščina" },
+const LOCALE_CONFIG: Record<Locale, { flag: string; label: string; short: string }> = {
+  bs: { flag: "🇧🇦", label: "Bosanski",   short: "BS" },
+  hr: { flag: "🇭🇷", label: "Hrvatski",   short: "HR" },
+  en: { flag: "🇬🇧", label: "English",    short: "EN" },
+  sl: { flag: "🇸🇮", label: "Slovenščina",short: "SL" },
+  it: { flag: "🇮🇹", label: "Italiano",   short: "IT" },
+  es: { flag: "🇪🇸", label: "Español",    short: "ES" },
 };
 
 export default function LanguageSwitcher() {
@@ -40,7 +42,7 @@ export default function LanguageSwitcher() {
         aria-label={t("label")}
       >
         <span>{current.flag}</span>
-        <span className="hidden sm:block">{current.label}</span>
+        <span className="text-xs font-medium">{current.short}</span>
         <svg className="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
         </svg>
