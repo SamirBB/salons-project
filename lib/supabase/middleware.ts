@@ -6,16 +6,16 @@ const PUBLIC_PATHS = ["/login", "/register", "/auth", "/invite"];
 
 // Mapa dashboard ruta → nav ključ
 const ROUTE_TO_NAV_KEY: Record<string, string> = {
-  "/dashboard/kalendar":     "kalendar",
-  "/dashboard/klijenti":     "klijenti",
-  "/dashboard/poruke":       "poruke",
-  "/dashboard/cjenovnik":    "cjenovnik",
-  "/dashboard/promocije":    "promocije",
-  "/dashboard/uposlenici":   "uposlenici",
-  "/dashboard/roba":         "roba",
-  "/dashboard/narudzbenice": "narudzbenice",
-  "/dashboard/izvjestaji":   "izvjestaji",
-  "/dashboard/profil":       "profil",
+  "/dashboard/calendar":    "calendar",
+  "/dashboard/clients":     "clients",
+  "/dashboard/messages":    "messages",
+  "/dashboard/price-list":  "price-list",
+  "/dashboard/promotions":  "promotions",
+  "/dashboard/employees":   "employees",
+  "/dashboard/inventory":   "inventory",
+  "/dashboard/orders":      "orders",
+  "/dashboard/reports":     "reports",
+  "/dashboard/profile":     "profile",
 };
 
 function getNavKeyForPath(pathname: string): string | null {

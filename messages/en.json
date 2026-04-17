@@ -63,16 +63,16 @@
     }
   },
   "nav": {
-    "kalendar": "Calendar",
-    "klijenti": "Clients",
-    "poruke": "Messages",
-    "cjenovnik": "Price list",
-    "promocije": "Promotions",
-    "uposlenici": "Employees",
-    "roba": "Inventory",
-    "narudzbenice": "Orders",
-    "izvjestaji": "Reports",
-    "profil": "Profile",
+    "calendar": "Calendar",
+    "clients": "Clients",
+    "messages": "Messages",
+    "price-list": "Price list",
+    "promotions": "Promotions",
+    "employees": "Employees",
+    "inventory": "Inventory",
+    "orders": "Orders",
+    "reports": "Reports",
+    "profile": "Profile",
     "dashboard": "Dashboard"
   },
   "topbar": {

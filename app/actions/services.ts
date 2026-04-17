@@ -78,7 +78,7 @@ export async function createService(
 
   if (error) return { error: "createError" };
 
-  revalidatePath("/dashboard/cjenovnik");
+  revalidatePath("/dashboard/price-list");
   return { id: data.id };
 }
 
@@ -113,8 +113,8 @@ export async function updateService(
 
   if (error) return { error: "updateError" };
 
-  revalidatePath("/dashboard/cjenovnik");
-  revalidatePath(`/dashboard/cjenovnik/${serviceId}`);
+  revalidatePath("/dashboard/price-list");
+  revalidatePath(`/dashboard/price-list/${serviceId}`);
   return { success: true };
 }
 
@@ -137,7 +137,7 @@ export async function toggleServiceActive(
 
   if (error) return { error: "updateError" };
 
-  revalidatePath("/dashboard/cjenovnik");
+  revalidatePath("/dashboard/price-list");
   return {};
 }
 
@@ -159,7 +159,7 @@ export async function deleteService(
 
   if (error) return { error: "deleteError" };
 
-  revalidatePath("/dashboard/cjenovnik");
+  revalidatePath("/dashboard/price-list");
   return {};
 }
 
@@ -260,7 +260,7 @@ export async function syncEmployeeServices(
     if (insertError) return { error: "updateError" };
   }
 
-  revalidatePath(`/dashboard/uposlenici/${employeeId}`);
+  revalidatePath(`/dashboard/employees/${employeeId}`);
   return {};
 }
 
@@ -299,6 +299,6 @@ export async function syncServiceEmployees(
     if (insertError) return { error: "updateError" };
   }
 
-  revalidatePath(`/dashboard/cjenovnik/${serviceId}`);
+  revalidatePath(`/dashboard/price-list/${serviceId}`);
   return {};
 }

@@ -38,10 +38,10 @@ export default function ServiceForm({ mode, service }: Props) {
 
   useEffect(() => {
     if (state && "id" in state && state.id) {
-      router.push(`/dashboard/cjenovnik/${state.id}`);
+      router.push(`/dashboard/price-list/${state.id}`);
     }
     if (state && "success" in state && state.success) {
-      router.push(`/dashboard/cjenovnik/${service!.id}`);
+      router.push(`/dashboard/price-list/${service!.id}`);
     }
   }, [state]);
 

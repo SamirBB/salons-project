@@ -66,7 +66,7 @@ export default async function EmployeeDetailPage({
       {/* Back navigation */}
       <div className="flex items-center gap-3">
         <Link
-          href="/dashboard/uposlenici"
+          href="/dashboard/employees"
           className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
