@@ -31,7 +31,7 @@ export default async function CjenovnikPage() {
         </div>
         {canManage && (
           <Link
-            href="/dashboard/cjenovnik/nova"
+            href="/dashboard/price-list/new"
             className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
           >
             <span className="text-lg leading-none">+</span>

@@ -134,7 +134,7 @@ export default function ClientList({
             return (
               <li
                 key={c.id}
-                onClick={() => router.push(`/dashboard/klijenti/${c.id}`)}
+                onClick={() => router.push(`/dashboard/clients/${c.id}`)}
                 className="flex items-center gap-3 px-5 py-3.5 cursor-pointer hover:bg-slate-50 transition-colors group"
               >
                 <ListAvatar url={c.photo_url} letter={initial} />

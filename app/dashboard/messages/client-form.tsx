@@ -272,11 +272,11 @@ export default function ClientForm({ mode, clientId, canManage, initial }: Props
           const up = await uploadClientPhoto(newId, fd);
           if ("error" in up) {
             setMessage({ type: "err", text: t(`errors.${up.error}`) });
-            router.push(`/dashboard/klijenti/${newId}`);
+            router.push(`/dashboard/clients/${newId}`);
             return;
           }
         }
-        router.push(`/dashboard/klijenti/${newId}`);
+        router.push(`/dashboard/clients/${newId}`);
         return;
       }
 
@@ -534,7 +534,7 @@ export default function ClientForm({ mode, clientId, canManage, initial }: Props
           {isPending ? t("saving") : mode === "create" ? t("createButton") : t("saveButton")}
         </button>
         <Link
-          href="/dashboard/klijenti"
+          href="/dashboard/clients"
           className="text-sm text-slate-500 hover:text-slate-700 transition-colors"
         >
           {t("cancel")}

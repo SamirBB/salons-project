@@ -71,7 +71,7 @@ export default function EmployeeServicesForm({ employeeId, allServices, assigned
         <div className="text-center py-6">
           <p className="text-sm text-slate-400">{t("noServicesYet")}</p>
           <Link
-            href="/dashboard/cjenovnik/nova"
+            href="/dashboard/price-list/new"
             className="mt-2 inline-flex text-xs text-indigo-600 hover:underline"
           >
             {tC("addService")} →

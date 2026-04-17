@@ -5,7 +5,7 @@ import { getSession } from "@/lib/session";
 import { ROLE_PERMISSIONS } from "@/lib/roles";
 import ClientList, { type ClientListRow } from "./client-list";
 
-export default async function KlijentiPage() {
+export default async function ClientsPage() {
   const session = await getSession();
   const supabase = await createClient();
   const t = await getTranslations("klijenti");
@@ -25,9 +25,7 @@ export default async function KlijentiPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">{t("title")}</h2>
-          <p className="text-sm text-slate-500 mt-0.5">
-            {t("subtitle", { count: clients?.length ?? 0 })}
-          </p>
+          <p className="text-sm text-slate-500 mt-0.5">{t("subtitle", { count: clients?.length ?? 0 })}</p>
         </div>
         <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
           <a
@@ -44,7 +42,7 @@ export default async function KlijentiPage() {
           </a>
           {canManage && (
             <Link
-              href="/dashboard/klijenti/novi"
+              href="/dashboard/clients/new"
               className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

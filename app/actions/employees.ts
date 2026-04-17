@@ -29,7 +29,7 @@ export async function toggleEmployeeStatus(employeeId: string, currentStatus: bo
 
   if (error) return { error: "Greška pri promjeni statusa." };
 
-  revalidatePath("/dashboard/uposlenici");
+  revalidatePath("/dashboard/employees");
   return { success: true };
 }
 
@@ -49,7 +49,7 @@ export async function removeEmployee(employeeId: string) {
 
   if (error) return { error: "Greška pri brisanju uposlenika." };
 
-  revalidatePath("/dashboard/uposlenici");
+  revalidatePath("/dashboard/employees");
   return { success: true };
 }
 
@@ -79,8 +79,8 @@ export async function updateEmployee(
 
   if (error) return { error: "Greška pri ažuriranju podataka." };
 
-  revalidatePath("/dashboard/uposlenici");
-  revalidatePath(`/dashboard/uposlenici/${employeeId}`);
+  revalidatePath("/dashboard/employees");
+  revalidatePath(`/dashboard/employees/${employeeId}`);
   return { success: true };
 }
 
@@ -104,6 +104,6 @@ export async function updateEmployeeSchedule(
 
   if (error) return { error: "Greška pri ažuriranju rasporeda." };
 
-  revalidatePath(`/dashboard/uposlenici/${employeeId}`);
+  revalidatePath(`/dashboard/employees/${employeeId}`);
   return { success: true };
 }

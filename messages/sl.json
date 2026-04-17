@@ -63,16 +63,16 @@
     }
   },
   "nav": {
-    "kalendar": "Koledar",
-    "klijenti": "Stranke",
-    "poruke": "Sporočila",
-    "cjenovnik": "Cenik",
-    "promocije": "Promocije",
-    "uposlenici": "Zaposleni",
-    "roba": "Zaloga blaga",
-    "narudzbenice": "Naročila",
-    "izvjestaji": "Poročila",
-    "profil": "Profil",
+    "calendar": "Koledar",
+    "clients": "Stranke",
+    "messages": "Sporočila",
+    "price-list": "Cenik",
+    "promotions": "Promocije",
+    "employees": "Zaposleni",
+    "inventory": "Zaloga blaga",
+    "orders": "Naročila",
+    "reports": "Poročila",
+    "profile": "Profil",
     "dashboard": "Nadzorna plošča"
   },
   "topbar": {

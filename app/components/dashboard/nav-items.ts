@@ -8,16 +8,16 @@ export type NavItem = {
 };
 
 export const ALL_NAV_ITEMS: NavItem[] = [
-  { key: "kalendar",     title: "Kalendar",      href: "/dashboard/kalendar",     icon: "calendar"   },
-  { key: "klijenti",     title: "Klijenti",       href: "/dashboard/klijenti",     icon: "users"      },
-  { key: "poruke",       title: "Poruke",          href: "/dashboard/poruke",       icon: "mail"       },
-  { key: "cjenovnik",    title: "Cjenovnik",       href: "/dashboard/cjenovnik",    icon: "tag"        },
-  { key: "promocije",    title: "Promocije",       href: "/dashboard/promocije",    icon: "gift"       },
-  { key: "uposlenici",   title: "Uposlenici",      href: "/dashboard/uposlenici",   icon: "briefcase"  },
-  { key: "roba",         title: "Stanje robe",     href: "/dashboard/roba",         icon: "box"        },
-  { key: "narudzbenice", title: "Narudžbenice",    href: "/dashboard/narudzbenice", icon: "clipboard"  },
-  { key: "izvjestaji",   title: "Izvještaji",      href: "/dashboard/izvjestaji",   icon: "chart"      },
-  { key: "profil",       title: "Profil",          href: "/dashboard/profil",       icon: "settings"   },
+  { key: "calendar",   title: "Calendar",    href: "/dashboard/calendar",    icon: "calendar"  },
+  { key: "clients",    title: "Clients",     href: "/dashboard/clients",     icon: "users"     },
+  { key: "messages",   title: "Messages",    href: "/dashboard/messages",    icon: "mail"      },
+  { key: "price-list", title: "Price list",  href: "/dashboard/price-list",  icon: "tag"       },
+  { key: "promotions", title: "Promotions",  href: "/dashboard/promotions",  icon: "gift"      },
+  { key: "employees",  title: "Employees",   href: "/dashboard/employees",   icon: "briefcase" },
+  { key: "inventory",  title: "Inventory",   href: "/dashboard/inventory",   icon: "box"       },
+  { key: "orders",     title: "Orders",      href: "/dashboard/orders",      icon: "clipboard" },
+  { key: "reports",    title: "Reports",     href: "/dashboard/reports",     icon: "chart"     },
+  { key: "profile",    title: "Profile",     href: "/dashboard/profile",     icon: "settings"  },
 ];
 
 export function getNavItemsForRole(role: Role): NavItem[] {

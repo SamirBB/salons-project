@@ -60,7 +60,7 @@ export async function createInvite(
 
   const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/invite/${invite.token}`;
 
-  revalidatePath("/dashboard/uposlenici");
+  revalidatePath("/dashboard/employees");
   return { success: true, inviteUrl };
 }
 

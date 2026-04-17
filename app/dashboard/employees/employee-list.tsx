@@ -91,7 +91,7 @@ export default function EmployeeList({
           {filtered.map((emp) => (
             <li
               key={emp.id}
-              onClick={() => router.push(`/dashboard/uposlenici/${emp.id}`)}
+              onClick={() => router.push(`/dashboard/employees/${emp.id}`)}
               className="flex items-center gap-3 px-5 py-3.5 cursor-pointer hover:bg-slate-50 transition-colors group"
             >
               {/* Avatar */}

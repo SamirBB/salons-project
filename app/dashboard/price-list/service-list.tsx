@@ -89,7 +89,7 @@ export default function ServiceList({ services, canManage }: Props) {
             {items.map((service) => (
               <div
                 key={service.id}
-                onClick={() => canManage && router.push(`/dashboard/cjenovnik/${service.id}`)}
+                onClick={() => canManage && router.push(`/dashboard/price-list/${service.id}`)}
                 className={`group relative rounded-2xl border bg-white shadow-sm transition-all ${
                   canManage ? "cursor-pointer hover:border-indigo-300 hover:shadow-md" : ""
                 } ${service.is_active ? "border-slate-200" : "border-slate-100 opacity-60"}`}
