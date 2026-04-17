@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!NAV_ACCESS[session.role].includes("klijenti")) {
+  if (!NAV_ACCESS[session.role].includes("clients")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
