@@ -6,6 +6,7 @@ import { getSession } from "@/lib/session";
 import { ROLE_PERMISSIONS } from "@/lib/roles";
 import { clientDisplayName, clientInitialLetter } from "@/lib/clients";
 import ClientForm from "../client-form";
+import TreatmentKarton from "./treatment-karton";
 
 function dateToInputValue(value: string | null): string {
   if (!value) return "";
@@ -34,11 +35,27 @@ export default async function ClientDetailPage({
   if (!client) notFound();
 
   const canManage = ROLE_PERMISSIONS[session.role].canManageClients;
+
+  const [{ data: treatments }, { data: employees }] = await Promise.all([
+    supabase
+      .from("client_treatments")
+      .select("*, employees(full_name, color)")
+      .eq("client_id", id)
+      .eq("tenant_id", session.tenantId)
+      .order("treated_at", { ascending: false }),
+    supabase
+      .from("employees")
+      .select("id, full_name, color")
+      .eq("tenant_id", session.tenantId)
+      .eq("is_active", true)
+      .order("full_name"),
+  ]);
   const display = clientDisplayName(client);
   const initialLetter = clientInitialLetter(display);
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="space-y-6">
+      {/* Breadcrumb */}
       <div className="flex items-center gap-3">
         <Link
           href="/dashboard/clients"
@@ -51,6 +68,7 @@ export default async function ClientDetailPage({
         </Link>
       </div>
 
+      {/* Client header — avatar, ime, export */}
       <div className="flex flex-wrap items-center gap-3">
         {client.photo_url ? (
           <img
@@ -110,6 +128,14 @@ export default async function ClientDetailPage({
           instagram_reviewed: client.instagram_reviewed,
           legacy_full_name: client.full_name,
         }}
+      />
+
+      <TreatmentKarton
+        clientId={client.id}
+        treatments={(treatments ?? []) as any}
+        employees={employees ?? []}
+        canManage={canManage}
+        currentEmployeeId={session.employeeId}
       />
     </div>
   );

@@ -354,3 +354,86 @@ export async function toggleClientActive(clientId: string, currentStatus: boolea
   revalidatePath(`/dashboard/klijenti/${clientId}`);
   return { success: true };
 }
+
+// ─── TREATMENT KARTON ─────────────────────────────────────────────
+
+export type Treatment = {
+  id: string;
+  client_id: string;
+  employee_id: string | null;
+  session_number: number | null;
+  treated_at: string;
+  zone: string | null;
+  treatment_type: string | null;
+  phototype: string | null;
+  energy_level: string | null;
+  impulses_count: number | null;
+  notes: string | null;
+  side_effects: string | null;
+  amount_charged: number | null;
+  invoice_number: string | null;
+  is_trial: boolean;
+  created_at: string;
+  employees?: { full_name: string; color: string | null } | null;
+};
+
+export async function createTreatment(
+  clientId: string,
+  data: Omit<Treatment, "id" | "client_id" | "created_at" | "employees">
+) {
+  const session = await getSession();
+  const supabase = await createClient();
+
+  const { error } = await supabase.from("client_treatments").insert({
+    tenant_id: session.tenantId,
+    client_id: clientId,
+    ...data,
+  });
+
+  if (error) return { error: "createError" as const };
+
+  await supabase
+    .from("clients")
+    .update({ last_visit_at: new Date().toISOString(), updated_by: session.userId, updated_at: new Date().toISOString() })
+    .eq("id", clientId)
+    .eq("tenant_id", session.tenantId);
+
+  revalidatePath(`/dashboard/clients/${clientId}`);
+  return { success: true as const };
+}
+
+export async function updateTreatment(
+  treatmentId: string,
+  clientId: string,
+  data: Partial<Omit<Treatment, "id" | "client_id" | "created_at" | "employees">>
+) {
+  const session = await getSession();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("client_treatments")
+    .update(data)
+    .eq("id", treatmentId)
+    .eq("tenant_id", session.tenantId);
+
+  if (error) return { error: "updateError" as const };
+
+  revalidatePath(`/dashboard/clients/${clientId}`);
+  return { success: true as const };
+}
+
+export async function deleteTreatment(treatmentId: string, clientId: string) {
+  const session = await getSession();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("client_treatments")
+    .delete()
+    .eq("id", treatmentId)
+    .eq("tenant_id", session.tenantId);
+
+  if (error) return { error: "deleteError" as const };
+
+  revalidatePath(`/dashboard/clients/${clientId}`);
+  return { success: true as const };
+}

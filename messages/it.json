@@ -326,6 +326,44 @@
       "badPhotoType": "Formati ammessi: JPG, PNG, WebP.",
       "uploadError": "Caricamento foto non riuscito. Controlla le policy del bucket salon-assets.",
       "notFound": "Cliente non trovato."
+    },
+    "karton": {
+      "title": "Scheda cliente",
+      "subtitle": "{count} trattamento/i",
+      "addTreatment": "Nuovo trattamento",
+      "newTreatment": "Nuovo trattamento",
+      "editTreatment": "Modifica trattamento",
+      "noTreatments": "Ancora nessun trattamento per questo cliente.",
+      "noTreatmentsHint": "Aggiungi il primo trattamento con il pulsante sopra.",
+      "isTrial": "Trattamento di prova",
+      "sessionNumber": "N° sessione",
+      "employee": "Dipendente",
+      "noEmployee": "— nessun dipendente —",
+      "zonePlaceholder": "es. Gambe",
+      "sideEffects": "Effetti collaterali",
+      "sideEffectsPlaceholder": "es. arrossamento",
+      "invoicePlaceholder": "es. R-2024-001",
+      "notesPlaceholder": "Note...",
+      "cancel": "Annulla",
+      "saving": "Salvataggio...",
+      "saveButton": "Salva",
+      "yes": "Sì",
+      "no": "No",
+      "col": {
+        "date": "Data",
+        "zone": "Zona",
+        "type": "Tipo",
+        "phototype": "Fototipo",
+        "energy": "Energia",
+        "impulses": "Impulsi",
+        "notes": "Note",
+        "amount": "Importo",
+        "invoice": "Fattura"
+      },
+      "errors": {
+        "generic": "Errore nel salvataggio del trattamento.",
+        "noPermission": "Non hai il permesso per questa azione."
+      }
     }
   },
   "klijentiExport": {

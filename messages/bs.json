@@ -360,6 +360,44 @@
       "badPhotoType": "Dozvoljeni su JPG, PNG i WebP.",
       "uploadError": "Greška pri uploadu slike. Provjerite Storage pravila za bucket salon-assets (putanja tenant_id/clients/…).",
       "notFound": "Klijent nije pronađen."
+    },
+    "karton": {
+      "title": "Karton klijenta",
+      "subtitle": "{count} tretman(a)",
+      "addTreatment": "Novi tretman",
+      "newTreatment": "Novi tretman",
+      "editTreatment": "Uredi tretman",
+      "noTreatments": "Još nema tretmana za ovog klijenta.",
+      "noTreatmentsHint": "Dodajte prvi tretman klikom na dugme iznad.",
+      "isTrial": "Probni tretman",
+      "sessionNumber": "Br. sesije",
+      "employee": "Radnik",
+      "noEmployee": "— bez radnika —",
+      "zonePlaceholder": "npr. Noge",
+      "sideEffects": "Nuspojave",
+      "sideEffectsPlaceholder": "npr. crvenilo",
+      "invoicePlaceholder": "npr. R-2024-001",
+      "notesPlaceholder": "Napomene...",
+      "cancel": "Otkaži",
+      "saving": "Spremanje...",
+      "saveButton": "Spremi",
+      "yes": "Da",
+      "no": "Ne",
+      "col": {
+        "date": "Datum",
+        "zone": "Zona",
+        "type": "Vrsta",
+        "phototype": "Fototip",
+        "energy": "Energija",
+        "impulses": "Impulsi",
+        "notes": "Napomene",
+        "amount": "Iznos",
+        "invoice": "Račun"
+      },
+      "errors": {
+        "generic": "Greška pri čuvanju tretmana.",
+        "noPermission": "Nemate dozvolu za ovu akciju."
+      }
     }
   },
   "klijentiExport": {

@@ -126,65 +126,92 @@ export default function ClientList({
       </div>
 
       {filtered.length > 0 ? (
-        <ul className="divide-y divide-slate-100">
-          {filtered.map((c) => {
-            const visitLabel = formatVisit(c.last_visit_at);
-            const display = clientDisplayName(c);
-            const initial = clientInitialLetter(display);
-            return (
-              <li
-                key={c.id}
-                onClick={() => router.push(`/dashboard/clients/${c.id}`)}
-                className="flex items-center gap-3 px-5 py-3.5 cursor-pointer hover:bg-slate-50 transition-colors group"
-              >
-                <ListAvatar url={c.photo_url} letter={initial} />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-slate-900">{display}</p>
-                  <p className="text-xs text-slate-500 truncate">
-                    {[c.phone, c.email].filter(Boolean).join(" · ") || "—"}
-                  </p>
-                  {visitLabel && (
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {t("lastVisit")}: {visitLabel}
-                    </p>
-                  )}
-                </div>
-                {canManage ? (
-                  <button
-                    type="button"
-                    disabled={loadingId === c.id || isPending}
-                    onClick={(e) => handleToggle(e, c)}
-                    title={c.is_active ? t("setInactive") : t("setActive")}
-                    className={`text-xs px-2.5 py-1 rounded-full font-medium border transition-colors disabled:opacity-50 shrink-0 ${
-                      c.is_active
-                        ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                        : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200"
-                    }`}
-                  >
-                    {loadingId === c.id ? "..." : c.is_active ? t("active") : t("inactive")}
-                  </button>
-                ) : (
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
-                      c.is_active ? "bg-green-50 text-green-700" : "bg-slate-100 text-slate-500"
-                    }`}
-                  >
-                    {c.is_active ? t("active") : t("inactive")}
-                  </span>
-                )}
-                <svg
-                  className="h-4 w-4 text-slate-300 group-hover:text-slate-400 shrink-0 transition-colors"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
+        <>
+          {/* Table header — visible md+ */}
+          <div className="hidden md:grid md:grid-cols-[auto_1fr_1fr_1fr_auto_auto] lg:grid-cols-[auto_1fr_1fr_1fr_1fr_auto_auto] items-center gap-x-4 px-5 py-2 border-b border-slate-100 bg-slate-50">
+            <div className="w-9" />
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">{t("nameSummary")}</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">{t("phoneLabel")}</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">{t("emailLabel")}</span>
+            <span className="hidden lg:block text-xs font-semibold uppercase tracking-wide text-slate-400">{t("lastVisit")}</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">{t("active")}</span>
+            <div className="w-4" />
+          </div>
+
+          <ul className="divide-y divide-slate-100">
+            {filtered.map((c) => {
+              const visitLabel = formatVisit(c.last_visit_at);
+              const display = clientDisplayName(c);
+              const initial = clientInitialLetter(display);
+              return (
+                <li
+                  key={c.id}
+                  onClick={() => router.push(`/dashboard/clients/${c.id}`)}
+                  className="cursor-pointer hover:bg-slate-50 transition-colors group"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
-              </li>
-            );
-          })}
-        </ul>
+                  {/* Mobile layout */}
+                  <div className="flex items-center gap-3 px-5 py-3.5 md:hidden">
+                    <ListAvatar url={c.photo_url} letter={initial} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-slate-900">{display}</p>
+                      <p className="text-xs text-slate-500 truncate">
+                        {[c.phone, c.email].filter(Boolean).join(" · ") || "—"}
+                      </p>
+                      {visitLabel && (
+                        <p className="text-xs text-slate-400 mt-0.5">{t("lastVisit")}: {visitLabel}</p>
+                      )}
+                    </div>
+                    {canManage ? (
+                      <button
+                        type="button"
+                        disabled={loadingId === c.id || isPending}
+                        onClick={(e) => handleToggle(e, c)}
+                        title={c.is_active ? t("setInactive") : t("setActive")}
+                        className={`text-xs px-2.5 py-1 rounded-full font-medium border transition-colors disabled:opacity-50 shrink-0 ${c.is_active ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100" : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200"}`}
+                      >
+                        {loadingId === c.id ? "..." : c.is_active ? t("active") : t("inactive")}
+                      </button>
+                    ) : (
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${c.is_active ? "bg-green-50 text-green-700" : "bg-slate-100 text-slate-500"}`}>
+                        {c.is_active ? t("active") : t("inactive")}
+                      </span>
+                    )}
+                    <svg className="h-4 w-4 text-slate-300 group-hover:text-slate-400 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </div>
+
+                  {/* Desktop table layout md+ */}
+                  <div className="hidden md:grid md:grid-cols-[auto_1fr_1fr_1fr_auto_auto] lg:grid-cols-[auto_1fr_1fr_1fr_1fr_auto_auto] items-center gap-x-4 px-5 py-3">
+                    <ListAvatar url={c.photo_url} letter={initial} />
+                    <p className="text-sm font-medium text-slate-900 truncate">{display}</p>
+                    <p className="text-sm text-slate-500 truncate">{c.phone || "—"}</p>
+                    <p className="text-sm text-slate-500 truncate">{c.email || "—"}</p>
+                    <p className="hidden lg:block text-sm text-slate-400 truncate whitespace-nowrap">{visitLabel || "—"}</p>
+                    {canManage ? (
+                      <button
+                        type="button"
+                        disabled={loadingId === c.id || isPending}
+                        onClick={(e) => handleToggle(e, c)}
+                        title={c.is_active ? t("setInactive") : t("setActive")}
+                        className={`text-xs px-2.5 py-1 rounded-full font-medium border transition-colors disabled:opacity-50 whitespace-nowrap ${c.is_active ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100" : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200"}`}
+                      >
+                        {loadingId === c.id ? "..." : c.is_active ? t("active") : t("inactive")}
+                      </button>
+                    ) : (
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${c.is_active ? "bg-green-50 text-green-700" : "bg-slate-100 text-slate-500"}`}>
+                        {c.is_active ? t("active") : t("inactive")}
+                      </span>
+                    )}
+                    <svg className="h-4 w-4 text-slate-300 group-hover:text-slate-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </>
       ) : (
         <div className="px-5 py-8 text-center text-sm text-slate-400">
           {search ? t("noSearchResults") : t("noClients")}

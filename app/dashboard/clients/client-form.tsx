@@ -291,7 +291,7 @@ export default function ClientForm({ mode, clientId, canManage, initial }: Props
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm max-w-3xl">
+    <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       {message && (
         <p
           className={`text-sm rounded-lg px-3 py-2 ${
@@ -343,7 +343,8 @@ export default function ClientForm({ mode, clientId, canManage, initial }: Props
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* Ime, Prezime, Datum rođenja, JMB — 2 kol na sm, 4 kol na lg */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <label htmlFor="client-first" className="block text-sm font-medium text-slate-700 mb-1">
             {t("firstNameLabel")} <span className="text-red-500">*</span>
@@ -372,9 +373,6 @@ export default function ClientForm({ mode, clientId, canManage, initial }: Props
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           />
         </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="client-dob" className="block text-sm font-medium text-slate-700 mb-1">
             {t("dateOfBirthLabel")} <span className="text-red-500">*</span>
@@ -406,22 +404,22 @@ export default function ClientForm({ mode, clientId, canManage, initial }: Props
         </div>
       </div>
 
-      <div>
-        <label htmlFor="client-street" className="block text-sm font-medium text-slate-700 mb-1">
-          {t("streetLabel")} <span className="text-red-500">*</span>
-        </label>
-        <input
-          id="client-street"
-          required
-          value={street}
-          onChange={(e) => setStreet(e.target.value)}
-          placeholder={t("streetPlaceholder")}
-          autoComplete="street-address"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-        />
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* Ulica, Grad, Poštanski — puna širina na sm, 3 kol na lg */}
+      <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-[2fr_1fr_1fr]">
+        <div>
+          <label htmlFor="client-street" className="block text-sm font-medium text-slate-700 mb-1">
+            {t("streetLabel")} <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="client-street"
+            required
+            value={street}
+            onChange={(e) => setStreet(e.target.value)}
+            placeholder={t("streetPlaceholder")}
+            autoComplete="street-address"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          />
+        </div>
         <div>
           <label htmlFor="client-city" className="block text-sm font-medium text-slate-700 mb-1">
             {t("cityLabel")} <span className="text-red-500">*</span>
@@ -452,6 +450,7 @@ export default function ClientForm({ mode, clientId, canManage, initial }: Props
         </div>
       </div>
 
+      {/* Telefon + Email — 2 kol */}
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="client-phone" className="block text-sm font-medium text-slate-700 mb-1">

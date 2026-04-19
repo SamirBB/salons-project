@@ -21,7 +21,7 @@ export default async function ClientsPage() {
   const canManage = ROLE_PERMISSIONS[session.role].canManageClients;
 
   return (
-    <div className="max-w-4xl space-y-6">
+    <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">{t("title")}</h2>

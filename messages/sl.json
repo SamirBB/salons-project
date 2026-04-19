@@ -326,6 +326,44 @@
       "badPhotoType": "Dovoljeni so JPG, PNG in WebP.",
       "uploadError": "Napaka pri nalaganju. Preverite pravila za bucket salon-assets.",
       "notFound": "Stranka ni najdena."
+    },
+    "karton": {
+      "title": "Karton stranke",
+      "subtitle": "{count} tretman(ov)",
+      "addTreatment": "Nov tretman",
+      "newTreatment": "Nov tretman",
+      "editTreatment": "Uredi tretman",
+      "noTreatments": "Za to stranko še ni tretmanov.",
+      "noTreatmentsHint": "Dodajte prvi tretman z gumbom zgoraj.",
+      "isTrial": "Preizkusni tretman",
+      "sessionNumber": "Št. seje",
+      "employee": "Zaposleni",
+      "noEmployee": "— brez zaposlenega —",
+      "zonePlaceholder": "npr. Noge",
+      "sideEffects": "Stranski učinki",
+      "sideEffectsPlaceholder": "npr. rdečina",
+      "invoicePlaceholder": "npr. R-2024-001",
+      "notesPlaceholder": "Opombe...",
+      "cancel": "Prekliči",
+      "saving": "Shranjevanje...",
+      "saveButton": "Shrani",
+      "yes": "Da",
+      "no": "Ne",
+      "col": {
+        "date": "Datum",
+        "zone": "Cona",
+        "type": "Vrsta",
+        "phototype": "Fototip",
+        "energy": "Energija",
+        "impulses": "Impulzi",
+        "notes": "Opombe",
+        "amount": "Znesek",
+        "invoice": "Račun"
+      },
+      "errors": {
+        "generic": "Napaka pri shranjevanju tretmana.",
+        "noPermission": "Nimate dovoljenja za to dejanje."
+      }
     }
   },
   "klijentiExport": {
