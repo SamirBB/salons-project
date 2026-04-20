@@ -361,15 +361,8 @@ export type Treatment = {
   id: string;
   client_id: string;
   employee_id: string | null;
-  session_number: number | null;
   treated_at: string;
-  zone: string | null;
-  treatment_type: string | null;
-  phototype: string | null;
-  energy_level: string | null;
-  impulses_count: number | null;
   notes: string | null;
-  side_effects: string | null;
   amount_charged: number | null;
   invoice_number: string | null;
   is_trial: boolean;

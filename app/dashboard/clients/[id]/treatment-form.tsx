@@ -16,9 +16,6 @@ type Props = {
   roundedTop?: boolean;
 };
 
-const TREATMENT_TYPES = ["IPL", "SHR", "RF", "Elight", "Laser", "Mezoterapija", "Drugi"];
-const PHOTOTYPES = ["I", "II", "III", "IV", "V", "VI"];
-
 export default function TreatmentForm({ clientId, treatment, employees, currentEmployeeId, onClose, roundedTop = true }: Props) {
   const t = useTranslations("klijenti");
   const [isPending, startTransition] = useTransition();
@@ -28,16 +25,9 @@ export default function TreatmentForm({ clientId, treatment, employees, currentE
 
   const [form, setForm] = useState({
     is_trial: treatment?.is_trial ?? false,
-    session_number: treatment?.session_number?.toString() ?? "",
     treated_at: treatment?.treated_at ?? today,
     employee_id: treatment?.employee_id ?? currentEmployeeId ?? "",
-    zone: treatment?.zone ?? "",
-    treatment_type: treatment?.treatment_type ?? "",
-    phototype: treatment?.phototype ?? "",
-    energy_level: treatment?.energy_level ?? "",
-    impulses_count: treatment?.impulses_count?.toString() ?? "",
     notes: treatment?.notes ?? "",
-    side_effects: treatment?.side_effects ?? "",
     amount_charged: treatment?.amount_charged?.toString() ?? "",
     invoice_number: treatment?.invoice_number ?? "",
   });
@@ -52,16 +42,9 @@ export default function TreatmentForm({ clientId, treatment, employees, currentE
 
     const payload = {
       is_trial: form.is_trial,
-      session_number: form.session_number ? parseInt(form.session_number) : null,
       treated_at: form.treated_at,
       employee_id: form.employee_id || null,
-      zone: form.zone || null,
-      treatment_type: form.treatment_type || null,
-      phototype: form.phototype || null,
-      energy_level: form.energy_level || null,
-      impulses_count: form.impulses_count ? parseInt(form.impulses_count) : null,
       notes: form.notes || null,
-      side_effects: form.side_effects || null,
       amount_charged: form.amount_charged ? parseFloat(form.amount_charged) : null,
       invoice_number: form.invoice_number || null,
     };
@@ -99,8 +82,8 @@ export default function TreatmentForm({ clientId, treatment, employees, currentE
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Row 1: trial, sesija, datum, radnik */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {/* Row 1: trial, datum, radnik */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <div className="col-span-2 sm:col-span-1 flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-2.5">
             <input
               type="checkbox"
@@ -112,11 +95,6 @@ export default function TreatmentForm({ clientId, treatment, employees, currentE
             <label htmlFor="is_trial" className="text-sm font-medium text-slate-700 cursor-pointer">
               {t("karton.isTrial")}
             </label>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.sessionNumber")}</label>
-            <input type="number" min="1" value={form.session_number} onChange={(e) => set("session_number", e.target.value)} placeholder="1"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.col.date")} *</label>
@@ -133,56 +111,14 @@ export default function TreatmentForm({ clientId, treatment, employees, currentE
           </div>
         </div>
 
-        {/* Row 2: zona, vrsta, fototip, energija, impulsi */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          <div className="col-span-2 sm:col-span-1">
-            <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.col.zone")}</label>
-            <input type="text" value={form.zone} onChange={(e) => set("zone", e.target.value)} placeholder={t("karton.zonePlaceholder")}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.col.type")}</label>
-            <select value={form.treatment_type} onChange={(e) => set("treatment_type", e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="">—</option>
-              {TREATMENT_TYPES.map((tp) => <option key={tp} value={tp}>{tp}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.col.phototype")}</label>
-            <select value={form.phototype} onChange={(e) => set("phototype", e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="">—</option>
-              {PHOTOTYPES.map((p) => <option key={p} value={p}>{p}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.col.energy")}</label>
-            <input type="text" value={form.energy_level} onChange={(e) => set("energy_level", e.target.value)} placeholder="npr. 15J"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.col.impulses")}</label>
-            <input type="number" min="0" value={form.impulses_count} onChange={(e) => set("impulses_count", e.target.value)} placeholder="0"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
+        {/* Row 2: napomene */}
+        <div>
+          <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.col.notes")}</label>
+          <textarea rows={3} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder={t("karton.notesPlaceholder")}
+            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none" />
         </div>
 
-        {/* Row 3: napomene, nuspojave */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.col.notes")}</label>
-            <textarea rows={2} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder={t("karton.notesPlaceholder")}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.sideEffects")}</label>
-            <textarea rows={2} value={form.side_effects} onChange={(e) => set("side_effects", e.target.value)} placeholder={t("karton.sideEffectsPlaceholder")}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none" />
-          </div>
-        </div>
-
-        {/* Row 4: iznos, račun */}
+        {/* Row 3: iznos, račun */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">{t("karton.col.amount")}</label>

@@ -128,12 +128,7 @@ export default function TreatmentKarton({ clientId, treatments, employees, canMa
                 <tr className="border-b border-slate-100 bg-slate-50">
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 w-8">#</th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.date")}</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.zone")}</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.type")}</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.phototype")}</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.energy")}</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.impulses")}</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 max-w-[180px]">{t("karton.col.notes")}</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.notes")}</th>
                   <th className="text-right text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.amount")}</th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.invoice")}</th>
                   {canManage && <th className="px-4 py-3 w-20" />}
@@ -146,22 +141,13 @@ export default function TreatmentKarton({ clientId, treatments, employees, canMa
                       {tr.is_trial ? (
                         <span className="inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700">P</span>
                       ) : (
-                        <span className="text-slate-400">{tr.session_number ?? treatments.length - idx}</span>
+                        <span className="text-slate-400">{treatments.length - idx}</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{formatDate(tr.treated_at)}</td>
-                    <td className="px-4 py-3 text-slate-700">{tr.zone || "—"}</td>
-                    <td className="px-4 py-3">
-                      {tr.treatment_type ? (
-                        <span className="inline-flex rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">{tr.treatment_type}</span>
-                      ) : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-slate-700">{tr.phototype || "—"}</td>
-                    <td className="px-4 py-3 text-slate-700">{tr.energy_level || "—"}</td>
-                    <td className="px-4 py-3 text-slate-700">{tr.impulses_count ?? "—"}</td>
-                    <td className="px-4 py-3 max-w-[180px]">
-                      <div className="text-slate-700 truncate" title={[tr.notes, tr.side_effects].filter(Boolean).join(" / ")}>
-                        {[tr.notes, tr.side_effects].filter(Boolean).join(" / ") || "—"}
+                    <td className="px-4 py-3 max-w-[300px]">
+                      <div className="text-slate-700 truncate" title={tr.notes ?? ""}>
+                        {tr.notes || "—"}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right font-medium text-slate-800 whitespace-nowrap">{formatPrice(tr.amount_charged)}</td>
