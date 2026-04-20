@@ -336,6 +336,7 @@
       "noTreatments": "Za to stranko še ni tretmanov.",
       "noTreatmentsHint": "Dodajte prvi tretman z gumbom zgoraj.",
       "services": "Storitve",
+      "servicesPlaceholder": "Izberite storitve...",
       "noServicesAvailable": "Ni storitev v ceniku.",
       "employee": "Zaposleni",
       "noEmployee": "— brez zaposlenega —",

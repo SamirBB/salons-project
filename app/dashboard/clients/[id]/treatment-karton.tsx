@@ -160,10 +160,10 @@ export default function TreatmentKarton({
                     #
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
-                    {t("karton.col.date")}
-                  </th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
                     {t("karton.col.services")}
+                  </th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">
+                    {t("karton.col.date")}
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
                     {t("karton.col.notes")}
@@ -183,9 +183,6 @@ export default function TreatmentKarton({
                     <td className="px-4 py-3 text-xs text-slate-400">
                       {treatments.length - idx}
                     </td>
-                    <td className="px-4 py-3 text-slate-700 whitespace-nowrap">
-                      {formatDate(tr.treated_at)}
-                    </td>
                     <td className="px-4 py-3 max-w-[220px]">
                       {tr.services && tr.services.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
@@ -201,6 +198,9 @@ export default function TreatmentKarton({
                       ) : (
                         <span className="text-slate-400">—</span>
                       )}
+                    </td>
+                    <td className="px-4 py-3 text-slate-700 whitespace-nowrap">
+                      {formatDate(tr.treated_at)}
                     </td>
                     <td className="px-4 py-3 max-w-[240px]">
                       <div className="text-slate-700 truncate" title={tr.notes ?? ""}>

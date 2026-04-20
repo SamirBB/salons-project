@@ -336,6 +336,7 @@
       "noTreatments": "Aún no hay tratamientos para este cliente.",
       "noTreatmentsHint": "Añada el primer tratamiento con el botón de arriba.",
       "services": "Servicios",
+      "servicesPlaceholder": "Seleccionar servicios...",
       "noServicesAvailable": "No hay servicios en la lista de precios.",
       "employee": "Empleado",
       "noEmployee": "— sin empleado —",

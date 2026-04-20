@@ -370,6 +370,7 @@
       "noTreatments": "Još nema tretmana za ovog klijenta.",
       "noTreatmentsHint": "Dodajte prvi tretman klikom na dugme iznad.",
       "services": "Usluge",
+      "servicesPlaceholder": "Odaberi usluge...",
       "noServicesAvailable": "Nema usluga u cjenovniku.",
       "employee": "Radnik",
       "noEmployee": "— bez radnika —",

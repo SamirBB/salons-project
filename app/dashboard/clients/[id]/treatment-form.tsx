@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { createTreatment, updateTreatment } from "@/app/actions/clients";
 import type { Treatment, TreatmentData } from "@/app/actions/clients";
 
@@ -30,6 +30,8 @@ export default function TreatmentForm({
   const t = useTranslations("klijenti");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const servicesRef = useRef<HTMLDivElement>(null);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -41,6 +43,18 @@ export default function TreatmentForm({
     amount_charged: treatment?.amount_charged?.toString() ?? "",
     invoice_number: treatment?.invoice_number ?? "",
   });
+
+  // Zatvori popover klikom izvan
+  useEffect(() => {
+    if (!servicesOpen) return;
+    function onMouseDown(e: MouseEvent) {
+      if (servicesRef.current && !servicesRef.current.contains(e.target as Node)) {
+        setServicesOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onMouseDown);
+    return () => document.removeEventListener("mousedown", onMouseDown);
+  }, [servicesOpen]);
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -80,6 +94,11 @@ export default function TreatmentForm({
     });
   }
 
+  const selectedLabels = services
+    .filter((s) => form.service_ids.includes(s.id))
+    .map((s) => s.name)
+    .join(", ");
+
   return (
     <div
       className={`${
@@ -108,7 +127,81 @@ export default function TreatmentForm({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Row 1: datum, radnik */}
+
+        {/* Row 1: Usluge — popover */}
+        <div>
+          <label className="block text-xs font-medium text-slate-500 mb-1">
+            {t("karton.services")}
+          </label>
+          {services.length === 0 ? (
+            <p className="text-sm text-slate-400">{t("karton.noServicesAvailable")}</p>
+          ) : (
+            <div ref={servicesRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setServicesOpen((o) => !o)}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:border-slate-300 transition-colors"
+              >
+                <span
+                  className={`truncate text-left ${
+                    form.service_ids.length === 0 ? "text-slate-400" : "text-slate-700"
+                  }`}
+                >
+                  {form.service_ids.length === 0
+                    ? t("karton.servicesPlaceholder")
+                    : selectedLabels}
+                </span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {form.service_ids.length > 0 && (
+                    <span className="inline-flex items-center rounded-full bg-indigo-100 px-1.5 py-0.5 text-xs font-semibold text-indigo-700">
+                      {form.service_ids.length}
+                    </span>
+                  )}
+                  <svg
+                    className={`w-4 h-4 text-slate-400 transition-transform duration-150 ${
+                      servicesOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+
+              {servicesOpen && (
+                <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+                  {services.map((s) => {
+                    const selected = form.service_ids.includes(s.id);
+                    return (
+                      <label
+                        key={s.id}
+                        className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${
+                          selected ? "bg-indigo-50" : "hover:bg-slate-50"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => toggleService(s.id)}
+                          className="w-4 h-4 rounded accent-indigo-600 shrink-0"
+                        />
+                        <span className="flex-1 text-sm text-slate-700">{s.name}</span>
+                        <span className="text-xs text-slate-400 shrink-0 tabular-nums">
+                          {s.price.toFixed(2).replace(".", ",") + " €"}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Row 2: datum, radnik */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">
@@ -141,48 +234,7 @@ export default function TreatmentForm({
           </div>
         </div>
 
-        {/* Usluge — multi-select chips */}
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-2">
-            {t("karton.services")}
-          </label>
-          {services.length === 0 ? (
-            <p className="text-sm text-slate-400">{t("karton.noServicesAvailable")}</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {services.map((s) => {
-                const selected = form.service_ids.includes(s.id);
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => toggleService(s.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                      selected
-                        ? "border-indigo-300 bg-indigo-100 text-indigo-700"
-                        : "border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:text-indigo-600"
-                    }`}
-                  >
-                    {selected && (
-                      <svg
-                        className="w-3 h-3 shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2.5}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                    {s.name}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Row 2: napomene */}
+        {/* Row 3: napomene */}
         <div>
           <label className="block text-xs font-medium text-slate-500 mb-1">
             {t("karton.col.notes")}
@@ -196,7 +248,7 @@ export default function TreatmentForm({
           />
         </div>
 
-        {/* Row 3: iznos, račun */}
+        {/* Row 4: iznos, račun */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">
@@ -212,9 +264,7 @@ export default function TreatmentForm({
                 placeholder="0.00"
                 className="w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
-                €
-              </span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">€</span>
             </div>
           </div>
           <div>

@@ -336,6 +336,7 @@
       "noTreatments": "Ancora nessun trattamento per questo cliente.",
       "noTreatmentsHint": "Aggiungi il primo trattamento con il pulsante sopra.",
       "services": "Servizi",
+      "servicesPlaceholder": "Seleziona servizi...",
       "noServicesAvailable": "Nessun servizio nel listino prezzi.",
       "employee": "Dipendente",
       "noEmployee": "— nessun dipendente —",
