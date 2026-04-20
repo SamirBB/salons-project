@@ -7,6 +7,7 @@ import { ROLE_PERMISSIONS } from "@/lib/roles";
 import { clientDisplayName, clientInitialLetter } from "@/lib/clients";
 import ClientForm from "../client-form";
 import TreatmentKarton from "./treatment-karton";
+import { getActiveCustomFields } from "@/app/actions/custom-fields";
 
 function dateToInputValue(value: string | null): string {
   if (!value) return "";
@@ -36,7 +37,7 @@ export default async function ClientDetailPage({
 
   const canManage = ROLE_PERMISSIONS[session.role].canManageClients;
 
-  const [{ data: rawTreatments }, { data: employees }, { data: services }] = await Promise.all([
+  const [{ data: rawTreatments }, { data: employees }, { data: services }, customFields] = await Promise.all([
     supabase
       .from("client_treatments")
       .select("*, employees(full_name, color), client_treatment_services(service_id, services(id, name, price))")
@@ -56,6 +57,7 @@ export default async function ClientDetailPage({
       .eq("is_active", true)
       .order("category", { nullsFirst: true })
       .order("name"),
+    getActiveCustomFields(),
   ]);
 
   // Flatten junction table into services array per treatment
@@ -150,6 +152,7 @@ export default async function ClientDetailPage({
         treatments={treatments as any}
         employees={employees ?? []}
         services={(services ?? []) as any}
+        customFields={customFields}
         canManage={canManage}
         currentEmployeeId={session.employeeId}
       />

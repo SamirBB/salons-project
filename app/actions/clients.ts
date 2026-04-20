@@ -367,6 +367,7 @@ export type Treatment = {
   notes: string | null;
   amount_charged: number | null;
   invoice_number: string | null;
+  custom_data?: Record<string, string | number | boolean | null>;
   created_at: string;
   employees?: { full_name: string; color: string | null } | null;
   services?: TreatmentService[];
@@ -378,6 +379,7 @@ export type TreatmentData = {
   notes: string | null;
   amount_charged: number | null;
   invoice_number: string | null;
+  custom_data?: Record<string, string | number | boolean | null>;
 };
 
 export async function createTreatment(

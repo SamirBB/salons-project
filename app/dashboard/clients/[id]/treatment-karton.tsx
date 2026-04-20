@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { deleteTreatment } from "@/app/actions/clients";
 import TreatmentForm from "./treatment-form";
 import type { Treatment } from "@/app/actions/clients";
+import type { CustomField } from "@/app/actions/custom-fields";
 
 type Employee = { id: string; full_name: string; color: string | null };
 type ServiceOption = { id: string; name: string; price: number; category: string | null };
@@ -14,6 +15,7 @@ type Props = {
   treatments: Treatment[];
   employees: Employee[];
   services: ServiceOption[];
+  customFields: CustomField[];
   canManage: boolean;
   currentEmployeeId: string | null;
 };
@@ -28,11 +30,18 @@ function formatPrice(p: number | null) {
   return p.toFixed(2).replace(".", ",") + " €";
 }
 
+function renderCustomValue(value: unknown, fieldType: string): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (fieldType === "boolean") return value === true || value === "true" ? "Da" : "Ne";
+  return String(value);
+}
+
 export default function TreatmentKarton({
   clientId,
   treatments,
   employees,
   services,
+  customFields,
   canManage,
   currentEmployeeId,
 }: Props) {
@@ -132,6 +141,7 @@ export default function TreatmentKarton({
             treatment={editTreatment ?? undefined}
             employees={employees}
             services={services}
+            customFields={customFields}
             currentEmployeeId={currentEmployeeId}
             onClose={() => {
               setShowForm(false);
@@ -168,6 +178,14 @@ export default function TreatmentKarton({
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
                     {t("karton.col.notes")}
                   </th>
+                  {customFields.map((cf) => (
+                    <th
+                      key={cf.id}
+                      className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap"
+                    >
+                      {cf.label}
+                    </th>
+                  ))}
                   <th className="text-right text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
                     {t("karton.col.amount")}
                   </th>
@@ -207,6 +225,11 @@ export default function TreatmentKarton({
                         {tr.notes || "—"}
                       </div>
                     </td>
+                    {customFields.map((cf) => (
+                      <td key={cf.id} className="px-4 py-3 text-slate-600 text-sm whitespace-nowrap">
+                        {renderCustomValue(tr.custom_data?.[cf.field_key], cf.field_type)}
+                      </td>
+                    ))}
                     <td className="px-4 py-3 text-right font-medium text-slate-800 whitespace-nowrap">
                       {formatPrice(tr.amount_charged)}
                     </td>

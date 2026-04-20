@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition, useRef, useEffect } from "react";
 import { createTreatment, updateTreatment } from "@/app/actions/clients";
 import type { Treatment, TreatmentData } from "@/app/actions/clients";
+import type { CustomField } from "@/app/actions/custom-fields";
 
 type Employee = { id: string; full_name: string; color: string | null };
 type ServiceOption = { id: string; name: string; price: number; category: string | null };
@@ -13,6 +14,7 @@ type Props = {
   treatment?: Treatment;
   employees: Employee[];
   services: ServiceOption[];
+  customFields: CustomField[];
   currentEmployeeId: string | null;
   onClose: () => void;
   roundedTop?: boolean;
@@ -23,6 +25,7 @@ export default function TreatmentForm({
   treatment,
   employees,
   services,
+  customFields,
   currentEmployeeId,
   onClose,
   roundedTop = true,
@@ -42,6 +45,20 @@ export default function TreatmentForm({
     notes: treatment?.notes ?? "",
     amount_charged: treatment?.amount_charged?.toString() ?? "",
     invoice_number: treatment?.invoice_number ?? "",
+  });
+
+  // Custom fields state: Record<field_key, string | boolean>
+  const [customData, setCustomData] = useState<Record<string, string | boolean>>(() => {
+    const init: Record<string, string | boolean> = {};
+    customFields.forEach((f) => {
+      const stored = treatment?.custom_data?.[f.field_key];
+      if (f.field_type === "boolean") {
+        init[f.field_key] = stored === true || stored === "true";
+      } else {
+        init[f.field_key] = stored != null ? String(stored) : "";
+      }
+    });
+    return init;
   });
 
   // Zatvori popover klikom izvan
@@ -79,6 +96,7 @@ export default function TreatmentForm({
       notes: form.notes || null,
       amount_charged: form.amount_charged ? parseFloat(form.amount_charged) : null,
       invoice_number: form.invoice_number || null,
+      custom_data: customData,
     };
 
     startTransition(async () => {
@@ -280,6 +298,99 @@ export default function TreatmentForm({
             />
           </div>
         </div>
+
+        {/* Custom fields */}
+        {customFields.length > 0 && (
+          <div className="space-y-4">
+            <div className="border-t border-slate-200/80 pt-1" />
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Dodatna polja
+            </p>
+            {customFields.map((cf) => (
+              <div key={cf.id}>
+                <label className="block text-xs font-medium text-slate-500 mb-1">
+                  {cf.label}
+                  {cf.is_required && <span className="ml-0.5 text-red-400"> *</span>}
+                </label>
+
+                {cf.field_type === "text" && (
+                  <input
+                    type="text"
+                    required={cf.is_required}
+                    value={(customData[cf.field_key] as string) ?? ""}
+                    onChange={(e) =>
+                      setCustomData((d) => ({ ...d, [cf.field_key]: e.target.value }))
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                )}
+
+                {cf.field_type === "textarea" && (
+                  <textarea
+                    required={cf.is_required}
+                    rows={2}
+                    value={(customData[cf.field_key] as string) ?? ""}
+                    onChange={(e) =>
+                      setCustomData((d) => ({ ...d, [cf.field_key]: e.target.value }))
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  />
+                )}
+
+                {cf.field_type === "number" && (
+                  <input
+                    type="number"
+                    step="any"
+                    required={cf.is_required}
+                    value={(customData[cf.field_key] as string) ?? ""}
+                    onChange={(e) =>
+                      setCustomData((d) => ({ ...d, [cf.field_key]: e.target.value }))
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                )}
+
+                {cf.field_type === "boolean" && (
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-2.5">
+                    <input
+                      type="checkbox"
+                      id={`cf_${cf.field_key}`}
+                      checked={(customData[cf.field_key] as boolean) ?? false}
+                      onChange={(e) =>
+                        setCustomData((d) => ({ ...d, [cf.field_key]: e.target.checked }))
+                      }
+                      className="w-4 h-4 rounded accent-indigo-600"
+                    />
+                    <label
+                      htmlFor={`cf_${cf.field_key}`}
+                      className="text-sm text-slate-700 cursor-pointer"
+                    >
+                      {cf.label}
+                    </label>
+                  </div>
+                )}
+
+                {cf.field_type === "select" && (
+                  <select
+                    required={cf.is_required}
+                    value={(customData[cf.field_key] as string) ?? ""}
+                    onChange={(e) =>
+                      setCustomData((d) => ({ ...d, [cf.field_key]: e.target.value }))
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="">— odaberi —</option>
+                    {cf.options.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="flex items-center justify-end gap-3 pt-1">
           <button
