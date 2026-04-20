@@ -392,5 +392,41 @@
     "sl": "Slovenščina",
     "it": "Italiano",
     "es": "Español"
+  },
+  "customFields": {
+    "settingsButton": "Campi trattamento",
+    "pageTitle": "Campi personalizzati del trattamento",
+    "pageSubtitle": "Aggiungi i tuoi campi che appariranno su ogni trattamento. Valido solo per questo salone.",
+    "noFields": "Ancora nessun campo personalizzato.",
+    "noFieldsHint": "Clicca su \"Nuovo campo\" per aggiungerne uno.",
+    "addButton": "Nuovo campo",
+    "labelLabel": "Nome del campo",
+    "labelPlaceholder": "es. Tipo di pelle",
+    "typeLabel": "Tipo di campo",
+    "types": {
+      "text": "Testo",
+      "textarea": "Testo lungo",
+      "number": "Numero",
+      "boolean": "Sì / No",
+      "select": "Lista a discesa"
+    },
+    "optionsLabel": "Opzioni",
+    "optionPlaceholder": "Aggiungi opzione...",
+    "addOption": "Aggiungi",
+    "isRequired": "Campo obbligatorio",
+    "cancel": "Annulla",
+    "saving": "Salvataggio...",
+    "saveChanges": "Salva modifiche",
+    "addField": "Aggiungi campo",
+    "deactivate": "Disattiva",
+    "activate": "Attiva",
+    "confirmYes": "Sì",
+    "confirmNo": "No",
+    "additionalFields": "Campi aggiuntivi",
+    "selectPlaceholder": "— seleziona —",
+    "booleanTrue": "Sì",
+    "booleanFalse": "No",
+    "validationOptions": "Aggiungi almeno un'opzione per la lista a discesa.",
+    "validationLabel": "Il nome del campo è obbligatorio."
   }
 }

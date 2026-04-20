@@ -6,6 +6,7 @@ import { deleteTreatment } from "@/app/actions/clients";
 import TreatmentForm from "./treatment-form";
 import type { Treatment } from "@/app/actions/clients";
 import type { CustomField } from "@/app/actions/custom-fields";
+// useTranslations used twice: "klijenti" + "customFields"
 
 type Employee = { id: string; full_name: string; color: string | null };
 type ServiceOption = { id: string; name: string; price: number; category: string | null };
@@ -30,9 +31,9 @@ function formatPrice(p: number | null) {
   return p.toFixed(2).replace(".", ",") + " €";
 }
 
-function renderCustomValue(value: unknown, fieldType: string): string {
+function renderCustomValue(value: unknown, fieldType: string, boolTrue: string, boolFalse: string): string {
   if (value === null || value === undefined || value === "") return "—";
-  if (fieldType === "boolean") return value === true || value === "true" ? "Da" : "Ne";
+  if (fieldType === "boolean") return value === true || value === "true" ? boolTrue : boolFalse;
   return String(value);
 }
 
@@ -46,6 +47,9 @@ export default function TreatmentKarton({
   currentEmployeeId,
 }: Props) {
   const t = useTranslations("klijenti");
+  const tCF = useTranslations("customFields");
+  const boolTrue = tCF("booleanTrue");
+  const boolFalse = tCF("booleanFalse");
   const [showForm, setShowForm] = useState(false);
   const [editTreatment, setEditTreatment] = useState<Treatment | null>(null);
   const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -227,7 +231,7 @@ export default function TreatmentKarton({
                     </td>
                     {customFields.map((cf) => (
                       <td key={cf.id} className="px-4 py-3 text-slate-600 text-sm whitespace-nowrap">
-                        {renderCustomValue(tr.custom_data?.[cf.field_key], cf.field_type)}
+                        {renderCustomValue(tr.custom_data?.[cf.field_key], cf.field_type, boolTrue, boolFalse)}
                       </td>
                     ))}
                     <td className="px-4 py-3 text-right font-medium text-slate-800 whitespace-nowrap">

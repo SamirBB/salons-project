@@ -392,5 +392,41 @@
     "sl": "Slovenščina",
     "it": "Italiano",
     "es": "Español"
+  },
+  "customFields": {
+    "settingsButton": "Campos de tratamiento",
+    "pageTitle": "Campos personalizados de tratamiento",
+    "pageSubtitle": "Añada sus propios campos que aparecerán en cada tratamiento. Solo aplica a este salón.",
+    "noFields": "Aún no hay campos personalizados.",
+    "noFieldsHint": "Haga clic en \"Nuevo campo\" para añadir el primero.",
+    "addButton": "Nuevo campo",
+    "labelLabel": "Nombre del campo",
+    "labelPlaceholder": "p.ej. Tipo de piel",
+    "typeLabel": "Tipo de campo",
+    "types": {
+      "text": "Texto",
+      "textarea": "Texto largo",
+      "number": "Número",
+      "boolean": "Sí / No",
+      "select": "Lista desplegable"
+    },
+    "optionsLabel": "Opciones",
+    "optionPlaceholder": "Añadir opción...",
+    "addOption": "Añadir",
+    "isRequired": "Campo obligatorio",
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "saveChanges": "Guardar cambios",
+    "addField": "Añadir campo",
+    "deactivate": "Desactivar",
+    "activate": "Activar",
+    "confirmYes": "Sí",
+    "confirmNo": "No",
+    "additionalFields": "Campos adicionales",
+    "selectPlaceholder": "— seleccionar —",
+    "booleanTrue": "Sí",
+    "booleanFalse": "No",
+    "validationOptions": "Añada al menos una opción para la lista desplegable.",
+    "validationLabel": "El nombre del campo es obligatorio."
   }
 }

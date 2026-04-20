@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import {
   createCustomField,
   updateCustomField,
@@ -14,21 +15,7 @@ type Props = {
   initialFields: CustomField[];
 };
 
-const FIELD_TYPES: { value: FieldType; label: string }[] = [
-  { value: "text", label: "Tekst" },
-  { value: "textarea", label: "Dugi tekst" },
-  { value: "number", label: "Broj" },
-  { value: "boolean", label: "Da / Ne" },
-  { value: "select", label: "Padajuća lista" },
-];
-
-const TYPE_LABELS: Record<FieldType, string> = {
-  text: "Tekst",
-  textarea: "Dugi tekst",
-  number: "Broj",
-  boolean: "Da / Ne",
-  select: "Lista",
-};
+const FIELD_TYPE_VALUES: FieldType[] = ["text", "textarea", "number", "boolean", "select"];
 
 type FormState = {
   label: string;
@@ -63,6 +50,7 @@ function InlineForm({
   onCancel: () => void;
   submitLabel: string;
 }) {
+  const t = useTranslations("customFields");
   const [form, setForm] = useState<FormState>(initial);
   const [optionInput, setOptionInput] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -92,9 +80,9 @@ function InlineForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.label.trim()) { setError("Naziv polja je obavezan."); return; }
+    if (!form.label.trim()) { setError(t("validationLabel")); return; }
     if (form.field_type === "select" && form.options.length === 0) {
-      setError("Dodajte bar jednu opciju za padajuću listu.");
+      setError(t("validationOptions"));
       return;
     }
     setError(null);
@@ -111,25 +99,25 @@ function InlineForm({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">Naziv polja *</label>
+          <label className="block text-xs font-medium text-slate-500 mb-1">{t("labelLabel")} *</label>
           <input
             type="text"
             required
             value={form.label}
             onChange={(e) => set("label", e.target.value)}
-            placeholder="npr. Tip kože"
+            placeholder={t("labelPlaceholder")}
             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">Tip polja</label>
+          <label className="block text-xs font-medium text-slate-500 mb-1">{t("typeLabel")}</label>
           <select
             value={form.field_type}
             onChange={(e) => set("field_type", e.target.value as FieldType)}
             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            {FIELD_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>{t.label}</option>
+            {FIELD_TYPE_VALUES.map((v) => (
+              <option key={v} value={v}>{t(`types.${v}`)}</option>
             ))}
           </select>
         </div>
@@ -137,14 +125,14 @@ function InlineForm({
 
       {form.field_type === "select" && (
         <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">Opcije</label>
+          <label className="block text-xs font-medium text-slate-500 mb-1">{t("optionsLabel")}</label>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
               value={optionInput}
               onChange={(e) => setOptionInput(e.target.value)}
               onKeyDown={handleOptionKeyDown}
-              placeholder="Dodaj opciju..."
+              placeholder={t("optionPlaceholder")}
               className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <button
@@ -152,7 +140,7 @@ function InlineForm({
               onClick={addOption}
               className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
             >
-              Dodaj
+              {t("addOption")}
             </button>
           </div>
           {form.options.length > 0 && (
@@ -187,7 +175,7 @@ function InlineForm({
             onChange={(e) => set("is_required", e.target.checked)}
             className="w-4 h-4 rounded accent-indigo-600"
           />
-          <span className="text-sm text-slate-700">Obavezno polje</span>
+          <span className="text-sm text-slate-700">{t("isRequired")}</span>
         </label>
       </div>
 
@@ -197,14 +185,14 @@ function InlineForm({
           onClick={onCancel}
           className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
         >
-          Otkaži
+          {t("cancel")}
         </button>
         <button
           type="submit"
           disabled={isPending}
           className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-60 transition-colors"
         >
-          {isPending ? "Spremanje..." : submitLabel}
+          {isPending ? t("saving") : submitLabel}
         </button>
       </div>
     </form>
@@ -212,6 +200,7 @@ function InlineForm({
 }
 
 export default function FieldManager({ initialFields }: Props) {
+  const t = useTranslations("customFields");
   const [fields, setFields] = useState<CustomField[]>(initialFields);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -271,8 +260,8 @@ export default function FieldManager({ initialFields }: Props) {
     <div className="space-y-3">
       {fields.length === 0 && !showAddForm && (
         <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
-          <p className="text-slate-400 text-sm">Još nema prilagođenih polja.</p>
-          <p className="text-slate-300 text-xs mt-1">Kliknite "Novo polje" da dodate prvo polje.</p>
+          <p className="text-slate-400 text-sm">{t("noFields")}</p>
+          <p className="text-slate-300 text-xs mt-1">{t("noFieldsHint")}</p>
         </div>
       )}
 
@@ -284,7 +273,7 @@ export default function FieldManager({ initialFields }: Props) {
                 initial={fieldToForm(field)}
                 onSave={(form) => handleUpdate(field.id, form)}
                 onCancel={() => setEditingId(null)}
-                submitLabel="Spremi izmjene"
+                submitLabel={t("saveChanges")}
               />
             </div>
           ) : (
@@ -321,7 +310,7 @@ export default function FieldManager({ initialFields }: Props) {
                 </p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                    {TYPE_LABELS[field.field_type]}
+                    {t(`types.${field.field_type}`)}
                   </span>
                   {field.field_type === "select" && field.options.length > 0 && (
                     <span className="text-xs text-slate-400">{field.options.join(", ")}</span>
@@ -336,7 +325,7 @@ export default function FieldManager({ initialFields }: Props) {
                   type="button"
                   onClick={() => handleToggle(field.id, field.is_active)}
                   disabled={isPending}
-                  title={field.is_active ? "Deaktiviraj" : "Aktiviraj"}
+                  title={field.is_active ? t("deactivate") : t("activate")}
                   className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none ${
                     field.is_active ? "bg-indigo-600" : "bg-slate-200"
                   }`}
@@ -368,14 +357,14 @@ export default function FieldManager({ initialFields }: Props) {
                       disabled={isPending}
                       className="rounded px-2 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                     >
-                      Da
+                      {t("confirmYes")}
                     </button>
                     <button
                       type="button"
                       onClick={() => setConfirmDelete(null)}
                       className="rounded px-2 py-1 text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
                     >
-                      Ne
+                      {t("confirmNo")}
                     </button>
                   </div>
                 ) : (
@@ -401,7 +390,7 @@ export default function FieldManager({ initialFields }: Props) {
           initial={emptyForm()}
           onSave={handleCreate}
           onCancel={() => setShowAddForm(false)}
-          submitLabel="Dodaj polje"
+          submitLabel={t("addField")}
         />
       ) : (
         <button
@@ -412,7 +401,7 @@ export default function FieldManager({ initialFields }: Props) {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Novo polje
+          {t("addButton")}
         </button>
       )}
     </div>

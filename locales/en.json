@@ -392,5 +392,41 @@
     "sl": "Slovenščina",
     "it": "Italiano",
     "es": "Español"
+  },
+  "customFields": {
+    "settingsButton": "Treatment Fields",
+    "pageTitle": "Custom Treatment Fields",
+    "pageSubtitle": "Add your own fields that will appear on every treatment. Only applies to this salon.",
+    "noFields": "No custom fields yet.",
+    "noFieldsHint": "Click \"New field\" to add the first one.",
+    "addButton": "New field",
+    "labelLabel": "Field name",
+    "labelPlaceholder": "e.g. Skin type",
+    "typeLabel": "Field type",
+    "types": {
+      "text": "Text",
+      "textarea": "Long text",
+      "number": "Number",
+      "boolean": "Yes / No",
+      "select": "Dropdown"
+    },
+    "optionsLabel": "Options",
+    "optionPlaceholder": "Add option...",
+    "addOption": "Add",
+    "isRequired": "Required field",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "saveChanges": "Save changes",
+    "addField": "Add field",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "confirmYes": "Yes",
+    "confirmNo": "No",
+    "additionalFields": "Additional fields",
+    "selectPlaceholder": "— select —",
+    "booleanTrue": "Yes",
+    "booleanFalse": "No",
+    "validationOptions": "Add at least one option for the dropdown.",
+    "validationLabel": "Field name is required."
   }
 }

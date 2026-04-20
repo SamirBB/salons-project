@@ -42,7 +42,7 @@ const LOCALE_TO_BCP47: Record<Locale, string> = {
 };
 
 async function loadExportMessages(locale: Locale): Promise<ExportMessages> {
-  const mod = await import(`../messages/${locale}.json`);
+  const mod = await import(`../locales/${locale}.json`);
   const k = (mod as { default: { klijentiExport: ExportMessages } }).default.klijentiExport;
   return k;
 }

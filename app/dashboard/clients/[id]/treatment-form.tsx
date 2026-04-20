@@ -5,6 +5,7 @@ import { useState, useTransition, useRef, useEffect } from "react";
 import { createTreatment, updateTreatment } from "@/app/actions/clients";
 import type { Treatment, TreatmentData } from "@/app/actions/clients";
 import type { CustomField } from "@/app/actions/custom-fields";
+// useTranslations used twice: "klijenti" + "customFields"
 
 type Employee = { id: string; full_name: string; color: string | null };
 type ServiceOption = { id: string; name: string; price: number; category: string | null };
@@ -31,6 +32,7 @@ export default function TreatmentForm({
   roundedTop = true,
 }: Props) {
   const t = useTranslations("klijenti");
+  const tCF = useTranslations("customFields");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [servicesOpen, setServicesOpen] = useState(false);
@@ -304,7 +306,7 @@ export default function TreatmentForm({
           <div className="space-y-4">
             <div className="border-t border-slate-200/80 pt-1" />
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Dodatna polja
+              {tCF("additionalFields")}
             </p>
             {customFields.map((cf) => (
               <div key={cf.id}>
@@ -379,7 +381,7 @@ export default function TreatmentForm({
                     }
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <option value="">— odaberi —</option>
+                    <option value="">{tCF("selectPlaceholder")}</option>
                     {cf.options.map((opt) => (
                       <option key={opt} value={opt}>
                         {opt}
