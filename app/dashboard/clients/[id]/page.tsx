@@ -36,10 +36,10 @@ export default async function ClientDetailPage({
 
   const canManage = ROLE_PERMISSIONS[session.role].canManageClients;
 
-  const [{ data: treatments }, { data: employees }] = await Promise.all([
+  const [{ data: rawTreatments }, { data: employees }, { data: services }] = await Promise.all([
     supabase
       .from("client_treatments")
-      .select("*, employees(full_name, color)")
+      .select("*, employees(full_name, color), client_treatment_services(service_id, services(id, name, price))")
       .eq("client_id", id)
       .eq("tenant_id", session.tenantId)
       .order("treated_at", { ascending: false }),
@@ -49,7 +49,22 @@ export default async function ClientDetailPage({
       .eq("tenant_id", session.tenantId)
       .eq("is_active", true)
       .order("full_name"),
+    supabase
+      .from("services")
+      .select("id, name, price, category")
+      .eq("tenant_id", session.tenantId)
+      .eq("is_active", true)
+      .order("category", { nullsFirst: true })
+      .order("name"),
   ]);
+
+  // Flatten junction table into services array per treatment
+  const treatments = (rawTreatments ?? []).map((t: any) => ({
+    ...t,
+    services: (t.client_treatment_services ?? [])
+      .map((cts: any) => cts.services)
+      .filter(Boolean),
+  }));
   const display = clientDisplayName(client);
   const initialLetter = clientInitialLetter(display);
 
@@ -132,8 +147,9 @@ export default async function ClientDetailPage({
 
       <TreatmentKarton
         clientId={client.id}
-        treatments={(treatments ?? []) as any}
+        treatments={treatments as any}
         employees={employees ?? []}
+        services={(services ?? []) as any}
         canManage={canManage}
         currentEmployeeId={session.employeeId}
       />

@@ -357,6 +357,8 @@ export async function toggleClientActive(clientId: string, currentStatus: boolea
 
 // ─── TREATMENT KARTON ─────────────────────────────────────────────
 
+export type TreatmentService = { id: string; name: string; price: number };
+
 export type Treatment = {
   id: string;
   client_id: string;
@@ -365,25 +367,44 @@ export type Treatment = {
   notes: string | null;
   amount_charged: number | null;
   invoice_number: string | null;
-  is_trial: boolean;
   created_at: string;
   employees?: { full_name: string; color: string | null } | null;
+  services?: TreatmentService[];
+};
+
+export type TreatmentData = {
+  employee_id: string | null;
+  treated_at: string;
+  notes: string | null;
+  amount_charged: number | null;
+  invoice_number: string | null;
 };
 
 export async function createTreatment(
   clientId: string,
-  data: Omit<Treatment, "id" | "client_id" | "created_at" | "employees">
+  data: TreatmentData,
+  serviceIds: string[]
 ) {
   const session = await getSession();
   const supabase = await createClient();
 
-  const { error } = await supabase.from("client_treatments").insert({
-    tenant_id: session.tenantId,
-    client_id: clientId,
-    ...data,
-  });
+  const { data: created, error } = await supabase
+    .from("client_treatments")
+    .insert({ tenant_id: session.tenantId, client_id: clientId, ...data })
+    .select("id")
+    .single();
 
-  if (error) return { error: "createError" as const };
+  if (error || !created) return { error: "createError" as const };
+
+  if (serviceIds.length > 0) {
+    await supabase.from("client_treatment_services").insert(
+      serviceIds.map((service_id) => ({
+        tenant_id: session.tenantId,
+        treatment_id: created.id,
+        service_id,
+      }))
+    );
+  }
 
   await supabase
     .from("clients")
@@ -398,7 +419,8 @@ export async function createTreatment(
 export async function updateTreatment(
   treatmentId: string,
   clientId: string,
-  data: Partial<Omit<Treatment, "id" | "client_id" | "created_at" | "employees">>
+  data: TreatmentData,
+  serviceIds: string[]
 ) {
   const session = await getSession();
   const supabase = await createClient();
@@ -410,6 +432,22 @@ export async function updateTreatment(
     .eq("tenant_id", session.tenantId);
 
   if (error) return { error: "updateError" as const };
+
+  // Sync junction table
+  await supabase
+    .from("client_treatment_services")
+    .delete()
+    .eq("treatment_id", treatmentId);
+
+  if (serviceIds.length > 0) {
+    await supabase.from("client_treatment_services").insert(
+      serviceIds.map((service_id) => ({
+        tenant_id: session.tenantId,
+        treatment_id: treatmentId,
+        service_id,
+      }))
+    );
+  }
 
   revalidatePath(`/dashboard/clients/${clientId}`);
   return { success: true as const };

@@ -7,11 +7,13 @@ import TreatmentForm from "./treatment-form";
 import type { Treatment } from "@/app/actions/clients";
 
 type Employee = { id: string; full_name: string; color: string | null };
+type ServiceOption = { id: string; name: string; price: number; category: string | null };
 
 type Props = {
   clientId: string;
   treatments: Treatment[];
   employees: Employee[];
+  services: ServiceOption[];
   canManage: boolean;
   currentEmployeeId: string | null;
 };
@@ -26,7 +28,14 @@ function formatPrice(p: number | null) {
   return p.toFixed(2).replace(".", ",") + " €";
 }
 
-export default function TreatmentKarton({ clientId, treatments, employees, canManage, currentEmployeeId }: Props) {
+export default function TreatmentKarton({
+  clientId,
+  treatments,
+  employees,
+  services,
+  canManage,
+  currentEmployeeId,
+}: Props) {
   const t = useTranslations("klijenti");
   const [showForm, setShowForm] = useState(false);
   const [editTreatment, setEditTreatment] = useState<Treatment | null>(null);
@@ -61,7 +70,9 @@ export default function TreatmentKarton({ clientId, treatments, employees, canMa
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-slate-800">{t("karton.title")}</h2>
-          <p className="text-xs text-slate-400">{t("karton.subtitle", { count: treatments.length })}</p>
+          <p className="text-xs text-slate-400">
+            {t("karton.subtitle", { count: treatments.length })}
+          </p>
         </div>
         {canManage && !showForm && !editTreatment && (
           <button
@@ -83,7 +94,13 @@ export default function TreatmentKarton({ clientId, treatments, employees, canMa
                 disabled={editIndex <= 0}
                 className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-indigo-600 hover:bg-indigo-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
                 Prethodni
@@ -97,7 +114,13 @@ export default function TreatmentKarton({ clientId, treatments, employees, canMa
                 className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-indigo-600 hover:bg-indigo-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 Sljedeći
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -108,8 +131,13 @@ export default function TreatmentKarton({ clientId, treatments, employees, canMa
             clientId={clientId}
             treatment={editTreatment ?? undefined}
             employees={employees}
+            services={services}
             currentEmployeeId={currentEmployeeId}
-            onClose={() => { setShowForm(false); setEditTreatment(null); setEditIndex(null); }}
+            onClose={() => {
+              setShowForm(false);
+              setEditTreatment(null);
+              setEditIndex(null);
+            }}
             roundedTop={!(isEditing && total > 1)}
           />
         </div>
@@ -118,7 +146,9 @@ export default function TreatmentKarton({ clientId, treatments, employees, canMa
       {treatments.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
           <p className="text-slate-400 text-sm">{t("karton.noTreatments")}</p>
-          {canManage && <p className="text-slate-300 text-xs mt-1">{t("karton.noTreatmentsHint")}</p>}
+          {canManage && (
+            <p className="text-slate-300 text-xs mt-1">{t("karton.noTreatmentsHint")}</p>
+          )}
         </div>
       ) : (
         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -126,50 +156,118 @@ export default function TreatmentKarton({ clientId, treatments, employees, canMa
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 w-8">#</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.date")}</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.notes")}</th>
-                  <th className="text-right text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.amount")}</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">{t("karton.col.invoice")}</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 w-8">
+                    #
+                  </th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
+                    {t("karton.col.date")}
+                  </th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
+                    {t("karton.col.services")}
+                  </th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
+                    {t("karton.col.notes")}
+                  </th>
+                  <th className="text-right text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
+                    {t("karton.col.amount")}
+                  </th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
+                    {t("karton.col.invoice")}
+                  </th>
                   {canManage && <th className="px-4 py-3 w-20" />}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {treatments.map((tr, idx) => (
-                  <tr key={tr.id} className={`hover:bg-slate-50 transition-colors ${tr.is_trial ? "bg-amber-50/40" : ""}`}>
-                    <td className="px-4 py-3 text-xs">
-                      {tr.is_trial ? (
-                        <span className="inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700">P</span>
+                  <tr key={tr.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-4 py-3 text-xs text-slate-400">
+                      {treatments.length - idx}
+                    </td>
+                    <td className="px-4 py-3 text-slate-700 whitespace-nowrap">
+                      {formatDate(tr.treated_at)}
+                    </td>
+                    <td className="px-4 py-3 max-w-[220px]">
+                      {tr.services && tr.services.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {tr.services.map((s) => (
+                            <span
+                              key={s.id}
+                              className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700"
+                            >
+                              {s.name}
+                            </span>
+                          ))}
+                        </div>
                       ) : (
-                        <span className="text-slate-400">{treatments.length - idx}</span>
+                        <span className="text-slate-400">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{formatDate(tr.treated_at)}</td>
-                    <td className="px-4 py-3 max-w-[300px]">
+                    <td className="px-4 py-3 max-w-[240px]">
                       <div className="text-slate-700 truncate" title={tr.notes ?? ""}>
                         {tr.notes || "—"}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right font-medium text-slate-800 whitespace-nowrap">{formatPrice(tr.amount_charged)}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs">{tr.invoice_number || "—"}</td>
+                    <td className="px-4 py-3 text-right font-medium text-slate-800 whitespace-nowrap">
+                      {formatPrice(tr.amount_charged)}
+                    </td>
+                    <td className="px-4 py-3 text-slate-500 text-xs">
+                      {tr.invoice_number || "—"}
+                    </td>
                     {canManage && (
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
                           {confirmDelete === tr.id ? (
                             <>
-                              <button onClick={() => handleDelete(tr.id)} disabled={isPending} className="rounded px-2 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100">{t("karton.yes")}</button>
-                              <button onClick={() => setConfirmDelete(null)} className="rounded px-2 py-1 text-xs bg-slate-100 text-slate-600 hover:bg-slate-200">{t("karton.no")}</button>
+                              <button
+                                onClick={() => handleDelete(tr.id)}
+                                disabled={isPending}
+                                className="rounded px-2 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100"
+                              >
+                                {t("karton.yes")}
+                              </button>
+                              <button
+                                onClick={() => setConfirmDelete(null)}
+                                className="rounded px-2 py-1 text-xs bg-slate-100 text-slate-600 hover:bg-slate-200"
+                              >
+                                {t("karton.no")}
+                              </button>
                             </>
                           ) : (
                             <>
-                              <button onClick={() => openEdit(tr, idx)} className="rounded p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-500 transition-colors">
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              <button
+                                onClick={() => openEdit(tr, idx)}
+                                className="rounded p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-500 transition-colors"
+                              >
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
                                 </svg>
                               </button>
-                              <button onClick={() => setConfirmDelete(tr.id)} className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors">
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              <button
+                                onClick={() => setConfirmDelete(tr.id)}
+                                className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                              >
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
                                 </svg>
                               </button>
                             </>
