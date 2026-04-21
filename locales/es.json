@@ -358,7 +358,13 @@
         "generic": "Error al guardar el tratamiento.",
         "noPermission": "No tiene permiso para esta acción."
       }
-    }
+    },
+    "editButton": "Editar",
+    "editClientTitle": "Editar cliente",
+    "tabKarton": "Historial",
+    "tabPromocije": "Promociones",
+    "promoPlaceholder": "El módulo de promociones aún no está vinculado a los clientes.",
+    "promoPlaceholderHint": "Próximamente."
   },
   "klijentiExport": {
     "pdfTitle": "Clientes",

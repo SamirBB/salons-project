@@ -38,6 +38,7 @@ type Props = {
   clientId?: string;
   canManage: boolean;
   initial: ClientFormInitial;
+  onSaved?: () => void;
 };
 
 function ReviewToggle({
@@ -70,7 +71,7 @@ function ReviewToggle({
   );
 }
 
-export default function ClientForm({ mode, clientId, canManage, initial }: Props) {
+export default function ClientForm({ mode, clientId, canManage, initial, onSaved }: Props) {
   const t = useTranslations("klijenti");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -287,6 +288,7 @@ export default function ClientForm({ mode, clientId, canManage, initial }: Props
         return;
       }
       setMessage({ type: "ok", text: t("savedChanges") });
+      onSaved?.();
     });
   }
 

@@ -392,7 +392,13 @@
         "generic": "Greška pri čuvanju tretmana.",
         "noPermission": "Nemate dozvolu za ovu akciju."
       }
-    }
+    },
+    "editButton": "Uredi",
+    "editClientTitle": "Uredi klijenta",
+    "tabKarton": "Karton",
+    "tabPromocije": "Promocije",
+    "promoPlaceholder": "Modul promocija nije još povezan sa klijentima.",
+    "promoPlaceholderHint": "Uskoro dostupno."
   },
   "klijentiExport": {
     "pdfTitle": "Klijenti",

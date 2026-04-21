@@ -358,7 +358,13 @@
         "generic": "Failed to save treatment.",
         "noPermission": "You do not have permission for this action."
       }
-    }
+    },
+    "editButton": "Edit",
+    "editClientTitle": "Edit client",
+    "tabKarton": "Record",
+    "tabPromocije": "Promotions",
+    "promoPlaceholder": "Promotions module not yet linked to clients.",
+    "promoPlaceholderHint": "Coming soon."
   },
   "klijentiExport": {
     "pdfTitle": "Clients",

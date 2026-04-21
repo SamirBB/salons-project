@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
 import { ROLE_PERMISSIONS } from "@/lib/roles";
 import { clientDisplayName, clientInitialLetter } from "@/lib/clients";
-import ClientForm from "../client-form";
+import ClientSummary from "./client-summary";
+import ClientTabs from "./client-tabs";
 import TreatmentKarton from "./treatment-karton";
 import { getActiveCustomFields } from "@/app/actions/custom-fields";
 
@@ -67,11 +68,30 @@ export default async function ClientDetailPage({
       .map((cts: any) => cts.services)
       .filter(Boolean),
   }));
+
   const display = clientDisplayName(client);
   const initialLetter = clientInitialLetter(display);
 
+  const initial = {
+    first_name: client.first_name ?? "",
+    last_name: client.last_name ?? "",
+    date_of_birth: dateToInputValue(client.date_of_birth),
+    jmb: client.jmb ?? "",
+    street: client.street ?? "",
+    city: client.city ?? "",
+    postal_code: client.postal_code ?? "",
+    phone: client.phone ?? "",
+    email: client.email ?? "",
+    notes: client.notes ?? "",
+    photo_url: client.photo_url,
+    google_reviewed: client.google_reviewed,
+    facebook_reviewed: client.facebook_reviewed,
+    instagram_reviewed: client.instagram_reviewed,
+    legacy_full_name: client.full_name,
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Breadcrumb */}
       <div className="flex items-center gap-3">
         <Link
@@ -85,76 +105,30 @@ export default async function ClientDetailPage({
         </Link>
       </div>
 
-      {/* Client header — avatar, ime, export */}
-      <div className="flex flex-wrap items-center gap-3">
-        {client.photo_url ? (
-          <img
-            src={client.photo_url}
-            alt=""
-            className="h-12 w-12 shrink-0 rounded-full object-cover border border-slate-200"
-          />
-        ) : (
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-lg font-bold text-indigo-700">
-            {initialLetter}
-          </div>
-        )}
-        <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-semibold text-slate-900">{display}</h2>
-          <p className="text-sm text-slate-500">
-            {client.is_active ? (
-              <span className="text-green-700">{t("active")}</span>
-            ) : (
-              <span className="text-slate-500">{t("inactive")}</span>
-            )}
-          </p>
-        </div>
-        <div className="ml-auto flex shrink-0 flex-wrap items-center gap-2">
-          <a
-            href={`/api/dashboard/clients/export?format=xlsx&clientId=${encodeURIComponent(client.id)}`}
-            className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
-          >
-            {t("exportClientExcel")}
-          </a>
-          <a
-            href={`/api/dashboard/clients/export?format=pdf&clientId=${encodeURIComponent(client.id)}`}
-            className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
-          >
-            {t("exportClientPdf")}
-          </a>
-        </div>
-      </div>
-
-      <ClientForm
-        mode="edit"
+      {/* Compact summary card */}
+      <ClientSummary
         clientId={client.id}
+        display={display}
+        initialLetter={initialLetter}
+        photoUrl={client.photo_url}
+        isActive={client.is_active}
         canManage={canManage}
-        initial={{
-          first_name: client.first_name ?? "",
-          last_name: client.last_name ?? "",
-          date_of_birth: dateToInputValue(client.date_of_birth),
-          jmb: client.jmb ?? "",
-          street: client.street ?? "",
-          city: client.city ?? "",
-          postal_code: client.postal_code ?? "",
-          phone: client.phone ?? "",
-          email: client.email ?? "",
-          notes: client.notes ?? "",
-          photo_url: client.photo_url,
-          google_reviewed: client.google_reviewed,
-          facebook_reviewed: client.facebook_reviewed,
-          instagram_reviewed: client.instagram_reviewed,
-          legacy_full_name: client.full_name,
-        }}
+        initial={initial}
       />
 
-      <TreatmentKarton
-        clientId={client.id}
-        treatments={treatments as any}
-        employees={employees ?? []}
-        services={(services ?? []) as any}
-        customFields={customFields}
-        canManage={canManage}
-        currentEmployeeId={session.employeeId}
+      {/* Tabs: Karton + Promocije */}
+      <ClientTabs
+        karton={
+          <TreatmentKarton
+            clientId={client.id}
+            treatments={treatments as any}
+            employees={employees ?? []}
+            services={(services ?? []) as any}
+            customFields={customFields}
+            canManage={canManage}
+            currentEmployeeId={session.employeeId}
+          />
+        }
       />
     </div>
   );

@@ -358,7 +358,13 @@
         "generic": "Greška pri spremanju tretmana.",
         "noPermission": "Nemate dozvolu za ovu akciju."
       }
-    }
+    },
+    "editButton": "Uredi",
+    "editClientTitle": "Uredi klijenta",
+    "tabKarton": "Karton",
+    "tabPromocije": "Promocije",
+    "promoPlaceholder": "Modul promocija nije još povezan s klijentima.",
+    "promoPlaceholderHint": "Uskoro dostupno."
   },
   "klijentiExport": {
     "pdfTitle": "Klijenti",

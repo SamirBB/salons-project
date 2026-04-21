@@ -358,7 +358,13 @@
         "generic": "Napaka pri shranjevanju tretmana.",
         "noPermission": "Nimate dovoljenja za to dejanje."
       }
-    }
+    },
+    "editButton": "Uredi",
+    "editClientTitle": "Uredi stranko",
+    "tabKarton": "Karton",
+    "tabPromocije": "Promocije",
+    "promoPlaceholder": "Modul promocij še ni povezan s strankami.",
+    "promoPlaceholderHint": "Kmalu na voljo."
   },
   "klijentiExport": {
     "pdfTitle": "Stranke",

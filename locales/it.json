@@ -358,7 +358,13 @@
         "generic": "Errore nel salvataggio del trattamento.",
         "noPermission": "Non hai il permesso per questa azione."
       }
-    }
+    },
+    "editButton": "Modifica",
+    "editClientTitle": "Modifica cliente",
+    "tabKarton": "Cartella",
+    "tabPromocije": "Promozioni",
+    "promoPlaceholder": "Il modulo promozioni non è ancora collegato ai clienti.",
+    "promoPlaceholderHint": "Prossimamente."
   },
   "klijentiExport": {
     "pdfTitle": "Clienti",
