@@ -9,10 +9,65 @@ import ClientSummary from "./client-summary";
 import ClientTabs from "./client-tabs";
 import TreatmentKarton from "./treatment-karton";
 import { getActiveCustomFields } from "@/app/actions/custom-fields";
+import type { Treatment, TreatmentService } from "@/app/actions/clients";
 
 function dateToInputValue(value: string | null): string {
   if (!value) return "";
   return value.slice(0, 10);
+}
+
+type KartonEmployee = { id: string; full_name: string; color: string | null };
+type KartonService = { id: string; name: string; price: number; category: string | null };
+
+type NestedServiceRow = { id: string; name: string; price: number };
+
+type RawTreatmentServiceJoin = {
+  service_id: string;
+  services: NestedServiceRow | NestedServiceRow[] | null;
+};
+
+/** Oblik reda iz Supabase selecta sa `client_treatment_services(..., services(...))`. */
+type RawTreatmentRow = {
+  id: string;
+  client_id: string;
+  employee_id: string | null;
+  treated_at: string;
+  notes: string | null;
+  amount_charged: number | null;
+  invoice_number: string | null;
+  created_at: string;
+  custom_data?: Record<string, string | number | boolean | null>;
+  employees?: { full_name: string; color: string | null } | null;
+  client_treatment_services?: RawTreatmentServiceJoin[] | null;
+};
+
+function joinedServiceToTreatmentService(
+  svc: NestedServiceRow | NestedServiceRow[] | null | undefined
+): TreatmentService | null {
+  if (svc == null) return null;
+  const row = Array.isArray(svc) ? svc[0] : svc;
+  if (!row || typeof row.id !== "string") return null;
+  return { id: row.id, name: row.name, price: Number(row.price) };
+}
+
+function mapRawTreatmentToTreatment(row: RawTreatmentRow): Treatment {
+  const treatmentServices = (row.client_treatment_services ?? [])
+    .map((j) => joinedServiceToTreatmentService(j.services))
+    .filter((s): s is TreatmentService => s !== null);
+
+  return {
+    id: row.id,
+    client_id: row.client_id,
+    employee_id: row.employee_id,
+    treated_at: row.treated_at,
+    notes: row.notes,
+    amount_charged: row.amount_charged,
+    invoice_number: row.invoice_number,
+    custom_data: row.custom_data,
+    created_at: row.created_at,
+    employees: row.employees ?? undefined,
+    services: treatmentServices,
+  };
 }
 
 export default async function ClientDetailPage({
@@ -61,12 +116,21 @@ export default async function ClientDetailPage({
     getActiveCustomFields(),
   ]);
 
-  // Flatten junction table into services array per treatment
-  const treatments = (rawTreatments ?? []).map((t: any) => ({
-    ...t,
-    services: (t.client_treatment_services ?? [])
-      .map((cts: any) => cts.services)
-      .filter(Boolean),
+  const treatments: Treatment[] = (rawTreatments ?? []).map((row) =>
+    mapRawTreatmentToTreatment(row as RawTreatmentRow)
+  );
+
+  const kartonEmployees: KartonEmployee[] = (employees ?? []).map((e) => ({
+    id: e.id,
+    full_name: e.full_name,
+    color: e.color,
+  }));
+
+  const kartonServices: KartonService[] = (services ?? []).map((s) => ({
+    id: s.id,
+    name: s.name,
+    price: s.price,
+    category: s.category,
   }));
 
   const display = clientDisplayName(client);
@@ -121,9 +185,9 @@ export default async function ClientDetailPage({
         karton={
           <TreatmentKarton
             clientId={client.id}
-            treatments={treatments as any}
-            employees={employees ?? []}
-            services={(services ?? []) as any}
+            treatments={treatments}
+            employees={kartonEmployees}
+            services={kartonServices}
             customFields={customFields}
             canManage={canManage}
             currentEmployeeId={session.employeeId}

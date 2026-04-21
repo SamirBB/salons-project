@@ -38,6 +38,19 @@ function formatPrice(price: number): string {
   return new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(price);
 }
 
+/** Ista ikona korpe kao na listi promocija (`promotion-list.tsx`). */
+function TrashIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+      />
+    </svg>
+  );
+}
+
 export default function ServiceList({ services, canManage }: Props) {
   const t = useTranslations("cjenovnik");
   const router = useRouter();
@@ -122,63 +135,66 @@ export default function ServiceList({ services, canManage }: Props) {
                     </span>
                   </div>
 
-                  {/* Actions */}
-                  <div
-                    className="flex items-center gap-2"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {/* Toggle active + Delete — samo za managere */}
-                    {canManage && (
-                      <>
-                        <button
-                          onClick={() => handleToggle(service.id, service.is_active)}
-                          disabled={isPending}
-                          title={service.is_active ? t("deactivate") : t("activate")}
-                          className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
-                            service.is_active
-                              ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                              : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                          }`}
-                        >
-                          {service.is_active ? t("active") : t("inactive")}
-                        </button>
+                  {/* Toggle + delete: stopPropagation da klik ne otvara detalje */}
+                  {canManage ? (
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        onClick={() => handleToggle(service.id, service.is_active)}
+                        disabled={isPending}
+                        title={service.is_active ? t("deactivate") : t("activate")}
+                        className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+                          service.is_active
+                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                            : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                        }`}
+                      >
+                        {service.is_active ? t("active") : t("inactive")}
+                      </button>
 
-                        {confirmDelete === service.id ? (
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs text-slate-500">{t("confirmDelete")}</span>
-                            <button
-                              onClick={() => handleDelete(service.id)}
-                              disabled={isPending}
-                              className="rounded-lg bg-red-50 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-100"
-                            >
-                              {t("yes")}
-                            </button>
-                            <button
-                              onClick={() => setConfirmDelete(null)}
-                              className="rounded-lg bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-200"
-                            >
-                              {t("no")}
-                            </button>
-                          </div>
-                        ) : (
+                      {confirmDelete === service.id ? (
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-slate-500">{t("confirmDelete")}</span>
                           <button
-                            onClick={() => setConfirmDelete(service.id)}
-                            title={t("deleteService")}
-                            className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                            type="button"
+                            onClick={() => handleDelete(service.id)}
+                            disabled={isPending}
+                            className="rounded-lg bg-red-50 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-100"
                           >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            {t("yes")}
                           </button>
-                        )}
-                      </>
-                    )}
+                          <button
+                            type="button"
+                            onClick={() => setConfirmDelete(null)}
+                            className="rounded-lg bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-200"
+                          >
+                            {t("no")}
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmDelete(service.id)}
+                          title={t("deleteService")}
+                          className="shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                        >
+                          <TrashIcon />
+                        </button>
+                      )}
+                    </div>
+                  ) : null}
 
-                    {/* Chevron — uvijek vidljiv */}
-                    <svg className="w-4 h-4 text-slate-300 group-hover:text-slate-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
+                  {/* Chevron izvan stopPropagation — klik ide na karticu i otvara detalje */}
+                  <svg
+                    className="w-4 h-4 shrink-0 text-slate-300 transition-colors group-hover:text-slate-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    aria-hidden
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
               </div>
             ))}

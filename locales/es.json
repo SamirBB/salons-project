@@ -270,6 +270,10 @@
     "listEnd": "Fin",
     "listService": "Servicio",
     "listActive": "Activa",
+    "listDeleteAria": "Eliminar promoción",
+    "confirmDelete": "¿Seguro?",
+    "yes": "Sí",
+    "no": "No",
     "openDetailsAria": "Abrir detalles",
     "editPromotionTitle": "Editar promoción",
     "editSectionTitle": "Datos de la promoción",
@@ -310,6 +314,8 @@
       "updateError": "Error al guardar la promoción.",
       "invalidService": "El servicio seleccionado no es válido.",
       "noPermission": "No tienes permiso.",
+      "invalidDateRange": "La fecha y hora de fin deben ser iguales o posteriores al inicio.",
+      "deleteError": "No se pudo eliminar la promoción.",
       "generic": "Error. Inténtalo de nuevo."
     }
   },

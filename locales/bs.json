@@ -304,6 +304,10 @@
     "listEnd": "Završetak",
     "listService": "Usluga",
     "listActive": "Aktivna",
+    "listDeleteAria": "Obriši promociju",
+    "confirmDelete": "Sigurno?",
+    "yes": "Da",
+    "no": "Ne",
     "openDetailsAria": "Otvori detalje",
     "editPromotionTitle": "Uredi promociju",
     "editSectionTitle": "Podaci promocije",
@@ -344,6 +348,8 @@
       "updateError": "Greška pri snimanju promocije.",
       "invalidService": "Odabrana usluga nije valjana.",
       "noPermission": "Nemate dozvolu.",
+      "invalidDateRange": "Završetak mora biti u isto vrijeme ili nakon početka.",
+      "deleteError": "Greška pri brisanju promocije.",
       "generic": "Greška. Pokušajte ponovo."
     }
   },

@@ -1,3 +1,11 @@
+/** Prikaz u listi — formatirati na serveru (isti locale kao stranica) da nema hydration mismatch-a. */
+export function formatPromotionListDateTime(iso: string | null | undefined, locale: string): string {
+  if (iso == null || iso === "") return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short" }).format(d);
+}
+
 /** Vrijednost za input type="datetime-local" u lokalnoj vremenskoj zoni. */
 export function isoToDatetimeLocalValue(iso: string | null): string {
   if (!iso) return "";

@@ -1,9 +1,9 @@
 import { getSession } from "@/lib/session";
 import { createClient } from "@/lib/supabase/server";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
-import PromotionList from "./promotion-list";
-import type { Promotion } from "@/app/actions/promotions";
+import PromotionList, { type PromotionListRow } from "./promotion-list";
+import { formatPromotionListDateTime } from "@/lib/promotion-datetime";
 
 const SELECT =
   "id, tenant_id, name, description, terms, promotion_type, starts_at, ends_at, is_active, display_order, color, service_id, created_at";
@@ -11,6 +11,7 @@ const SELECT =
 export default async function PromotionsPage() {
   const session = await getSession();
   const t = await getTranslations("promocije");
+  const locale = await getLocale();
   const supabase = await createClient();
 
   const { data: rawRows } = await supabase
@@ -32,9 +33,11 @@ export default async function PromotionsPage() {
     for (const s of svcs ?? []) nameById.set(s.id, s.name);
   }
 
-  const promotions = rows.map((r) => ({
+  const promotions: PromotionListRow[] = rows.map((r) => ({
     ...r,
     services: r.service_id && nameById.has(r.service_id) ? { name: nameById.get(r.service_id)! } : null,
+    starts_at_display: formatPromotionListDateTime(r.starts_at, locale),
+    ends_at_display: formatPromotionListDateTime(r.ends_at, locale),
   }));
 
   const canManage = ["owner", "manager"].includes(session.role);
@@ -59,7 +62,7 @@ export default async function PromotionsPage() {
         )}
       </div>
 
-      <PromotionList promotions={promotions as Promotion[]} canManage={canManage} />
+      <PromotionList promotions={promotions} canManage={canManage} />
     </div>
   );
 }

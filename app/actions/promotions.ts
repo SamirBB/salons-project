@@ -4,14 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
-/*
-  U Supabase dodaj kolonu (SQL Editor), ako još nema:
-  ALTER TABLE public.promotions
-    ADD COLUMN IF NOT EXISTS service_id uuid REFERENCES public.services (id) ON DELETE SET NULL;
-  CREATE INDEX IF NOT EXISTS idx_promotions_service_id ON public.promotions (service_id);
-*/
-
-/** Usklađeno sa `public.promotions` u Supabase. */
+/** Usklađeno sa `public.promotions` u Supabase (uključuje nullable `service_id` → `services`). */
 export type Promotion = {
   id: string;
   tenant_id: string;
@@ -38,6 +31,12 @@ function parseTs(raw: string | null | undefined): string | null {
   if (!s) return null;
   const d = new Date(s);
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
+}
+
+/** Kada su oba postavljena, završetak mora biti ≥ početak. */
+function endsNotBeforeStart(starts_at: string | null, ends_at: string | null): boolean {
+  if (!starts_at || !ends_at) return true;
+  return new Date(ends_at).getTime() >= new Date(starts_at).getTime();
 }
 
 async function assertServiceInTenant(
@@ -78,6 +77,9 @@ export async function createPromotion(
 
   if (!name) return { error: "nameRequired" };
   if (!ends_at) return { error: "endDateRequired" };
+  if (!endsNotBeforeStart(starts_at, ends_at)) {
+    return { error: "invalidDateRange" };
+  }
 
   const supabase = await createClient();
   if (service_id && !(await assertServiceInTenant(supabase, session.tenantId, service_id))) {
@@ -133,6 +135,9 @@ export async function updatePromotion(
 
   if (!name) return { error: "nameRequired" };
   if (!ends_at) return { error: "endDateRequired" };
+  if (!endsNotBeforeStart(starts_at, ends_at)) {
+    return { error: "invalidDateRange" };
+  }
 
   const supabase = await createClient();
   if (service_id && !(await assertServiceInTenant(supabase, session.tenantId, service_id))) {
@@ -164,6 +169,28 @@ export async function updatePromotion(
   revalidatePath("/dashboard/promotions");
   revalidatePath(`/dashboard/promotions/${promotionId}`);
   return { success: true };
+}
+
+export async function deletePromotion(promotionId: string): Promise<{ error?: string }> {
+  const session = await getSession();
+  if (!["owner", "manager"].includes(session.role)) {
+    return { error: "noPermission" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("promotions")
+    .delete()
+    .eq("id", promotionId)
+    .eq("tenant_id", session.tenantId);
+
+  if (error) {
+    console.error("[deletePromotion]", error.message, error.code, error.details);
+    return { error: "deleteError" };
+  }
+
+  revalidatePath("/dashboard/promotions");
+  return {};
 }
 
 export async function getPromotionById(id: string): Promise<Promotion | null> {

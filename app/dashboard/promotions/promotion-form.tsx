@@ -25,6 +25,7 @@ export default function PromotionForm({ services }: { services: ServiceOption[] 
   const router = useRouter();
   const [state, formAction, pending] = useActionState(createPromotion, null);
   const [color, setColor] = useState("#6366f1");
+  const [endsMin, setEndsMin] = useState("");
 
   useEffect(() => {
     if (state && "id" in state && state.id) {
@@ -101,6 +102,7 @@ export default function PromotionForm({ services }: { services: ServiceOption[] 
             <input
               name="starts_at"
               type="datetime-local"
+              onChange={(e) => setEndsMin(e.target.value)}
               className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -112,6 +114,7 @@ export default function PromotionForm({ services }: { services: ServiceOption[] 
               name="ends_at"
               type="datetime-local"
               required
+              min={endsMin || undefined}
               className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>

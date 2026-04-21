@@ -147,7 +147,7 @@ export async function insertClient(data: ClientFormPayload) {
     return { error: "createError" as const };
   }
 
-  revalidatePath("/dashboard/klijenti");
+  revalidatePath("/dashboard/clients");
   return { success: true, id: row.id };
 }
 
@@ -199,8 +199,8 @@ export async function updateClient(clientId: string, data: ClientFormPayload) {
     return { error: "updateError" as const };
   }
 
-  revalidatePath("/dashboard/klijenti");
-  revalidatePath(`/dashboard/klijenti/${clientId}`);
+  revalidatePath("/dashboard/clients");
+  revalidatePath(`/dashboard/clients/${clientId}`);
   return { success: true };
 }
 
@@ -280,8 +280,8 @@ export async function uploadClientPhoto(clientId: string, formData: FormData) {
     return { error: "updateError" as const };
   }
 
-  revalidatePath("/dashboard/klijenti");
-  revalidatePath(`/dashboard/klijenti/${clientId}`);
+  revalidatePath("/dashboard/clients");
+  revalidatePath(`/dashboard/clients/${clientId}`);
   return { success: true as const, photo_url };
 }
 
@@ -324,8 +324,8 @@ export async function removeClientPhoto(clientId: string) {
     return { error: "updateError" as const };
   }
 
-  revalidatePath("/dashboard/klijenti");
-  revalidatePath(`/dashboard/klijenti/${clientId}`);
+  revalidatePath("/dashboard/clients");
+  revalidatePath(`/dashboard/clients/${clientId}`);
   return { success: true as const };
 }
 
@@ -350,8 +350,8 @@ export async function toggleClientActive(clientId: string, currentStatus: boolea
     return { error: "updateError" as const };
   }
 
-  revalidatePath("/dashboard/klijenti");
-  revalidatePath(`/dashboard/klijenti/${clientId}`);
+  revalidatePath("/dashboard/clients");
+  revalidatePath(`/dashboard/clients/${clientId}`);
   return { success: true };
 }
 

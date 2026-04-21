@@ -32,6 +32,7 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
   const action = updatePromotion.bind(null, p.id);
   const [state, formAction, pending] = useActionState(action, null);
   const [color, setColor] = useState(p.color ?? "#6366f1");
+  const [endsMin, setEndsMin] = useState(isoToDatetimeLocalValue(p.starts_at));
 
   useEffect(() => {
     if (state?.success) router.refresh();
@@ -112,6 +113,7 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
               name="starts_at"
               type="datetime-local"
               defaultValue={isoToDatetimeLocalValue(p.starts_at)}
+              onChange={(e) => setEndsMin(e.target.value)}
               className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -123,6 +125,7 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
               name="ends_at"
               type="datetime-local"
               required
+              min={endsMin || undefined}
               defaultValue={isoToDatetimeLocalValue(p.ends_at)}
               className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />

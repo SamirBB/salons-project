@@ -270,6 +270,10 @@
     "listEnd": "Ends",
     "listService": "Service",
     "listActive": "Active",
+    "listDeleteAria": "Delete promotion",
+    "confirmDelete": "Are you sure?",
+    "yes": "Yes",
+    "no": "No",
     "openDetailsAria": "Open details",
     "editPromotionTitle": "Edit promotion",
     "editSectionTitle": "Promotion details",
@@ -310,6 +314,8 @@
       "updateError": "Could not save changes to the promotion.",
       "invalidService": "The selected service is not valid.",
       "noPermission": "You do not have permission.",
+      "invalidDateRange": "End date and time must be on or after the start.",
+      "deleteError": "Could not delete the promotion.",
       "generic": "An error occurred. Please try again."
     }
   },

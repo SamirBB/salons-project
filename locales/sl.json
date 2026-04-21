@@ -270,6 +270,10 @@
     "listEnd": "Konec",
     "listService": "Storitev",
     "listActive": "Aktivna",
+    "listDeleteAria": "Izbriši promocijo",
+    "confirmDelete": "Ste prepričani?",
+    "yes": "Da",
+    "no": "Ne",
     "openDetailsAria": "Odpri podrobnosti",
     "editPromotionTitle": "Uredi promocijo",
     "editSectionTitle": "Podatki promocije",
@@ -310,6 +314,8 @@
       "updateError": "Napaka pri shranjevanju promocije.",
       "invalidService": "Izbrana storitev ni veljavna.",
       "noPermission": "Nimate dovoljenja.",
+      "invalidDateRange": "Konec mora biti ob istem času ali po začetku.",
+      "deleteError": "Napaka pri brisanju promocije.",
       "generic": "Napaka. Poskusite znova."
     }
   },
