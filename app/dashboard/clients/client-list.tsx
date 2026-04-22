@@ -53,7 +53,6 @@ export default function ClientList({
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -80,21 +79,21 @@ export default function ClientList({
     }
   }
 
-  async function handleDelete(e: React.MouseEvent, id: string) {
+  async function handleDelete(e: React.MouseEvent, id: string, name: string) {
     e.stopPropagation();
     e.preventDefault();
+    if (!window.confirm(`Obrisati klijenta "${name}"? Ova radnja je trajna.`)) return;
     setDeleteError(null);
     setLoadingId(id);
     try {
       const res = await deleteClient(id);
       if (res && "error" in res) {
-        setDeleteError(`Greška: ${res.error}`);
+        setDeleteError(`Greška pri brisanju. Pokušajte ponovo.`);
       }
     } catch (err) {
-      setDeleteError(`Exception: ${String(err)}`);
+      setDeleteError(`Greška: ${String(err)}`);
     } finally {
       setLoadingId(null);
-      setConfirmDeleteId(null);
     }
   }
 
@@ -163,7 +162,7 @@ export default function ClientList({
             <span className="hidden lg:block text-xs font-semibold uppercase tracking-wide text-slate-400">{t("lastVisit")}</span>
             <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">{t("active")}</span>
             <div className="w-4" />
-            {canManage && <div className="w-8" />}
+            {canManage && <div className="w-7" />}
           </div>
 
           <ul className="divide-y divide-slate-100">
@@ -208,38 +207,17 @@ export default function ClientList({
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
                     {canManage && (
-                      <div onClick={(e) => e.stopPropagation()} className="shrink-0">
-                        {confirmDeleteId === c.id ? (
-                          <div className="flex gap-1">
-                            <button
-                              type="button"
-                              disabled={loadingId === c.id}
-                              onClick={(e) => handleDelete(e, c.id)}
-                              className="rounded px-2 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 font-medium"
-                            >
-                              {"Da, obriši"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }}
-                              className="rounded px-2 py-1 text-xs bg-slate-100 text-slate-600 hover:bg-slate-200"
-                            >
-                              {"Otkaži"}
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(c.id); }}
-                            className="rounded p-1.5 text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors"
-                            title="Obriši klijenta"
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
+                      <button
+                        type="button"
+                        disabled={loadingId === c.id}
+                        onClick={(e) => handleDelete(e, c.id, display)}
+                        className="rounded p-1.5 text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-40 shrink-0"
+                        title="Obriši klijenta"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
                     )}
                   </div>
 
@@ -269,38 +247,17 @@ export default function ClientList({
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
                     {canManage && (
-                      <div onClick={(e) => e.stopPropagation()}>
-                        {confirmDeleteId === c.id ? (
-                          <div className="flex gap-1">
-                            <button
-                              type="button"
-                              disabled={loadingId === c.id}
-                              onClick={(e) => handleDelete(e, c.id)}
-                              className="rounded px-2 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 font-medium whitespace-nowrap"
-                            >
-                              {"Da, obriši"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }}
-                              className="rounded px-2 py-1 text-xs bg-slate-100 text-slate-600 hover:bg-slate-200"
-                            >
-                              {"Otkaži"}
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(c.id); }}
-                            className="rounded p-1.5 text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors"
-                            title="Obriši klijenta"
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
+                      <button
+                        type="button"
+                        disabled={loadingId === c.id}
+                        onClick={(e) => handleDelete(e, c.id, display)}
+                        className="rounded p-1.5 text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-40"
+                        title="Obriši klijenta"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
                     )}
                   </div>
                 </li>
