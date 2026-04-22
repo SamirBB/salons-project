@@ -1,22 +1,33 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createService, updateService } from "@/app/actions/services";
 import type { Service } from "@/app/actions/services";
 
-const COLOR_SWATCHES = [
-  "#6366f1", // indigo
-  "#8b5cf6", // violet
-  "#ec4899", // pink
-  "#f43f5e", // rose
-  "#f97316", // orange
-  "#eab308", // yellow
-  "#22c55e", // green
-  "#14b8a6", // teal
-  "#3b82f6", // blue
-  "#6b7280", // gray
+// Paleta organizirana po nijansama, 7 tonova po redu (tamno → svjetlo)
+const COLOR_PALETTE: string[][] = [
+  ["#7f1d1d","#991b1b","#b91c1c","#dc2626","#ef4444","#f87171","#fca5a5"], // red
+  ["#7c2d12","#9a3412","#c2410c","#ea580c","#f97316","#fb923c","#fdba74"], // orange
+  ["#78350f","#92400e","#b45309","#d97706","#f59e0b","#fbbf24","#fcd34d"], // amber
+  ["#713f12","#854d0e","#a16207","#ca8a04","#eab308","#facc15","#fde047"], // yellow
+  ["#365314","#3f6212","#4d7c0f","#65a30d","#84cc16","#a3e635","#bef264"], // lime
+  ["#14532d","#166534","#15803d","#16a34a","#22c55e","#4ade80","#86efac"], // green
+  ["#064e3b","#065f46","#047857","#059669","#10b981","#34d399","#6ee7b7"], // emerald
+  ["#134e4a","#115e59","#0f766e","#0d9488","#14b8a6","#2dd4bf","#5eead4"], // teal
+  ["#164e63","#155e75","#0e7490","#0891b2","#06b6d4","#22d3ee","#67e8f9"], // cyan
+  ["#0c4a6e","#075985","#0369a1","#0284c7","#0ea5e9","#38bdf8","#7dd3fc"], // sky
+  ["#1e3a8a","#1e40af","#1d4ed8","#2563eb","#3b82f6","#60a5fa","#93c5fd"], // blue
+  ["#312e81","#3730a3","#4338ca","#4f46e5","#6366f1","#818cf8","#a5b4fc"], // indigo
+  ["#4a1d96","#5b21b6","#6d28d9","#7c3aed","#8b5cf6","#a78bfa","#c4b5fd"], // violet
+  ["#581c87","#6b21a8","#7e22ce","#9333ea","#a855f7","#c084fc","#d8b4fe"], // purple
+  ["#701a75","#86198f","#a21caf","#c026d3","#d946ef","#e879f9","#f0abfc"], // fuchsia
+  ["#831843","#9d174d","#be185d","#db2777","#ec4899","#f472b6","#f9a8d4"], // pink
+  ["#881337","#9f1239","#be123c","#e11d48","#f43f5e","#fb7185","#fda4af"], // rose
+  ["#1c1917","#292524","#44403c","#57534e","#78716c","#a8a29e","#d6d3d1"], // stone
+  ["#111827","#1f2937","#374151","#4b5563","#6b7280","#9ca3af","#d1d5db"], // gray
+  ["#0f172a","#1e293b","#334155","#475569","#64748b","#94a3b8","#cbd5e1"], // slate
 ];
 
 const DURATION_OPTIONS = [15, 30, 45, 60, 75, 90, 120, 150, 180];
@@ -191,26 +202,90 @@ function ColorPicker({
   selectedColor: string;
   onChange: (color: string) => void;
 }) {
+  const nativeRef = useRef<HTMLInputElement>(null);
+  const [hexInput, setHexInput] = useState(selectedColor);
+
+  // keep hex input in sync when palette swatch is clicked
+  useEffect(() => {
+    setHexInput(selectedColor);
+  }, [selectedColor]);
+
+  function handleHexInput(val: string) {
+    setHexInput(val);
+    // apply only when it looks like a valid 6-digit hex
+    if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+      onChange(val.toLowerCase());
+    }
+  }
+
+  function handleNativeChange(val: string) {
+    onChange(val.toLowerCase());
+    setHexInput(val.toLowerCase());
+  }
+
   return (
-    <div className="flex flex-wrap gap-2">
-      {COLOR_SWATCHES.map((color) => (
-        <button
-          key={color}
-          type="button"
-          onClick={() => onChange(color)}
-          className="w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 flex items-center justify-center"
-          style={{
-            backgroundColor: color,
-            borderColor: selectedColor === color ? "#1e293b" : "transparent",
-          }}
-        >
-          {selectedColor === color && (
-            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          )}
-        </button>
-      ))}
+    <div className="space-y-4">
+      {/* Palette grid */}
+      <div className="space-y-1">
+        {COLOR_PALETTE.map((row, ri) => (
+          <div key={ri} className="flex gap-1">
+            {row.map((color) => {
+              const active = selectedColor.toLowerCase() === color.toLowerCase();
+              return (
+                <button
+                  key={color}
+                  type="button"
+                  title={color}
+                  onClick={() => onChange(color)}
+                  className="w-7 h-7 rounded-md transition-all hover:scale-110 hover:z-10 relative flex items-center justify-center"
+                  style={{
+                    backgroundColor: color,
+                    outline: active ? "2px solid #1e293b" : "none",
+                    outlineOffset: "2px",
+                  }}
+                >
+                  {active && (
+                    <svg className="w-3 h-3 text-white drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      {/* Custom colour row */}
+      <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
+        {/* Preview swatch */}
+        <div
+          className="w-9 h-9 rounded-lg border border-slate-200 shrink-0 cursor-pointer"
+          style={{ backgroundColor: selectedColor }}
+          onClick={() => nativeRef.current?.click()}
+          title="Odaberi vlastitu boju"
+        />
+        {/* Native colour input (hidden, triggered by swatch click) */}
+        <input
+          ref={nativeRef}
+          type="color"
+          value={selectedColor}
+          onChange={(e) => handleNativeChange(e.target.value)}
+          className="sr-only"
+        />
+        {/* Hex text input */}
+        <input
+          type="text"
+          value={hexInput}
+          onChange={(e) => handleHexInput(e.target.value)}
+          maxLength={7}
+          placeholder="#000000"
+          spellCheck={false}
+          className="w-28 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-mono text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+        <span className="text-xs text-slate-400">Vlastita boja</span>
+      </div>
+
       <input type="hidden" name="color" value={selectedColor} onChange={() => {}} />
     </div>
   );
