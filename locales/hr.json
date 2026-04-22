@@ -466,7 +466,7 @@
   "customFields": {
     "settingsButton": "Polja tretmana",
     "pageTitle": "Prilagođena polja tretmana",
-    "pageSubtitle": "Dodajte vlastita polja koja će se prikazivati na svakom tretmanu. Vrijedi samo za ovaj salon.",
+    "pageSubtitle": "Dodajte vlastita polja koja će se prikazivati na svakom tretmanu.",
     "noFields": "Još nema prilagođenih polja.",
     "noFieldsHint": "Kliknite \"Novo polje\" da dodate prvo polje.",
     "addButton": "Novo polje",

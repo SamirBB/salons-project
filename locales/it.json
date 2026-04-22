@@ -466,7 +466,7 @@
   "customFields": {
     "settingsButton": "Campi trattamento",
     "pageTitle": "Campi personalizzati del trattamento",
-    "pageSubtitle": "Aggiungi i tuoi campi che appariranno su ogni trattamento. Valido solo per questo salone.",
+    "pageSubtitle": "Aggiungi i tuoi campi che appariranno su ogni trattamento.",
     "noFields": "Ancora nessun campo personalizzato.",
     "noFieldsHint": "Clicca su \"Nuovo campo\" per aggiungerne uno.",
     "addButton": "Nuovo campo",

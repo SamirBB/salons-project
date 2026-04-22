@@ -466,7 +466,7 @@
   "customFields": {
     "settingsButton": "Treatment Fields",
     "pageTitle": "Custom Treatment Fields",
-    "pageSubtitle": "Add your own fields that will appear on every treatment. Only applies to this salon.",
+    "pageSubtitle": "Add your own fields that will appear on every treatment.",
     "noFields": "No custom fields yet.",
     "noFieldsHint": "Click \"New field\" to add the first one.",
     "addButton": "New field",

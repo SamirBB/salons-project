@@ -466,7 +466,7 @@
   "customFields": {
     "settingsButton": "Campos de tratamiento",
     "pageTitle": "Campos personalizados de tratamiento",
-    "pageSubtitle": "Añada sus propios campos que aparecerán en cada tratamiento. Solo aplica a este salón.",
+    "pageSubtitle": "Añada sus propios campos que aparecerán en cada tratamiento.",
     "noFields": "Aún no hay campos personalizados.",
     "noFieldsHint": "Haga clic en \"Nuevo campo\" para añadir el primero.",
     "addButton": "Nuevo campo",
