@@ -3,19 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { updateEmployee } from "@/app/actions/employees";
-
-const PRESET_COLORS = [
-  "#6366f1",
-  "#8b5cf6",
-  "#ec4899",
-  "#f43f5e",
-  "#f97316",
-  "#eab308",
-  "#22c55e",
-  "#14b8a6",
-  "#3b82f6",
-  "#64748b",
-];
+import ColorPicker from "@/components/color-picker";
 
 type Props = {
   employeeId: string;
@@ -39,7 +27,7 @@ export default function EmployeeBasicForm({ employeeId, canManage, initialData }
   const [fullName, setFullName] = useState(initialData.full_name);
   const [phone, setPhone] = useState(initialData.phone ?? "");
   const [jobTitle, setJobTitle] = useState(initialData.job_title ?? "");
-  const [color, setColor] = useState(initialData.color ?? PRESET_COLORS[0]);
+  const [color, setColor] = useState(initialData.color ?? "#6366f1");
   const [bio, setBio] = useState(initialData.bio ?? "");
 
   function handleSave() {
@@ -132,28 +120,14 @@ export default function EmployeeBasicForm({ employeeId, canManage, initialData }
         <label className="block text-xs font-medium text-slate-700 mb-2">
           {t("color")}
         </label>
-        <div className="flex flex-wrap gap-2">
-          {PRESET_COLORS.map((c) => (
-            <button
-              key={c}
-              type="button"
-              disabled={!canManage}
-              onClick={() => canManage && setColor(c)}
-              title={c}
-              className="relative h-7 w-7 rounded-full transition-transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:cursor-default"
-              style={{ backgroundColor: c }}
-            >
-              {color === c && (
-                <svg
-                  className="absolute inset-0 m-auto h-4 w-4 text-white"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-            </button>
-          ))}
-        </div>
+        {canManage ? (
+          <ColorPicker selectedColor={color} onChange={setColor} name="__color_unused" />
+        ) : (
+          <span
+            className="inline-block w-6 h-6 rounded-full border border-slate-200"
+            style={{ backgroundColor: color }}
+          />
+        )}
       </div>
 
       {/* Bio */}
