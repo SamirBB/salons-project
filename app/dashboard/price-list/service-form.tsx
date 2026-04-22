@@ -260,7 +260,7 @@ function ColorPicker({
       {open && (
         <div className="absolute left-0 top-full mt-2 z-50 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl space-y-2.5 w-max">
           {/* Palette grid */}
-          <div className="space-y-1">
+          <div className="space-y-1 overflow-y-auto" style={{ maxHeight: "80px" }}>
             {COLOR_PALETTE.map((row, ri) => (
               <div key={ri} className="flex gap-1">
                 {row.map((color) => {
