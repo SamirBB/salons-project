@@ -5,19 +5,7 @@ import { updatePromotion, type Promotion } from "@/app/actions/promotions";
 import { isoToDatetimeLocalValue } from "@/lib/promotion-datetime";
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-const COLOR_SWATCHES = [
-  "#6366f1",
-  "#8b5cf6",
-  "#ec4899",
-  "#f43f5e",
-  "#f97316",
-  "#eab308",
-  "#22c55e",
-  "#14b8a6",
-  "#3b82f6",
-  "#6b7280",
-];
+import ColorPicker from "@/components/color-picker";
 
 type ServiceOption = { id: string; name: string };
 
@@ -160,21 +148,7 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
 
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
         <h2 className="font-semibold text-slate-700">{t("colorLabel")}</h2>
-        <div className="flex flex-wrap gap-2">
-          {COLOR_SWATCHES.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setColor(c)}
-              className="w-8 h-8 rounded-full border-2 transition-transform hover:scale-110"
-              style={{
-                backgroundColor: c,
-                borderColor: color === c ? "#1e293b" : "transparent",
-              }}
-            />
-          ))}
-        </div>
-        <input type="hidden" name="color" value={color} />
+        <ColorPicker selectedColor={color} onChange={setColor} />
       </div>
 
       <div className="flex items-center justify-end gap-3">
