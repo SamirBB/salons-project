@@ -455,6 +455,25 @@ export async function updateTreatment(
   return { success: true as const };
 }
 
+export async function deleteClient(clientId: string) {
+  const session = await getSession();
+  if (!ROLE_PERMISSIONS[session.role].canManageClients) {
+    return { error: "unauthorized" as const };
+  }
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("clients")
+    .delete()
+    .eq("id", clientId)
+    .eq("tenant_id", session.tenantId);
+
+  if (error) return { error: "deleteError" as const };
+
+  revalidatePath("/dashboard/clients");
+  return { success: true as const };
+}
+
 export async function deleteTreatment(treatmentId: string, clientId: string) {
   const session = await getSession();
   const supabase = await createClient();

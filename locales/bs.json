@@ -462,7 +462,10 @@
     "tabKarton": "Karton",
     "tabPromocije": "Promocije",
     "promoPlaceholder": "Modul promocija nije još povezan sa klijentima.",
-    "promoPlaceholderHint": "Uskoro dostupno."
+    "promoPlaceholderHint": "Uskoro dostupno.",
+    "deleteClient": "Obriši klijenta",
+    "deleteConfirm": "Da, obriši",
+    "deleteCancel": "Otkaži"
   },
   "klijentiExport": {
     "pdfTitle": "Klijenti",

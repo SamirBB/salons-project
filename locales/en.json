@@ -428,7 +428,10 @@
     "tabKarton": "Record",
     "tabPromocije": "Promotions",
     "promoPlaceholder": "Promotions module not yet linked to clients.",
-    "promoPlaceholderHint": "Coming soon."
+    "promoPlaceholderHint": "Coming soon.",
+    "deleteClient": "Delete client",
+    "deleteConfirm": "Yes, delete",
+    "deleteCancel": "Cancel"
   },
   "klijentiExport": {
     "pdfTitle": "Clients",

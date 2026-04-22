@@ -428,7 +428,10 @@
     "tabKarton": "Cartella",
     "tabPromocije": "Promozioni",
     "promoPlaceholder": "Il modulo promozioni non è ancora collegato ai clienti.",
-    "promoPlaceholderHint": "Prossimamente."
+    "promoPlaceholderHint": "Prossimamente.",
+    "deleteClient": "Elimina cliente",
+    "deleteConfirm": "Sì, elimina",
+    "deleteCancel": "Annulla"
   },
   "klijentiExport": {
     "pdfTitle": "Clienti",
