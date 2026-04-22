@@ -80,20 +80,22 @@ export default function ClientList({
     }
   }
 
-  function handleDelete(e: React.MouseEvent, id: string) {
+  async function handleDelete(e: React.MouseEvent, id: string) {
     e.stopPropagation();
+    e.preventDefault();
     setDeleteError(null);
     setLoadingId(id);
-    startTransition(async () => {
+    try {
       const res = await deleteClient(id);
-      setLoadingId(null);
       if (res && "error" in res) {
         setDeleteError(`Greška: ${res.error}`);
-        setConfirmDeleteId(null);
-      } else {
-        setConfirmDeleteId(null);
       }
-    });
+    } catch (err) {
+      setDeleteError(`Exception: ${String(err)}`);
+    } finally {
+      setLoadingId(null);
+      setConfirmDeleteId(null);
+    }
   }
 
   function handleToggle(e: React.MouseEvent, c: ClientListRow) {
