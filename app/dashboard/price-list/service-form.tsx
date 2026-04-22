@@ -202,20 +202,30 @@ function ColorPicker({
   selectedColor: string;
   onChange: (color: string) => void;
 }) {
-  const nativeRef = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
   const [hexInput, setHexInput] = useState(selectedColor);
+  const nativeRef = useRef<HTMLInputElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
-  // keep hex input in sync when palette swatch is clicked
   useEffect(() => {
     setHexInput(selectedColor);
   }, [selectedColor]);
 
+  // Zatvori na klik izvan
+  useEffect(() => {
+    if (!open) return;
+    function handle(e: MouseEvent) {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [open]);
+
   function handleHexInput(val: string) {
     setHexInput(val);
-    // apply only when it looks like a valid 6-digit hex
-    if (/^#[0-9a-fA-F]{6}$/.test(val)) {
-      onChange(val.toLowerCase());
-    }
+    if (/^#[0-9a-fA-F]{6}$/.test(val)) onChange(val.toLowerCase());
   }
 
   function handleNativeChange(val: string) {
@@ -223,68 +233,90 @@ function ColorPicker({
     setHexInput(val.toLowerCase());
   }
 
-  return (
-    <div className="space-y-4">
-      {/* Palette grid */}
-      <div className="space-y-1">
-        {COLOR_PALETTE.map((row, ri) => (
-          <div key={ri} className="flex gap-1">
-            {row.map((color) => {
-              const active = selectedColor.toLowerCase() === color.toLowerCase();
-              return (
-                <button
-                  key={color}
-                  type="button"
-                  title={color}
-                  onClick={() => onChange(color)}
-                  className="w-7 h-7 rounded-md transition-all hover:scale-110 hover:z-10 relative flex items-center justify-center"
-                  style={{
-                    backgroundColor: color,
-                    outline: active ? "2px solid #1e293b" : "none",
-                    outlineOffset: "2px",
-                  }}
-                >
-                  {active && (
-                    <svg className="w-3 h-3 text-white drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        ))}
-      </div>
+  function pickSwatch(color: string) {
+    onChange(color);
+    setOpen(false);
+  }
 
-      {/* Custom colour row */}
-      <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
-        {/* Preview swatch */}
-        <div
-          className="w-9 h-9 rounded-lg border border-slate-200 shrink-0 cursor-pointer"
+  return (
+    <div className="relative inline-block" ref={popoverRef}>
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+      >
+        <span
+          className="inline-block w-5 h-5 rounded-md border border-slate-200 shrink-0"
           style={{ backgroundColor: selectedColor }}
-          onClick={() => nativeRef.current?.click()}
-          title="Odaberi vlastitu boju"
         />
-        {/* Native colour input (hidden, triggered by swatch click) */}
-        <input
-          ref={nativeRef}
-          type="color"
-          value={selectedColor}
-          onChange={(e) => handleNativeChange(e.target.value)}
-          className="sr-only"
-        />
-        {/* Hex text input */}
-        <input
-          type="text"
-          value={hexInput}
-          onChange={(e) => handleHexInput(e.target.value)}
-          maxLength={7}
-          placeholder="#000000"
-          spellCheck={false}
-          className="w-28 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-mono text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-        <span className="text-xs text-slate-400">Vlastita boja</span>
-      </div>
+        <span className="font-mono text-xs text-slate-500">{selectedColor}</span>
+        <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+
+      {/* Popover */}
+      {open && (
+        <div className="absolute left-0 top-full mt-2 z-50 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl space-y-2.5 w-max">
+          {/* Palette grid */}
+          <div className="space-y-1">
+            {COLOR_PALETTE.map((row, ri) => (
+              <div key={ri} className="flex gap-1">
+                {row.map((color) => {
+                  const active = selectedColor.toLowerCase() === color.toLowerCase();
+                  return (
+                    <button
+                      key={color}
+                      type="button"
+                      title={color}
+                      onClick={() => pickSwatch(color)}
+                      className="w-6 h-6 rounded-md transition-all hover:scale-110 relative flex items-center justify-center"
+                      style={{
+                        backgroundColor: color,
+                        outline: active ? "2px solid #1e293b" : "none",
+                        outlineOffset: "2px",
+                      }}
+                    >
+                      {active && (
+                        <svg className="w-3 h-3 text-white drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          {/* Custom hex row */}
+          <div className="flex items-center gap-2 pt-1.5 border-t border-slate-100">
+            <div
+              className="w-7 h-7 rounded-lg border border-slate-200 shrink-0 cursor-pointer"
+              style={{ backgroundColor: selectedColor }}
+              onClick={() => nativeRef.current?.click()}
+              title="Odaberi vlastitu boju"
+            />
+            <input
+              ref={nativeRef}
+              type="color"
+              value={selectedColor}
+              onChange={(e) => handleNativeChange(e.target.value)}
+              className="sr-only"
+            />
+            <input
+              type="text"
+              value={hexInput}
+              onChange={(e) => handleHexInput(e.target.value)}
+              maxLength={7}
+              placeholder="#000000"
+              spellCheck={false}
+              className="w-24 rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-mono text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+      )}
 
       <input type="hidden" name="color" value={selectedColor} onChange={() => {}} />
     </div>
