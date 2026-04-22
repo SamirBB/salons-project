@@ -462,6 +462,31 @@ export async function deleteClient(clientId: string) {
   }
   const supabase = await createClient();
 
+  // Dohvati sve treatment ID-eve za ovog klijenta
+  const { data: treatments } = await supabase
+    .from("client_treatments")
+    .select("id")
+    .eq("client_id", clientId)
+    .eq("tenant_id", session.tenantId);
+
+  const treatmentIds = (treatments ?? []).map((t) => t.id);
+
+  // Obriši junction zapise (client_treatment_services)
+  if (treatmentIds.length > 0) {
+    await supabase
+      .from("client_treatment_services")
+      .delete()
+      .in("treatment_id", treatmentIds);
+  }
+
+  // Obriši tretmane
+  await supabase
+    .from("client_treatments")
+    .delete()
+    .eq("client_id", clientId)
+    .eq("tenant_id", session.tenantId);
+
+  // Obriši klijenta
   const { error } = await supabase
     .from("clients")
     .delete()
