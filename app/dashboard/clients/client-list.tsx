@@ -54,6 +54,7 @@ export default function ClientList({
   const [search, setSearch] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const filtered = clients.filter((c) => {
@@ -81,11 +82,17 @@ export default function ClientList({
 
   function handleDelete(e: React.MouseEvent, id: string) {
     e.stopPropagation();
+    setDeleteError(null);
     setLoadingId(id);
     startTransition(async () => {
-      await deleteClient(id);
-      setConfirmDeleteId(null);
+      const res = await deleteClient(id);
       setLoadingId(null);
+      if (res && "error" in res) {
+        setDeleteError(`Greška: ${res.error}`);
+        setConfirmDeleteId(null);
+      } else {
+        setConfirmDeleteId(null);
+      }
     });
   }
 
@@ -135,6 +142,13 @@ export default function ClientList({
           />
         </div>
       </div>
+
+      {deleteError && (
+        <div className="mx-5 mt-3 rounded-lg bg-red-50 border border-red-200 px-4 py-2.5 text-sm text-red-700 flex items-center justify-between gap-3">
+          <span>{deleteError}</span>
+          <button type="button" onClick={() => setDeleteError(null)} className="text-red-400 hover:text-red-600 shrink-0">✕</button>
+        </div>
+      )}
 
       {filtered.length > 0 ? (
         <>

@@ -493,7 +493,10 @@ export async function deleteClient(clientId: string) {
     .eq("id", clientId)
     .eq("tenant_id", session.tenantId);
 
-  if (error) return { error: "deleteError" as const };
+  if (error) {
+    console.error("[deleteClient] DB error:", error);
+    return { error: "deleteError" as const };
+  }
 
   revalidatePath("/dashboard/clients");
   return { success: true as const };
