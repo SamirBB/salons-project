@@ -53,7 +53,7 @@ export default function ClientList({
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const filtered = clients.filter((c) => {
@@ -79,22 +79,11 @@ export default function ClientList({
     }
   }
 
-  async function handleDelete(e: React.MouseEvent, id: string, name: string) {
-    e.stopPropagation();
-    e.preventDefault();
-    if (!window.confirm(`Obrisati klijenta "${name}"? Ova radnja je trajna.`)) return;
-    setDeleteError(null);
-    setLoadingId(id);
-    try {
-      const res = await deleteClient(id);
-      if (res && "error" in res) {
-        setDeleteError(`Greška pri brisanju. Pokušajte ponovo.`);
-      }
-    } catch (err) {
-      setDeleteError(`Greška: ${String(err)}`);
-    } finally {
-      setLoadingId(null);
-    }
+  function handleDelete(id: string) {
+    startTransition(async () => {
+      await deleteClient(id);
+      setConfirmDeleteId(null);
+    });
   }
 
   function handleToggle(e: React.MouseEvent, c: ClientListRow) {
@@ -144,12 +133,6 @@ export default function ClientList({
         </div>
       </div>
 
-      {deleteError && (
-        <div className="mx-5 mt-3 rounded-lg bg-red-50 border border-red-200 px-4 py-2.5 text-sm text-red-700 flex items-center justify-between gap-3">
-          <span>{deleteError}</span>
-          <button type="button" onClick={() => setDeleteError(null)} className="text-red-400 hover:text-red-600 shrink-0">✕</button>
-        </div>
-      )}
 
       {filtered.length > 0 ? (
         <>
@@ -207,17 +190,18 @@ export default function ClientList({
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
                     {canManage && (
-                      <button
-                        type="button"
-                        disabled={loadingId === c.id}
-                        onClick={(e) => handleDelete(e, c.id, display)}
-                        className="rounded p-1.5 text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-40 shrink-0"
-                        title="Obriši klijenta"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                      <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+                        {confirmDeleteId === c.id ? (
+                          <div className="flex items-center gap-1">
+                            <button type="button" onClick={() => handleDelete(c.id)} disabled={isPending} className="rounded px-2 py-1 text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100">Da</button>
+                            <button type="button" onClick={() => setConfirmDeleteId(null)} className="rounded px-2 py-1 text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200">Ne</button>
+                          </div>
+                        ) : (
+                          <button type="button" onClick={() => setConfirmDeleteId(c.id)} className="rounded p-1.5 text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors" title="Obriši klijenta">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -247,17 +231,18 @@ export default function ClientList({
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
                     {canManage && (
-                      <button
-                        type="button"
-                        disabled={loadingId === c.id}
-                        onClick={(e) => handleDelete(e, c.id, display)}
-                        className="rounded p-1.5 text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-40"
-                        title="Obriši klijenta"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        {confirmDeleteId === c.id ? (
+                          <div className="flex items-center gap-1">
+                            <button type="button" onClick={() => handleDelete(c.id)} disabled={isPending} className="rounded px-2 py-1 text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100">Da</button>
+                            <button type="button" onClick={() => setConfirmDeleteId(null)} className="rounded px-2 py-1 text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200">Ne</button>
+                          </div>
+                        ) : (
+                          <button type="button" onClick={() => setConfirmDeleteId(c.id)} className="rounded p-1.5 text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors" title="Obriši klijenta">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 </li>
