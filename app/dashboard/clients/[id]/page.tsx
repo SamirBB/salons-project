@@ -8,7 +8,11 @@ import { clientDisplayName, clientInitialLetter } from "@/lib/clients";
 import ClientSummary from "./client-summary";
 import ClientTabs from "./client-tabs";
 import TreatmentKarton from "./treatment-karton";
+import ClientPromotionsKarton from "./client-promotions-karton";
 import { getActiveCustomFields } from "@/app/actions/custom-fields";
+import { getClientPromotions, getAvailablePromotions } from "@/app/actions/client-promotions";
+import ClientSuggestionsKarton from "./client-suggestions-karton";
+import { getClientSuggestions } from "@/app/actions/client-suggestions";
 import type { Treatment, TreatmentService } from "@/app/actions/clients";
 
 function dateToInputValue(value: string | null): string {
@@ -93,7 +97,7 @@ export default async function ClientDetailPage({
 
   const canManage = ROLE_PERMISSIONS[session.role].canManageClients;
 
-  const [{ data: rawTreatments }, { data: employees }, { data: services }, customFields] = await Promise.all([
+  const [{ data: rawTreatments }, { data: employees }, { data: services }, customFields, clientPromotions, availablePromotions, clientSuggestions] = await Promise.all([
     supabase
       .from("client_treatments")
       .select("*, employees(full_name, color), client_treatment_services(service_id, services(id, name, price))")
@@ -114,6 +118,9 @@ export default async function ClientDetailPage({
       .order("category", { nullsFirst: true })
       .order("name"),
     getActiveCustomFields(),
+    getClientPromotions(id),
+    getAvailablePromotions(),
+    getClientSuggestions(id),
   ]);
 
   const treatments: Treatment[] = (rawTreatments ?? []).map((row) =>
@@ -191,6 +198,21 @@ export default async function ClientDetailPage({
             customFields={customFields}
             canManage={canManage}
             currentEmployeeId={session.employeeId}
+          />
+        }
+        promocije={
+          <ClientPromotionsKarton
+            clientId={client.id}
+            promotions={clientPromotions}
+            available={availablePromotions}
+            canManage={canManage}
+          />
+        }
+        prijedlozi={
+          <ClientSuggestionsKarton
+            clientId={client.id}
+            suggestions={clientSuggestions}
+            canManage={canManage}
           />
         }
       />
