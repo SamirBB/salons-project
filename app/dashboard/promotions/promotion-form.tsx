@@ -5,6 +5,7 @@ import { createPromotion } from "@/app/actions/promotions";
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ColorPicker from "@/components/color-picker";
+import DateTimePicker from "@/components/date-time-picker";
 
 type ServiceOption = { id: string; name: string };
 
@@ -13,7 +14,7 @@ export default function PromotionForm({ services }: { services: ServiceOption[] 
   const router = useRouter();
   const [state, formAction, pending] = useActionState(createPromotion, null);
   const [color, setColor] = useState("#6366f1");
-  const [endsMin, setEndsMin] = useState("");
+  const [startsAtIso, setStartsAtIso] = useState<string>("");
 
   useEffect(() => {
     if (state && "id" in state && state.id) {
@@ -87,23 +88,21 @@ export default function PromotionForm({ services }: { services: ServiceOption[] 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">{t("startsAtLabel")}</label>
-            <input
+            <DateTimePicker
               name="starts_at"
-              type="datetime-local"
-              onChange={(e) => setEndsMin(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Odaberi početak..."
+              onChange={setStartsAtIso}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">
               {t("endsAtLabel")} <span className="text-red-500">*</span>
             </label>
-            <input
+            <DateTimePicker
               name="ends_at"
-              type="datetime-local"
               required
-              min={endsMin || undefined}
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Odaberi završetak..."
+              minIso={startsAtIso || null}
             />
           </div>
         </div>

@@ -2,10 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { updatePromotion, type Promotion } from "@/app/actions/promotions";
-import { isoToDatetimeLocalValue } from "@/lib/promotion-datetime";
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ColorPicker from "@/components/color-picker";
+import DateTimePicker from "@/components/date-time-picker";
 
 type ServiceOption = { id: string; name: string };
 
@@ -20,7 +20,7 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
   const action = updatePromotion.bind(null, p.id);
   const [state, formAction, pending] = useActionState(action, null);
   const [color, setColor] = useState(p.color ?? "#6366f1");
-  const [endsMin, setEndsMin] = useState(isoToDatetimeLocalValue(p.starts_at));
+  const [startsAtIso, setStartsAtIso] = useState<string>(p.starts_at ?? "");
 
   useEffect(() => {
     if (state?.success) router.refresh();
@@ -97,25 +97,23 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">{t("startsAtLabel")}</label>
-            <input
+            <DateTimePicker
               name="starts_at"
-              type="datetime-local"
-              defaultValue={isoToDatetimeLocalValue(p.starts_at)}
-              onChange={(e) => setEndsMin(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              defaultValue={p.starts_at}
+              placeholder="Odaberi početak..."
+              onChange={setStartsAtIso}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">
               {t("endsAtLabel")} <span className="text-red-500">*</span>
             </label>
-            <input
+            <DateTimePicker
               name="ends_at"
-              type="datetime-local"
               required
-              min={endsMin || undefined}
-              defaultValue={isoToDatetimeLocalValue(p.ends_at)}
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              defaultValue={p.ends_at}
+              placeholder="Odaberi završetak..."
+              minIso={startsAtIso || null}
             />
           </div>
         </div>
