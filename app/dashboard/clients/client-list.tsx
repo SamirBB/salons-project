@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { toggleClientActive, deleteClient } from "@/app/actions/clients";
 import { clientDisplayName, clientInitialLetter } from "@/lib/clients";
 
@@ -32,11 +33,14 @@ function ListAvatar({ url, letter }: { url: string | null; letter: string }) {
     );
   }
   return (
-    <img
+    <Image
       src={url}
       alt=""
+      width={36}
+      height={36}
       className="h-9 w-9 shrink-0 rounded-full object-cover border border-slate-200"
       onError={() => setBroken(true)}
+      unoptimized
     />
   );
 }

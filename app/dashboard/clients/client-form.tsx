@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   insertClient,
   removeClientPhoto,
@@ -106,10 +107,13 @@ export default function ClientForm({ mode, clientId, canManage, initial, onSaved
         <p className="text-sm text-slate-500">{t("readOnlyHint")}</p>
         <div className="flex flex-wrap items-start gap-4">
           {photoPreview ? (
-            <img
+            <Image
               src={photoPreview}
               alt=""
+              width={80}
+              height={80}
               className="h-20 w-20 shrink-0 rounded-2xl border border-slate-200 object-cover"
+              unoptimized
             />
           ) : null}
           <dl className="grid flex-1 gap-3 text-sm sm:grid-cols-2 min-w-0">
@@ -309,7 +313,14 @@ export default function ClientForm({ mode, clientId, canManage, initial, onSaved
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-white">
             {photoPreview ? (
-              <img src={photoPreview} alt="" className="h-full w-full object-cover" />
+              <Image
+                src={photoPreview}
+                alt=""
+                width={80}
+                height={80}
+                className="h-full w-full object-cover"
+                unoptimized
+              />
             ) : (
               <span className="text-xs text-slate-400 text-center px-1">{t("noPhoto")}</span>
             )}

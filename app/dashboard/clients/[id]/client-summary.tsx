@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import ClientForm from "../client-form";
 import type { ClientFormInitial } from "../client-form";
 
@@ -53,10 +54,13 @@ export default function ClientSummary({
           {/* Avatar */}
           <div className="shrink-0">
             {photoUrl ? (
-              <img
+              <Image
                 src={photoUrl}
                 alt=""
+                width={56}
+                height={56}
                 className="h-14 w-14 rounded-full object-cover border border-slate-200"
+                unoptimized
               />
             ) : (
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100 text-xl font-bold text-indigo-700">
