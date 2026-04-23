@@ -99,7 +99,19 @@ export default async function PromotionDetailPage({ params }: Props) {
             <div className="flex flex-wrap gap-4">
               <div>
                 <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t("isActiveLabel")}</dt>
-                <dd className="mt-1 text-slate-800">{p.is_active ? t("activeYes") : t("activeNo")}</dd>
+                <dd className="mt-1">
+                  {(() => {
+                    const isExpired = !!p.ends_at && new Date(p.ends_at) < new Date();
+                    if (isExpired) {
+                      return <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">{t("activeExpired")}</span>;
+                    }
+                    return (
+                      <span className={p.is_active ? "rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700" : "rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500"}>
+                        {p.is_active ? t("activeYes") : t("activeNo")}
+                      </span>
+                    );
+                  })()}
+                </dd>
               </div>           
             </div>
             <div>

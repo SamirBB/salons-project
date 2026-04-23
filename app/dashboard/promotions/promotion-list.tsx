@@ -143,15 +143,27 @@ export default function PromotionList({ promotions, canManage }: Props) {
               <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{p.starts_at_display}</td>
               <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{p.ends_at_display}</td>
               <td className="px-3 py-3">
-                <span
-                  className={
-                    p.is_active
-                      ? "rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
-                      : "rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500"
+                {(() => {
+                  const isExpired = !!p.ends_at && new Date(p.ends_at) < new Date();
+                  if (isExpired) {
+                    return (
+                      <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+                        {t("activeExpired")}
+                      </span>
+                    );
                   }
-                >
-                  {p.is_active ? t("activeYes") : t("activeNo")}
-                </span>
+                  return (
+                    <span
+                      className={
+                        p.is_active
+                          ? "rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
+                          : "rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500"
+                      }
+                    >
+                      {p.is_active ? t("activeYes") : t("activeNo")}
+                    </span>
+                  );
+                })()}
               </td>
               <td className={`px-2 py-3 pr-3 text-right align-middle ${canManage ? "min-w-[9rem]" : "w-12"}`}>
                 <div className="inline-flex items-center justify-end gap-4">
