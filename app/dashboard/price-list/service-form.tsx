@@ -24,18 +24,18 @@ export default function ServiceForm({ mode, service }: Props) {
 
   const [state, formAction, pending] = useActionState(action, null);
 
-useEffect(() => {
-  if (!state) return;
+  useEffect(() => {
+    if (!state) return;
 
-  if ("id" in state && state.id) {
-    router.push(`/dashboard/price-list/${state.id}`);
-    return;
-  }
+    if ("id" in state && state.id) {
+      router.push(`/dashboard/price-list/${state.id}`);
+      return;
+    }
 
-  if ("success" in state && state.success && service?.id) {
-    router.push(`/dashboard/price-list/${service.id}`);
-  }
-}, [state, router, service]);
+    if ("success" in state && state.success && service?.id) {
+      router.push(`/dashboard/price-list/${service.id}`);
+    }
+  }, [state, router, service]);
 
   return (
     <form action={formAction} className="space-y-6">
