@@ -83,8 +83,32 @@ export default async function PromotionDetailPage({ params }: Props) {
           className="mt-1.5 h-4 w-4 shrink-0 rounded-full border border-slate-200"
           style={{ backgroundColor: p.color ?? "#94a3b8" }}
         />
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">{p.name}</h1>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-2xl font-bold text-slate-800">{p.name}</h1>
+            {(() => {
+              const isExpired = !!p.ends_at && new Date(p.ends_at) < new Date();
+              if (isExpired) {
+                return (
+                  <span className="rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                    {t("activeExpired")}
+                  </span>
+                );
+              }
+              if (p.is_active) {
+                return (
+                  <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                    {t("activeYes")}
+                  </span>
+                );
+              }
+              return (
+                <span className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-500">
+                  {t("activeNo")}
+                </span>
+              );
+            })()}
+          </div>
           <p className="text-sm text-slate-500 mt-0.5">
             {canManage ? t("editPromotionTitle") : `${t("detailType")}: ${promotionTypeDisplay}`}
           </p>
