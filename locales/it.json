@@ -405,6 +405,7 @@
       "employee": "Dipendente",
       "noEmployee": "— nessun dipendente —",
       "invoicePlaceholder": "es. R-2024-001",
+      "amountFromServices": "Calcolato dai servizi selezionati",
       "notesPlaceholder": "Note...",
       "cancel": "Annulla",
       "saving": "Salvataggio...",

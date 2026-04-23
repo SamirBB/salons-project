@@ -80,13 +80,28 @@ export default function TreatmentForm({
   }
 
   function toggleService(id: string) {
-    setForm((f) => ({
-      ...f,
-      service_ids: f.service_ids.includes(id)
+    setForm((f) => {
+      const newIds = f.service_ids.includes(id)
         ? f.service_ids.filter((s) => s !== id)
-        : [...f.service_ids, id],
-    }));
+        : [...f.service_ids, id];
+      const total = services
+        .filter((s) => newIds.includes(s.id))
+        .reduce((sum, s) => sum + s.price, 0);
+      return {
+        ...f,
+        service_ids: newIds,
+        amount_charged: total > 0 ? total.toFixed(2) : "",
+      };
+    });
   }
+
+  const servicesTotal = services
+    .filter((s) => form.service_ids.includes(s.id))
+    .reduce((sum, s) => sum + s.price, 0);
+  const amountMatchesTotal =
+    servicesTotal > 0 &&
+    form.amount_charged !== "" &&
+    Math.abs(parseFloat(form.amount_charged) - servicesTotal) < 0.001;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -286,6 +301,14 @@ export default function TreatmentForm({
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">€</span>
             </div>
+            {amountMatchesTotal && (
+              <p className="mt-1 text-[11px] text-indigo-500 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+                </svg>
+                {t("karton.amountFromServices")}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">

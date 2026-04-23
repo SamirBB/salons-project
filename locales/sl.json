@@ -405,6 +405,7 @@
       "employee": "Zaposleni",
       "noEmployee": "— brez zaposlenega —",
       "invoicePlaceholder": "npr. R-2024-001",
+      "amountFromServices": "Sešteto iz izbranih storitev",
       "notesPlaceholder": "Opombe...",
       "cancel": "Prekliči",
       "saving": "Shranjevanje...",

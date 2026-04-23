@@ -405,6 +405,7 @@
       "employee": "Radnik",
       "noEmployee": "— bez radnika —",
       "invoicePlaceholder": "npr. R-2024-001",
+      "amountFromServices": "Sabrano iz odabranih usluga",
       "notesPlaceholder": "Napomene...",
       "cancel": "Odustani",
       "saving": "Spremanje...",
