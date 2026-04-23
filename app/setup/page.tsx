@@ -35,7 +35,7 @@ const DAY_KEYS: Record<string, "monday" | "tuesday" | "wednesday" | "thursday" |
 export default function SetupPage() {
   const [state, action, pending] = useActionState(createTenant, undefined);
   const t = useTranslations("setup");
-  const tCommon = useTranslations("common");
+
 
   const [step, setStep] = useState(1);
 

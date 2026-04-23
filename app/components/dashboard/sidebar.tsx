@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { getNavItemsForRole } from "./nav-items";
-import { ROLE_LABELS, type Role } from "@/lib/roles";
+import { type Role } from "@/lib/roles";
 
 const icons: Record<string, React.ReactNode> = {
   calendar: (

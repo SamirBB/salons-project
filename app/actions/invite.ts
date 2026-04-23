@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { isValidRole, type Role } from "@/lib/roles";
+import { isValidRole } from "@/lib/roles";
 import { getSession } from "@/lib/session";
 
 // ─── Vlasnik kreira invite ───────────────────────────────────────────────────
