@@ -100,11 +100,7 @@ export default async function PromotionDetailPage({ params }: Props) {
               <div>
                 <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t("isActiveLabel")}</dt>
                 <dd className="mt-1 text-slate-800">{p.is_active ? t("activeYes") : t("activeNo")}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t("displayOrderLabel")}</dt>
-                <dd className="mt-1 text-slate-800">{p.display_order}</dd>
-              </div>
+              </div>           
             </div>
             <div>
               <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t("startsAtLabel")}</dt>

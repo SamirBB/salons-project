@@ -130,16 +130,6 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">{t("displayOrderLabel")}</label>
-          <input
-            name="display_order"
-            type="number"
-            defaultValue={p.display_order}
-            className="w-full max-w-[12rem] rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
         <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
           <input type="checkbox" name="is_active" defaultChecked={p.is_active} className="rounded border-slate-300 text-indigo-600" />
           {t("isActiveLabel")}
