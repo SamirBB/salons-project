@@ -58,6 +58,13 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
+  // Root "/" → dashboard ili login
+  if (pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = user ? "/dashboard" : "/login";
+    return NextResponse.redirect(url);
+  }
+
   // Unauthenticated → login
   if (!user && !isPublic && pathname !== "/setup") {
     const url = request.nextUrl.clone();
