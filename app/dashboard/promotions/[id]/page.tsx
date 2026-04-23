@@ -44,7 +44,17 @@ export default async function PromotionDetailPage({ params }: Props) {
 
   if (!row) notFound();
 
-  const p = row as Promotion;
+  // Eagerly deactivate if expired and still marked active
+  const rawPromotion = row as Promotion;
+  const isExpiredNow = !!rawPromotion.ends_at && new Date(rawPromotion.ends_at) < new Date();
+  if (isExpiredNow && rawPromotion.is_active) {
+    await supabase
+      .from("promotions")
+      .update({ is_active: false })
+      .eq("id", rawPromotion.id)
+      .eq("tenant_id", session.tenantId);
+  }
+  const p: Promotion = isExpiredNow ? { ...rawPromotion, is_active: false } : rawPromotion;
 
   const promotionTypeDisplay =
     p.promotion_type === "bundle"

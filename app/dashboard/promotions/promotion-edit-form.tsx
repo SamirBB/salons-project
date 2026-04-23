@@ -21,6 +21,7 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
   const [state, formAction, pending] = useActionState(action, null);
   const [color, setColor] = useState(p.color ?? "#6366f1");
   const [startsAtIso, setStartsAtIso] = useState<string>(p.starts_at ?? "");
+  const isExpired = !!p.ends_at && new Date(p.ends_at) < new Date();
 
   useEffect(() => {
     if (state?.success) router.refresh();
@@ -128,10 +129,18 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
           />
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
-          <input type="checkbox" name="is_active" defaultChecked={p.is_active} className="rounded border-slate-300 text-indigo-600" />
-          {t("isActiveLabel")}
-        </label>
+        {isExpired ? (
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <input type="checkbox" disabled className="rounded border-slate-300 opacity-50" />
+            <span>{t("isActiveLabel")}</span>
+            <span className="text-xs text-amber-600">— {t("activeExpired")}</span>
+          </div>
+        ) : (
+          <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+            <input type="checkbox" name="is_active" defaultChecked={p.is_active} className="rounded border-slate-300 text-indigo-600" />
+            {t("isActiveLabel")}
+          </label>
+        )}
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
