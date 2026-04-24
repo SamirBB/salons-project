@@ -12,6 +12,7 @@ type Props = {
 export default function DevicesSettings({ devices, appUrl }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
+  const [browser, setBrowser] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -21,12 +22,13 @@ export default function DevicesSettings({ devices, appUrl }: Props) {
     if (!name.trim()) return;
     setError(null);
     startTransition(async () => {
-      const result = await addDevice(name);
+      const result = await addDevice(name, browser);
       if (result.error) {
         setError("Greška pri dodavanju uređaja.");
         return;
       }
       setName("");
+      setBrowser("");
       setShowForm(false);
     });
   }
@@ -68,23 +70,37 @@ export default function DevicesSettings({ devices, appUrl }: Props) {
       {showForm && (
         <div className="rounded-xl border border-indigo-200 bg-indigo-50/40 p-4 space-y-3">
           <p className="text-sm font-medium text-slate-700">Novi uređaj</p>
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-              Naziv uređaja
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="npr. Tablet recepcija, Kasa 1"
-              autoFocus
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-            />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                Naziv uređaja
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="npr. Tablet recepcija, Kasa 1"
+                autoFocus
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                Browser
+              </label>
+              <input
+                type="text"
+                value={browser}
+                onChange={(e) => setBrowser(e.target.value)}
+                placeholder="npr. Chrome, Firefox, Safari"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              />
+            </div>
           </div>
           {error && <p className="text-xs text-red-500">{error}</p>}
           <div className="flex gap-2 justify-end">
             <button
-              onClick={() => { setShowForm(false); setName(""); setError(null); }}
+              onClick={() => { setShowForm(false); setName(""); setBrowser(""); setError(null); }}
               className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors"
             >
               Odustani
@@ -120,7 +136,14 @@ export default function DevicesSettings({ devices, appUrl }: Props) {
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-800">{d.name}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-semibold text-slate-800">{d.name}</p>
+                    {d.browser && (
+                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+                        {d.browser}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-slate-400 mt-0.5 font-mono truncate" title={d.device_identifier}>
                     {d.device_identifier}
                   </p>

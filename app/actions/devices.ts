@@ -8,6 +8,7 @@ export type Device = {
   id: string;
   tenant_id: string;
   name: string;
+  browser: string | null;
   device_identifier: string;
   is_active: boolean;
   created_at: string;
@@ -19,14 +20,14 @@ export async function getDevices(): Promise<Device[]> {
 
   const { data } = await supabase
     .from("devices")
-    .select("id, tenant_id, name, device_identifier, is_active, created_at")
+    .select("id, tenant_id, name, browser, device_identifier, is_active, created_at")
     .eq("tenant_id", session.tenantId)
     .order("created_at", { ascending: true });
 
   return (data ?? []) as Device[];
 }
 
-export async function addDevice(name: string): Promise<{ id?: string; error?: string }> {
+export async function addDevice(name: string, browser?: string): Promise<{ id?: string; error?: string }> {
   const session = await getSession();
   if (!["owner", "manager"].includes(session.role)) return { error: "noPermission" };
 
@@ -34,7 +35,7 @@ export async function addDevice(name: string): Promise<{ id?: string; error?: st
 
   const { data, error } = await supabase
     .from("devices")
-    .insert({ tenant_id: session.tenantId, name: name.trim() })
+    .insert({ tenant_id: session.tenantId, name: name.trim(), browser: browser?.trim() || null })
     .select("id")
     .single();
 

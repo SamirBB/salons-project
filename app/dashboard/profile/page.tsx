@@ -33,7 +33,11 @@ export default async function ProfilPage({
     getDevices(),
   ]);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ??
+    (process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : "http://localhost:3000");
 
   return (
     <div className="max-w-2xl space-y-6">
