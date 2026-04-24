@@ -25,7 +25,7 @@ export default async function UposleniciPage() {
   const canManage = session.role === "owner" || session.role === "manager";
 
   return (
-    <div className="max-w-4xl space-y-6">
+    <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">{t("title")}</h2>
