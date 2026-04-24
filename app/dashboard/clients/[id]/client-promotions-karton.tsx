@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { assignPromotion, removeClientPromotion, markPromotionUsed } from "@/app/actions/client-promotions";
 import type { ClientPromotion, AvailablePromotion } from "@/app/actions/client-promotions";
 
@@ -34,6 +34,9 @@ const PROMO_TYPE_LABELS: Record<string, string> = {
 };
 
 export default function ClientPromotionsKarton({ clientId, promotions, available, canManage }: Props) {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => { setNow(new Date()); }, []);
+
   const [showForm, setShowForm] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [notes, setNotes] = useState("");
@@ -204,7 +207,7 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
               <tbody className="divide-y divide-slate-100">
                 {promotions.map((cp) => {
                   const isExpired =
-                    !!cp.promotion.ends_at && new Date(cp.promotion.ends_at) < new Date();
+                    now !== null && !!cp.promotion.ends_at && new Date(cp.promotion.ends_at) < now;
                   const isUsed = cp.status === "completed";
                   return (
                     <tr key={cp.id} className="hover:bg-slate-50 transition-colors">
