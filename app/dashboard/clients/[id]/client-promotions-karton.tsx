@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { assignPromotion, removeClientPromotion, markPromotionUsed } from "@/app/actions/client-promotions";
 import type { ClientPromotion, AvailablePromotion } from "@/app/actions/client-promotions";
 
@@ -25,15 +26,9 @@ function ColorDot({ color }: { color: string | null }) {
   );
 }
 
-const PROMO_TYPE_LABELS: Record<string, string> = {
-  discount: "Popust",
-  loyalty: "Loyalty",
-  package: "Paket",
-  gift: "Poklon",
-  referral: "Preporuka",
-};
-
 export default function ClientPromotionsKarton({ clientId, promotions, available, canManage }: Props) {
+  const t = useTranslations("klijenti.clientPromotions");
+
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => { setNow(new Date()); }, []);
 
@@ -45,13 +40,22 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
   const [pendingUsed, setPendingUsed] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const PROMO_TYPE_LABELS: Record<string, string> = {
+    discount: t("typeDiscount"),
+    loyalty: t("typeLoyalty"),
+    package: t("typePackage"),
+    gift: t("typeGift"),
+    referral: t("typeReferral"),
+    bundle: t("typeBundle"),
+  };
+
   function handleAdd() {
     if (!selectedId) return;
     setError(null);
     startTransition(async () => {
       const result = await assignPromotion(clientId, selectedId, notes || null);
       if (result.error) {
-        setError(result.error === "noPermission" ? "Nemate dozvolu." : "Greška pri dodavanju promocije.");
+        setError(result.error === "noPermission" ? t("errorNoPermission") : t("errorAdd"));
         return;
       }
       setShowForm(false);
@@ -72,7 +76,7 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
     const result = await markPromotionUsed(id, clientId, !currentlyUsed);
     setPendingUsed(null);
     if (result.error) {
-      setError(result.error === "noPermission" ? "Nemate dozvolu." : "Greška pri ažuriranju statusa.");
+      setError(result.error === "noPermission" ? t("errorNoPermission") : t("errorStatus"));
     }
   }
 
@@ -83,11 +87,11 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-slate-800">Promocije</h2>
+          <h2 className="text-lg font-semibold text-slate-800">{t("title")}</h2>
           <p className="text-xs text-slate-400">
             {promotions.length === 0
-              ? "Nema dodijeljenih promocija"
-              : `${promotions.length} dodijeljena promocija`}
+              ? t("subtitleEmpty")
+              : t("subtitleCount", { count: promotions.length })}
           </p>
         </div>
         {canManage && !showForm && (
@@ -102,25 +106,25 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
 
       {showForm && (
         <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 space-y-3">
-          <p className="text-sm font-medium text-slate-700">Dodaj promociju klijentu</p>
+          <p className="text-sm font-medium text-slate-700">{t("formTitle")}</p>
 
           {unassigned.length === 0 ? (
-            <p className="text-sm text-slate-500">Nema dostupnih aktivnih promocija za dodjelu.</p>
+            <p className="text-sm text-slate-500">{t("noAvailable")}</p>
           ) : (
             <div className="space-y-1">
               <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-                Promocija
+                {t("selectLabel")}
               </label>
               <select
                 value={selectedId}
                 onChange={(e) => setSelectedId(e.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-300"
               >
-                <option value="">— Odaberi promociju —</option>
+                <option value="">{t("selectPlaceholder")}</option>
                 {unassigned.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
-                    {p.ends_at ? ` (do ${formatDate(p.ends_at)})` : ""}
+                    {p.ends_at ? ` ${t("untilDate", { date: formatDate(p.ends_at) })}` : ""}
                   </option>
                 ))}
               </select>
@@ -130,13 +134,13 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
           {unassigned.length > 0 && (
             <div className="space-y-1">
               <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-                Napomena (opciono)
+                {t("notesLabel")}
               </label>
               <input
                 type="text"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Npr. dogovor sa klijentom"
+                placeholder={t("notesPlaceholder")}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-300"
               />
             </div>
@@ -154,7 +158,7 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
               }}
               className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors"
             >
-              Zatvori
+              {t("close")}
             </button>
             {unassigned.length > 0 && (
               <button
@@ -162,22 +166,22 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
                 disabled={!selectedId || isPending}
                 className="rounded-xl px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {isPending ? "Dodajem…" : "Dodaj"}
+                {isPending ? t("adding") : t("add")}
               </button>
             )}
           </div>
         </div>
       )}
 
-      {error && (
+      {error && !showForm && (
         <p className="text-xs text-red-500 px-1">{error}</p>
       )}
 
       {promotions.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
-          <p className="text-slate-400 text-sm">Nema dodijeljenih promocija</p>
+          <p className="text-slate-400 text-sm">{t("emptyTitle")}</p>
           {canManage && (
-            <p className="text-slate-300 text-xs mt-1">Kliknite + da dodate promociju klijentu</p>
+            <p className="text-slate-300 text-xs mt-1">{t("emptyHint")}</p>
           )}
         </div>
       ) : (
@@ -187,19 +191,19 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
-                    Promocija
+                    {t("colPromotion")}
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
-                    Tip
+                    {t("colType")}
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">
-                    Datum
+                    {t("colDate")}
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
-                    Napomena
+                    {t("colNotes")}
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
-                    Status
+                    {t("colStatus")}
                   </th>
                   {canManage && <th className="px-4 py-3 w-16" />}
                 </tr>
@@ -235,7 +239,7 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
                           <button
                             onClick={() => handleToggleUsed(cp.id, isUsed)}
                             disabled={pendingUsed === cp.id}
-                            title={isUsed ? "Klikni da poništiš" : "Klikni da označiš kao iskorištenu"}
+                            title={isUsed ? t("titleHintUndo") : t("titleHintMark")}
                             className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-wait ${
                               isUsed
                                 ? "bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100"
@@ -245,20 +249,20 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
                             {pendingUsed === cp.id
                               ? "…"
                               : isUsed
-                              ? `Iskorištena ${cp.used_at ? formatDate(cp.used_at) : ""}`
-                              : "Aktivna"}
+                              ? t("statusUsed", { date: cp.used_at ? formatDate(cp.used_at) : "" })
+                              : t("statusActive")}
                           </button>
                         ) : isUsed ? (
                           <span className="inline-flex items-center rounded-full bg-violet-50 border border-violet-200 px-2.5 py-1 text-xs font-medium text-violet-700">
-                            Iskorištena {cp.used_at ? formatDate(cp.used_at) : ""}
+                            {t("statusUsed", { date: cp.used_at ? formatDate(cp.used_at) : "" })}
                           </span>
                         ) : isExpired ? (
                           <span className="inline-flex items-center rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-medium text-amber-700">
-                            Istekla
+                            {t("statusExpired")}
                           </span>
                         ) : (
                           <span className="inline-flex items-center rounded-full bg-green-50 border border-green-200 px-2.5 py-1 text-xs font-medium text-green-700">
-                            Aktivna
+                            {t("statusActive")}
                           </span>
                         )}
                       </td>
@@ -272,13 +276,13 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
                                   disabled={isPending}
                                   className="rounded px-2 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100"
                                 >
-                                  Da
+                                  {t("confirmYes")}
                                 </button>
                                 <button
                                   onClick={() => setConfirmDelete(null)}
                                   className="rounded px-2 py-1 text-xs bg-slate-100 text-slate-600 hover:bg-slate-200"
                                 >
-                                  Ne
+                                  {t("confirmNo")}
                                 </button>
                               </>
                             ) : (
@@ -286,18 +290,8 @@ export default function ClientPromotionsKarton({ clientId, promotions, available
                                 onClick={() => setConfirmDelete(cp.id)}
                                 className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
                               >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                  />
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                               </button>
                             )}
