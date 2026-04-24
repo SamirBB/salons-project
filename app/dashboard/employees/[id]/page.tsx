@@ -23,7 +23,7 @@ export default async function EmployeeDetailPage({
 
   const { data: employee } = await supabase
     .from("employees")
-    .select("id, full_name, email, phone, job_title, color, bio, is_active, working_hours")
+    .select("id, profile_id, full_name, email, phone, job_title, color, bio, is_active, working_hours")
     .eq("id", id)
     .eq("tenant_id", session.tenantId)
     .single();
@@ -39,6 +39,18 @@ export default async function EmployeeDetailPage({
   const canManage = session.role === "owner" || session.role === "manager";
   const salonSchedule = (tenant?.working_hours ?? {}) as WorkingHours;
   const employeeSchedule = (employee.working_hours ?? {}) as WorkingHours;
+
+  // Fetch current role for this employee
+  let employeeRole = "employee";
+  if (employee.profile_id) {
+    const { data: ut } = await supabase
+      .from("user_tenants")
+      .select("role")
+      .eq("user_id", employee.profile_id)
+      .eq("tenant_id", session.tenantId)
+      .single();
+    if (ut?.role) employeeRole = ut.role;
+  }
 
   // Fetch services + devices for assignment (owner/manager only)
   let allServices: { id: string; name: string; color: string | null; category: string | null }[] = [];
@@ -100,6 +112,7 @@ export default async function EmployeeDetailPage({
       {/* Section A: Basic info */}
       <EmployeeBasicForm
         employeeId={employee.id}
+        profileId={employee.profile_id}
         canManage={canManage}
         initialData={{
           full_name: employee.full_name,
@@ -108,6 +121,7 @@ export default async function EmployeeDetailPage({
           job_title: employee.job_title,
           color: employee.color,
           bio: employee.bio,
+          role: employeeRole,
         }}
       />
 

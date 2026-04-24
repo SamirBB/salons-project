@@ -15,13 +15,16 @@ export async function createEmployee(
     return { error: "Nemate dozvolu." };
   }
 
-  const fullName = (formData.get("full_name") as string)?.trim();
+  const firstName = (formData.get("first_name") as string)?.trim();
+  const lastName = (formData.get("last_name") as string)?.trim() ?? "";
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
   const email = (formData.get("email") as string)?.trim();
+  const phone = (formData.get("phone") as string)?.trim() || null;
   const password = formData.get("password") as string;
   const role = formData.get("role") as string;
   const deviceIds = formData.getAll("device_ids") as string[];
 
-  if (!fullName || !email || !password) return { error: "Popunite sva obavezna polja." };
+  if (!firstName || !email || !password) return { error: "Popunite sva obavezna polja." };
   if (password.length < 6) return { error: "Lozinka mora imati najmanje 6 karaktera." };
   if (!isValidRole(role) || role === "owner") return { error: "Nevažeća rola." };
 
@@ -62,6 +65,14 @@ export async function createEmployee(
   if (rpcError) {
     console.error("[createEmployee rpc]", rpcError.message);
     return { error: "Greška pri kreiranju radnika." };
+  }
+
+  // Spremi telefon ako je unesen
+  if (phone && employeeId) {
+    await supabase
+      .from("employees")
+      .update({ phone })
+      .eq("id", employeeId);
   }
 
   // Dodijeli uređaje ako su odabrani

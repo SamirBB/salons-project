@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
+import { isValidRole } from "@/lib/roles";
 
 export type WorkingHours = {
   [day: string]: {
@@ -97,6 +98,29 @@ export async function updateEmployee(
   revalidatePath("/dashboard/employees");
   revalidatePath(`/dashboard/employees/${employeeId}`);
   return { success: true };
+}
+
+export async function updateEmployeeRole(
+  profileId: string,
+  newRole: string
+): Promise<{ error?: string }> {
+  const session = await getSession();
+  if (session.role !== "owner" && session.role !== "manager") {
+    return { error: "Nemate dozvolu za ovu akciju." };
+  }
+  if (!isValidRole(newRole) || newRole === "owner") {
+    return { error: "Nevažeća rola." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("user_tenants")
+    .update({ role: newRole })
+    .eq("user_id", profileId)
+    .eq("tenant_id", session.tenantId);
+
+  if (error) return { error: "Greška pri promjeni role." };
+  return {};
 }
 
 export async function updateEmployeeSchedule(

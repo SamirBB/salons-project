@@ -29,21 +29,39 @@ export default function NewEmployeeForm({ devices }: Props) {
       <h3 className="text-sm font-semibold text-slate-700 mb-4">Podaci radnika</h3>
 
       <form action={action} className="space-y-4" autoComplete="off">
+        {/* Ime + Prezime */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="full_name" className="block text-xs font-medium text-slate-700 mb-1.5">
-              Ime i prezime *
+            <label htmlFor="first_name" className="block text-xs font-medium text-slate-700 mb-1.5">
+              Ime *
             </label>
             <input
-              id="full_name"
-              name="full_name"
+              id="first_name"
+              name="first_name"
               type="text"
               required
               autoComplete="off"
-              placeholder="npr. Ana Begić"
+              placeholder="npr. Ana"
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
+          <div>
+            <label htmlFor="last_name" className="block text-xs font-medium text-slate-700 mb-1.5">
+              Prezime
+            </label>
+            <input
+              id="last_name"
+              name="last_name"
+              type="text"
+              autoComplete="off"
+              placeholder="npr. Begić"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
+        </div>
+
+        {/* Email + Telefon */}
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="email" className="block text-xs font-medium text-slate-700 mb-1.5">
               Email *
@@ -58,8 +76,22 @@ export default function NewEmployeeForm({ devices }: Props) {
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
+          <div>
+            <label htmlFor="phone" className="block text-xs font-medium text-slate-700 mb-1.5">
+              Telefon
+            </label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              autoComplete="off"
+              placeholder="npr. +387 61 123 456"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
         </div>
 
+        {/* Lozinka + Rola */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="password" className="block text-xs font-medium text-slate-700 mb-1.5">
@@ -75,7 +107,7 @@ export default function NewEmployeeForm({ devices }: Props) {
               placeholder="Min. 6 karaktera"
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
-            <p className="mt-1 text-xs text-slate-400">Posaopćite lozinku radniku direktno.</p>
+            <p className="mt-1 text-xs text-slate-400">Prenesite lozinku radniku direktno.</p>
           </div>
           <div>
             <label htmlFor="role" className="block text-xs font-medium text-slate-700 mb-1.5">
@@ -120,7 +152,12 @@ export default function NewEmployeeForm({ devices }: Props) {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3" />
                     </svg>
                   </div>
-                  <span className="text-sm text-slate-800">{device.name}</span>
+                  <span className="text-sm text-slate-800">
+                    {device.name}
+                    {device.browser && (
+                      <span className="ml-1.5 text-xs text-slate-400">({device.browser})</span>
+                    )}
+                  </span>
                 </label>
               ))}
             </div>
