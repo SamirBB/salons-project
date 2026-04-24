@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { NAV_ACCESS, isValidRole, type Role } from "@/lib/roles";
 
-const PUBLIC_PATHS = ["/login", "/register", "/auth", "/invite"];
+const PUBLIC_PATHS = ["/login", "/register", "/auth", "/invite", "/device-setup"];
 
 // Mapa dashboard ruta → nav ključ
 const ROUTE_TO_NAV_KEY: Record<string, string> = {

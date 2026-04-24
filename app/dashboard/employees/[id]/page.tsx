@@ -6,6 +6,8 @@ import Link from "next/link";
 import EmployeeBasicForm from "./employee-basic-form";
 import EmployeeScheduleForm from "./employee-schedule-form";
 import EmployeeServicesForm from "./employee-services-form";
+import EmployeeDevicesForm from "./employee-devices-form";
+import { getDevices, getEmployeeDeviceIds } from "@/app/actions/devices";
 import type { WorkingHours } from "@/app/actions/employees";
 
 export default async function EmployeeDetailPage({
@@ -38,27 +40,30 @@ export default async function EmployeeDetailPage({
   const salonSchedule = (tenant?.working_hours ?? {}) as WorkingHours;
   const employeeSchedule = (employee.working_hours ?? {}) as WorkingHours;
 
-  // Fetch services for assignment (owner/manager only)
+  // Fetch services + devices for assignment (owner/manager only)
   let allServices: { id: string; name: string; color: string | null; category: string | null }[] = [];
   let assignedServiceIds: string[] = [];
+  let allDevices: Awaited<ReturnType<typeof getDevices>> = [];
+  let assignedDeviceIds: string[] = [];
 
   if (canManage) {
-    const { data: services } = await supabase
-      .from("services")
-      .select("id, name, color, category")
-      .eq("tenant_id", session.tenantId)
-      .eq("is_active", true)
-      .order("category", { nullsFirst: true })
-      .order("name");
+    const [servicesResult, devicesResult, assignedResult, assignedDevicesResult] = await Promise.all([
+      supabase
+        .from("services")
+        .select("id, name, color, category")
+        .eq("tenant_id", session.tenantId)
+        .eq("is_active", true)
+        .order("category", { nullsFirst: true })
+        .order("name"),
+      getDevices(),
+      supabase.from("employee_services").select("service_id").eq("employee_id", id),
+      getEmployeeDeviceIds(id),
+    ]);
 
-    allServices = services ?? [];
-
-    const { data: assigned } = await supabase
-      .from("employee_services")
-      .select("service_id")
-      .eq("employee_id", id);
-
-    assignedServiceIds = (assigned ?? []).map((r) => r.service_id);
+    allServices = servicesResult.data ?? [];
+    allDevices = devicesResult;
+    assignedServiceIds = (assignedResult.data ?? []).map((r) => r.service_id);
+    assignedDeviceIds = assignedDevicesResult;
   }
 
   return (
@@ -120,6 +125,15 @@ export default async function EmployeeDetailPage({
           employeeId={employee.id}
           allServices={allServices}
           assignedIds={assignedServiceIds}
+        />
+      )}
+
+      {/* Section D: Devices */}
+      {canManage && (
+        <EmployeeDevicesForm
+          employeeId={employee.id}
+          allDevices={allDevices}
+          assignedDeviceIds={assignedDeviceIds}
         />
       )}
     </div>

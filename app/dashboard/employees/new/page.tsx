@@ -2,7 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import InviteForm from "../invite-form";
+import NewEmployeeForm from "../new-employee-form";
+import { getDevices } from "@/app/actions/devices";
 
 export default async function NoviUposlenik() {
   const session = await getSession();
@@ -11,6 +12,8 @@ export default async function NoviUposlenik() {
 
   const canManage = session.role === "owner" || session.role === "manager";
   if (!canManage) redirect("/dashboard/employees");
+
+  const devices = await getDevices();
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -31,7 +34,7 @@ export default async function NoviUposlenik() {
         <p className="text-sm text-slate-500 mt-0.5">{tDetail("newEmployeeSubtitle")}</p>
       </div>
 
-      <InviteForm />
+      <NewEmployeeForm devices={devices} />
     </div>
   );
 }

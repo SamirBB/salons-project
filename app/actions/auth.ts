@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export async function login(
@@ -22,6 +23,50 @@ export async function login(
   if (error) {
     return { error: "Pogrešan email ili lozinka." };
   }
+
+  // ── Provjera uređaja za radnike ─────────────────────────────────────────────
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    const { data: userTenant } = await supabase
+      .from("user_tenants")
+      .select("role, tenant_id")
+      .eq("user_id", user.id)
+      .single();
+
+    if (userTenant && (userTenant.role === "employee" || userTenant.role === "receptionist")) {
+      const { data: employee } = await supabase
+        .from("employees")
+        .select("id")
+        .eq("profile_id", user.id)
+        .eq("tenant_id", userTenant.tenant_id)
+        .single();
+
+      if (employee) {
+        const { data: allowedDevices } = await supabase
+          .from("employee_devices")
+          .select("device_id, devices(device_identifier)")
+          .eq("employee_id", employee.id);
+
+        // Ako radnik ima dodjeljene uređaje, provjeri cookie
+        if (allowedDevices && allowedDevices.length > 0) {
+          const cookieStore = await cookies();
+          const deviceCookie = cookieStore.get("salon_device_id")?.value;
+
+          const isAllowed = allowedDevices.some((row) => {
+            const dev = Array.isArray(row.devices) ? row.devices[0] : row.devices;
+            return (dev as { device_identifier: string } | null)?.device_identifier === deviceCookie;
+          });
+
+          if (!isAllowed) {
+            await supabase.auth.signOut();
+            return { error: "Pristup nije dozvoljen sa ovog uređaja." };
+          }
+        }
+      }
+    }
+  }
+  // ────────────────────────────────────────────────────────────────────────────
 
   revalidatePath("/", "layout");
   redirect("/dashboard");
