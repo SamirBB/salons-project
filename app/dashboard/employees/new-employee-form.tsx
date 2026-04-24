@@ -28,7 +28,7 @@ export default function NewEmployeeForm({ devices }: Props) {
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
       <h3 className="text-sm font-semibold text-slate-700 mb-4">Podaci radnika</h3>
 
-      <form action={action} className="space-y-4">
+      <form action={action} className="space-y-4" autoComplete="off">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="full_name" className="block text-xs font-medium text-slate-700 mb-1.5">
@@ -39,6 +39,7 @@ export default function NewEmployeeForm({ devices }: Props) {
               name="full_name"
               type="text"
               required
+              autoComplete="off"
               placeholder="npr. Ana Begić"
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
@@ -52,6 +53,7 @@ export default function NewEmployeeForm({ devices }: Props) {
               name="email"
               type="email"
               required
+              autoComplete="off"
               placeholder="ana@email.com"
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
@@ -69,6 +71,7 @@ export default function NewEmployeeForm({ devices }: Props) {
               type="password"
               required
               minLength={6}
+              autoComplete="new-password"
               placeholder="Min. 6 karaktera"
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />

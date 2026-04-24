@@ -57,6 +57,7 @@ export async function updateEmployee(
   employeeId: string,
   data: {
     full_name?: string;
+    email?: string;
     phone?: string;
     job_title?: string;
     color?: string;
@@ -71,13 +72,27 @@ export async function updateEmployee(
 
   const supabase = await createClient();
 
-  const { error } = await supabase
-    .from("employees")
-    .update({ ...data, updated_at: new Date().toISOString() })
-    .eq("id", employeeId)
-    .eq("tenant_id", session.tenantId);
+  // If email is being changed, update via SECURITY DEFINER function
+  if (data.email) {
+    const { error: emailError } = await supabase.rpc("update_employee_email", {
+      p_employee_id: employeeId,
+      p_email: data.email.trim(),
+      p_tenant_id: session.tenantId,
+    });
+    if (emailError) return { error: "Greška pri ažuriranju emaila." };
+  }
 
-  if (error) return { error: "Greška pri ažuriranju podataka." };
+  // Update other fields
+  const { email: _email, ...rest } = data;
+  if (Object.keys(rest).length > 0) {
+    const { error } = await supabase
+      .from("employees")
+      .update({ ...rest, updated_at: new Date().toISOString() })
+      .eq("id", employeeId)
+      .eq("tenant_id", session.tenantId);
+
+    if (error) return { error: "Greška pri ažuriranju podataka." };
+  }
 
   revalidatePath("/dashboard/employees");
   revalidatePath(`/dashboard/employees/${employeeId}`);

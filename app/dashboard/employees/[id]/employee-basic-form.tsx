@@ -25,6 +25,7 @@ export default function EmployeeBasicForm({ employeeId, canManage, initialData }
   const [error, setError] = useState<string | null>(null);
 
   const [fullName, setFullName] = useState(initialData.full_name);
+  const [email, setEmail] = useState(initialData.email);
   const [phone, setPhone] = useState(initialData.phone ?? "");
   const [jobTitle, setJobTitle] = useState(initialData.job_title ?? "");
   const [color, setColor] = useState(initialData.color ?? "#6366f1");
@@ -36,6 +37,7 @@ export default function EmployeeBasicForm({ employeeId, canManage, initialData }
     startTransition(async () => {
       const result = await updateEmployee(employeeId, {
         full_name: fullName,
+        email: email !== initialData.email ? email : undefined,
         phone: phone || undefined,
         job_title: jobTitle || undefined,
         color,
@@ -72,12 +74,22 @@ export default function EmployeeBasicForm({ employeeId, canManage, initialData }
           )}
         </div>
 
-        {/* Email (read-only always) */}
+        {/* Email */}
         <div>
           <label className="block text-xs font-medium text-slate-700 mb-1.5">
             Email
           </label>
-          <p className="text-sm text-slate-600 py-2">{initialData.email}</p>
+          {canManage ? (
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="off"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          ) : (
+            <p className="text-sm text-slate-900 py-2">{email}</p>
+          )}
         </div>
 
         {/* Phone */}
