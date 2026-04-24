@@ -92,7 +92,7 @@
     "save": "Shrani",
     "saving": "Shranjevanje...",
     "changesSaved": "Spremembe shranjene.",
-    "inviteEmployee": "Povabi zaposlenega",
+    "inviteEmployee": "Dodaj zaposlenega",
     "newEmployee": "Nov zaposleni",
     "newEmployeeSubtitle": "Pošljite povabilo novemu zaposlenemu",
     "services": "Storitve",
@@ -132,7 +132,7 @@
     "no": "Ne",
     "copyInviteLink": "Kopiraj povezavo povabila",
     "copyLink": "Kopiraj povezavo",
-    "inviteEmployee": "Povabi zaposlenega"
+    "inviteEmployee": "Dodaj zaposlenega"
   },
   "inviteStatus": {
     "pending": "V čakanju",

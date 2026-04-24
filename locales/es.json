@@ -92,7 +92,7 @@
     "save": "Guardar",
     "saving": "Guardando...",
     "changesSaved": "Cambios guardados.",
-    "inviteEmployee": "Invitar empleado",
+    "inviteEmployee": "Añadir empleado",
     "newEmployee": "Nuevo empleado",
     "newEmployeeSubtitle": "Envía una invitación a un nuevo empleado",
     "services": "Servicios",
@@ -132,7 +132,7 @@
     "no": "No",
     "copyInviteLink": "Copiar enlace de invitación",
     "copyLink": "Copiar enlace",
-    "inviteEmployee": "Invitar empleado"
+    "inviteEmployee": "Añadir empleado"
   },
   "inviteStatus": {
     "pending": "Pendiente",

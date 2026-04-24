@@ -126,7 +126,7 @@
     "save": "Spremi",
     "saving": "Spremanje...",
     "changesSaved": "Promjene spremljene.",
-    "inviteEmployee": "Pozovi uposlenika",
+    "inviteEmployee": "Dodaj uposlenika",
     "newEmployee": "Novi uposlenik",
     "newEmployeeSubtitle": "Pošaljite pozivnicu novom uposleniku",
     "services": "Usluge",
@@ -166,7 +166,7 @@
     "no": "Ne",
     "copyInviteLink": "Kopiraj link pozivnice",
     "copyLink": "Kopiraj link",
-    "inviteEmployee": "Pozovi uposlenika"
+    "inviteEmployee": "Dodaj uposlenika"
   },
   "inviteStatus": {
     "pending": "Na čekanju",
