@@ -38,11 +38,9 @@ export default function TreatmentForm({
   const [servicesOpen, setServicesOpen] = useState(false);
   const servicesRef = useRef<HTMLDivElement>(null);
 
-  const today = new Date().toISOString().split("T")[0];
-
   const [form, setForm] = useState({
     service_ids: treatment?.services?.map((s) => s.id) ?? [],
-    treated_at: treatment?.treated_at ?? today,
+    treated_at: treatment?.treated_at ?? "",
     employee_id: treatment?.employee_id ?? currentEmployeeId ?? "",
     notes: treatment?.notes ?? "",
     amount_charged: treatment?.amount_charged?.toString() ?? "",
@@ -62,6 +60,14 @@ export default function TreatmentForm({
     });
     return init;
   });
+
+  // Postavi danas kao datum tretmana za novi tretman (nakon hydratacije)
+  useEffect(() => {
+    if (!treatment) {
+      setForm((f) => ({ ...f, treated_at: new Date().toISOString().split("T")[0] }));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Zatvori popover klikom izvan
   useEffect(() => {
