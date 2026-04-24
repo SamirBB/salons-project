@@ -391,6 +391,11 @@
       "uploadError": "Napaka pri nalaganju. Preverite pravila za bucket salon-assets.",
       "notFound": "Stranka ni najdena."
     },
+    "tabs": {
+      "tretman": "Tretma",
+      "promocije": "Promocije",
+      "prijedlozi": "Predlogi"
+    },
     "karton": {
       "title": "Karton stranke",
       "subtitle": "{count} tretman(ov)",

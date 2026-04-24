@@ -391,6 +391,11 @@
       "uploadError": "Greška pri uploadu slike. Provjerite Storage pravila za bucket salon-assets.",
       "notFound": "Klijent nije pronađen."
     },
+    "tabs": {
+      "tretman": "Tretman",
+      "promocije": "Promocije",
+      "prijedlozi": "Prijedlozi"
+    },
     "karton": {
       "title": "Karton klijenta",
       "subtitle": "{count} tretman(a)",

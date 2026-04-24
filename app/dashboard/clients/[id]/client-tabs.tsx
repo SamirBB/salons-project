@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Tab = "karton" | "promocije" | "prijedlozi";
 
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export default function ClientTabs({ karton, promocije, prijedlozi }: Props) {
+  const t = useTranslations("klijenti.tabs");
   const [activeTab, setActiveTab] = useState<Tab>("karton");
 
   return (
@@ -27,7 +29,7 @@ export default function ClientTabs({ karton, promocije, prijedlozi }: Props) {
                 : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
             }`}
           >
-            {tab === "karton" ? "Karton" : tab === "promocije" ? "Promocije" : "Prijedlozi"}
+            {tab === "karton" ? t("tretman") : tab === "promocije" ? t("promocije") : t("prijedlozi")}
           </button>
         ))}
       </div>

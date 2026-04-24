@@ -391,6 +391,11 @@
       "uploadError": "Error al subir la foto. Revisa las políticas del bucket salon-assets.",
       "notFound": "Cliente no encontrado."
     },
+    "tabs": {
+      "tretman": "Tratamiento",
+      "promocije": "Promociones",
+      "prijedlozi": "Sugerencias"
+    },
     "karton": {
       "title": "Ficha del cliente",
       "subtitle": "{count} tratamiento(s)",

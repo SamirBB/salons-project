@@ -391,6 +391,11 @@
       "uploadError": "Photo upload failed. Check Storage policies for the salon-assets bucket (path tenant_id/clients/…).",
       "notFound": "Client not found."
     },
+    "tabs": {
+      "tretman": "Treatment",
+      "promocije": "Promotions",
+      "prijedlozi": "Suggestions"
+    },
     "karton": {
       "title": "Client Card",
       "subtitle": "{count} treatment(s)",
