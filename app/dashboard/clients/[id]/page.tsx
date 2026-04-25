@@ -8,7 +8,6 @@ import { clientDisplayName, clientInitialLetter } from "@/lib/clients";
 import ClientSummary from "./client-summary";
 import ClientTabs from "./client-tabs";
 import TreatmentKarton from "./treatment-karton";
-import ClientPromotionsKarton from "./client-promotions-karton";
 import { getActiveCustomFields } from "@/app/actions/custom-fields";
 import { getClientPromotions, getAvailablePromotions } from "@/app/actions/client-promotions";
 import ClientSuggestionsKarton from "./client-suggestions-karton";
@@ -187,8 +186,12 @@ export default async function ClientDetailPage({
         initial={initial}
       />
 
-      {/* Tabs: Karton + Promocije */}
+      {/* Tabs: Prijedlozi | Tretman | [promotion tabs] | + Dodaj Promociju */}
       <ClientTabs
+        clientId={client.id}
+        promotions={clientPromotions}
+        available={availablePromotions}
+        canManage={canManage}
         karton={
           <TreatmentKarton
             clientId={client.id}
@@ -198,14 +201,6 @@ export default async function ClientDetailPage({
             customFields={customFields}
             canManage={canManage}
             currentEmployeeId={session.employeeId}
-          />
-        }
-        promocije={
-          <ClientPromotionsKarton
-            clientId={client.id}
-            promotions={clientPromotions}
-            available={availablePromotions}
-            canManage={canManage}
           />
         }
         prijedlozi={

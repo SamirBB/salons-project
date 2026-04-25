@@ -25,6 +25,7 @@ export type ClientPromotion = {
 export type AvailablePromotion = {
   id: string;
   name: string;
+  description: string | null;
   promotion_type: string;
   color: string | null;
   ends_at: string | null;
@@ -62,7 +63,7 @@ export async function getAvailablePromotions(): Promise<AvailablePromotion[]> {
 
   const { data } = await supabase
     .from("promotions")
-    .select("id, name, promotion_type, color, ends_at")
+    .select("id, name, description, promotion_type, color, ends_at")
     .eq("tenant_id", session.tenantId)
     .eq("is_active", true)
     .or("ends_at.is.null,ends_at.gt." + new Date().toISOString())

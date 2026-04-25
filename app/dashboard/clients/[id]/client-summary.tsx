@@ -21,7 +21,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
       <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">{label}</dt>
-      <dd className="mt-0.5 text-sm text-slate-800 truncate">{value}</dd>
+      <dd className="mt-0.5 text-sm text-slate-800 break-words">{value}</dd>
     </div>
   );
 }
@@ -47,10 +47,40 @@ export default function ClientSummary({
     initial.instagram_reviewed ? "In" : null,
   ].filter((x): x is string => x !== null);
 
+  // Shared action buttons (reused on mobile + desktop)
+  const actionButtons = (
+    <>
+      {canManage && (
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
+        >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Uredi
+        </button>
+      )}
+      <a
+        href={`/api/dashboard/clients/export?format=xlsx&clientId=${encodeURIComponent(clientId)}`}
+        className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+      >
+        {t("exportClientExcel")}
+      </a>
+      <a
+        href={`/api/dashboard/clients/export?format=pdf&clientId=${encodeURIComponent(clientId)}`}
+        className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+      >
+        {t("exportClientPdf")}
+      </a>
+    </>
+  );
+
   return (
     <>
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap items-start gap-4">
+        {/* Top row: Avatar + Name + Desktop actions */}
+        <div className="flex items-start gap-3">
           {/* Avatar */}
           <div className="shrink-0">
             {photoUrl ? (
@@ -69,9 +99,9 @@ export default function ClientSummary({
             )}
           </div>
 
-          {/* Name + status + info grid */}
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2 mb-3">
+          {/* Name + status */}
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-base font-semibold text-slate-900 leading-tight">{display}</h2>
               <span
                 className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -95,49 +125,33 @@ export default function ClientSummary({
                 </div>
               )}
             </div>
-
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-4">
-              <InfoRow label={t("phoneLabel")} value={initial.phone} />
-              <InfoRow label={t("emailLabel")} value={initial.email} />
-              <InfoRow label={t("dateOfBirthLabel")} value={initial.date_of_birth} />
-              {address && <InfoRow label={t("streetLabel")} value={address} />}
-              {initial.notes && (
-                <div className="col-span-2 sm:col-span-3 lg:col-span-4 min-w-0">
-                  <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                    {t("specialNoteLabel")}
-                  </dt>
-                  <dd className="mt-0.5 text-sm text-slate-600 line-clamp-2">{initial.notes}</dd>
-                </div>
-              )}
-            </dl>
           </div>
 
-          {/* Actions */}
-          <div className="flex shrink-0 flex-wrap items-center gap-2">
-            {canManage && (
-              <button
-                onClick={() => setDrawerOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
-              >
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                Uredi
-              </button>
-            )}
-            <a
-              href={`/api/dashboard/clients/export?format=xlsx&clientId=${encodeURIComponent(clientId)}`}
-              className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
-            >
-              {t("exportClientExcel")}
-            </a>
-            <a
-              href={`/api/dashboard/clients/export?format=pdf&clientId=${encodeURIComponent(clientId)}`}
-              className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
-            >
-              {t("exportClientPdf")}
-            </a>
+          {/* Actions — desktop only (sm+) */}
+          <div className="hidden sm:flex shrink-0 flex-wrap items-center gap-2">
+            {actionButtons}
           </div>
+        </div>
+
+        {/* Info grid */}
+        <dl className="mt-3 grid grid-cols-1 gap-y-2 sm:grid-cols-2 lg:grid-cols-4 sm:gap-x-6">
+          <InfoRow label={t("phoneLabel")} value={initial.phone} />
+          <InfoRow label={t("emailLabel")} value={initial.email} />
+          <InfoRow label={t("dateOfBirthLabel")} value={initial.date_of_birth} />
+          {address && <InfoRow label={t("streetLabel")} value={address} />}
+          {initial.notes && (
+            <div className="sm:col-span-2 lg:col-span-4 min-w-0">
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                {t("specialNoteLabel")}
+              </dt>
+              <dd className="mt-0.5 text-sm text-slate-600 line-clamp-2">{initial.notes}</dd>
+            </div>
+          )}
+        </dl>
+
+        {/* Actions — mobile only (below info) */}
+        <div className="flex sm:hidden flex-wrap gap-2 mt-3 pt-3 border-t border-slate-100">
+          {actionButtons}
         </div>
       </div>
 
