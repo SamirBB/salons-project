@@ -9,10 +9,11 @@ import {
   toggleCustomFieldActive,
   reorderCustomFields,
 } from "@/app/actions/custom-fields";
-import type { CustomField, FieldType } from "@/app/actions/custom-fields";
+import type { CustomField, EntityType, FieldType } from "@/app/actions/custom-fields";
 
 type Props = {
   initialFields: CustomField[];
+  entityType?: EntityType;
 };
 
 const FIELD_TYPE_VALUES: FieldType[] = ["text", "textarea", "number", "boolean", "select"];
@@ -199,7 +200,7 @@ function InlineForm({
   );
 }
 
-export default function FieldManager({ initialFields }: Props) {
+export default function FieldManager({ initialFields, entityType = "treatment" }: Props) {
   const t = useTranslations("customFields");
   const [fields, setFields] = useState<CustomField[]>(initialFields);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -213,6 +214,7 @@ export default function FieldManager({ initialFields }: Props) {
       field_type: form.field_type,
       options: form.options,
       is_required: form.is_required,
+      entity_type: entityType,
     });
     if (!result.error) {
       setShowAddForm(false);

@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 
+type Tab = "salon" | "uredaji" | "polja";
+
 type Props = {
-  activeTab: "salon" | "uredaji";
+  activeTab: Tab;
 };
 
 export default function ProfileTabs({ activeTab }: Props) {
-  const tabs: { key: "salon" | "uredaji"; label: string; href: string }[] = [
+  const tabs: { key: Tab; label: string; href: string }[] = [
     { key: "salon", label: "Postavke salona", href: "/dashboard/profile" },
     { key: "uredaji", label: "Uređaji", href: "/dashboard/profile?tab=uredaji" },
+    { key: "polja", label: "Prilagođena polja", href: "/dashboard/profile?tab=polja" },
   ];
 
   return (

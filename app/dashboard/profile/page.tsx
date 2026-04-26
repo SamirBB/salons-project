@@ -5,7 +5,9 @@ import { getTranslations } from "next-intl/server";
 import SalonSettingsForm from "./salon-settings-form";
 import DevicesSettings from "./devices-settings";
 import ProfileTabs from "./profile-tabs";
+import CustomFieldsSettings from "./custom-fields-settings";
 import { getDevices } from "@/app/actions/devices";
+import { getCustomFieldsAll } from "@/app/actions/custom-fields";
 
 export default async function ProfilPage({
   searchParams,
@@ -19,18 +21,19 @@ export default async function ProfilPage({
   }
 
   const { tab } = await searchParams;
-  const activeTab = tab === "uredaji" ? "uredaji" : "salon";
+  const activeTab = tab === "uredaji" ? "uredaji" : tab === "polja" ? "polja" : "salon";
 
   const supabase = await createClient();
   const t = await getTranslations("salon");
 
-  const [{ data: tenant }, devices] = await Promise.all([
+  const [{ data: tenant }, devices, allFields] = await Promise.all([
     supabase
       .from("tenants")
       .select("name, phone, city, address, working_hours, logo_url")
       .eq("id", session.tenantId)
       .single(),
     getDevices(),
+    getCustomFieldsAll(),
   ]);
 
   const appUrl =
@@ -63,6 +66,10 @@ export default async function ProfilPage({
 
       {activeTab === "uredaji" && (
         <DevicesSettings devices={devices} appUrl={appUrl} />
+      )}
+
+      {activeTab === "polja" && (
+        <CustomFieldsSettings fields={allFields} />
       )}
     </div>
   );

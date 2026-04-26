@@ -5,10 +5,12 @@ import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export type FieldType = "text" | "textarea" | "number" | "boolean" | "select";
+export type EntityType = "treatment" | "client" | "employee" | "pricelist";
 
 export type CustomField = {
   id: string;
   tenant_id: string;
+  entity_type: EntityType;
   field_key: string;
   label: string;
   field_type: FieldType;
@@ -22,7 +24,7 @@ export type CustomField = {
 function generateKey(label: string): string {
   const key = label
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[̀-ͯ]/g, "")
     .replace(/[đĐ]/g, "d")
     .replace(/[čČ]/g, "c")
     .replace(/[šŠ]/g, "s")
@@ -35,7 +37,26 @@ function generateKey(label: string): string {
   return key || `field_${Date.now()}`;
 }
 
-export async function getCustomFields(): Promise<CustomField[]> {
+function revalidateAll() {
+  revalidatePath("/dashboard/profile");
+  revalidatePath("/dashboard/clients/custom-fields");
+  revalidatePath("/dashboard/clients");
+}
+
+export async function getCustomFields(entityType: EntityType = "treatment"): Promise<CustomField[]> {
+  const session = await getSession();
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("treatment_custom_fields")
+    .select("*")
+    .eq("tenant_id", session.tenantId)
+    .eq("entity_type", entityType)
+    .order("display_order")
+    .order("created_at");
+  return (data ?? []) as CustomField[];
+}
+
+export async function getCustomFieldsAll(): Promise<Record<EntityType, CustomField[]>> {
   const session = await getSession();
   const supabase = await createClient();
   const { data } = await supabase
@@ -44,16 +65,23 @@ export async function getCustomFields(): Promise<CustomField[]> {
     .eq("tenant_id", session.tenantId)
     .order("display_order")
     .order("created_at");
-  return (data ?? []) as CustomField[];
+  const all = (data ?? []) as CustomField[];
+  return {
+    treatment: all.filter((f) => f.entity_type === "treatment"),
+    client: all.filter((f) => f.entity_type === "client"),
+    employee: all.filter((f) => f.entity_type === "employee"),
+    pricelist: all.filter((f) => f.entity_type === "pricelist"),
+  };
 }
 
-export async function getActiveCustomFields(): Promise<CustomField[]> {
+export async function getActiveCustomFields(entityType: EntityType = "treatment"): Promise<CustomField[]> {
   const session = await getSession();
   const supabase = await createClient();
   const { data } = await supabase
     .from("treatment_custom_fields")
     .select("*")
     .eq("tenant_id", session.tenantId)
+    .eq("entity_type", entityType)
     .eq("is_active", true)
     .order("display_order")
     .order("created_at");
@@ -65,6 +93,7 @@ export async function createCustomField(input: {
   field_type: FieldType;
   options: string[];
   is_required: boolean;
+  entity_type?: EntityType;
 }): Promise<{ error?: string }> {
   const session = await getSession();
   if (session.role !== "owner") return { error: "noPermission" };
@@ -72,6 +101,7 @@ export async function createCustomField(input: {
   const label = input.label.trim();
   if (!label) return { error: "invalidLabel" };
   const field_key = generateKey(label);
+  const entity_type: EntityType = input.entity_type ?? "treatment";
 
   const supabase = await createClient();
 
@@ -79,6 +109,7 @@ export async function createCustomField(input: {
     .from("treatment_custom_fields")
     .select("display_order")
     .eq("tenant_id", session.tenantId)
+    .eq("entity_type", entity_type)
     .order("display_order", { ascending: false })
     .limit(1)
     .single();
@@ -87,6 +118,7 @@ export async function createCustomField(input: {
 
   const { error } = await supabase.from("treatment_custom_fields").insert({
     tenant_id: session.tenantId,
+    entity_type,
     field_key,
     label,
     field_type: input.field_type,
@@ -100,8 +132,7 @@ export async function createCustomField(input: {
     return { error: "createError" };
   }
 
-  revalidatePath("/dashboard/clients/custom-fields");
-  revalidatePath("/dashboard/clients");
+  revalidateAll();
   return {};
 }
 
@@ -136,8 +167,7 @@ export async function updateCustomField(
 
   if (error) return { error: "updateError" };
 
-  revalidatePath("/dashboard/clients/custom-fields");
-  revalidatePath("/dashboard/clients");
+  revalidateAll();
   return {};
 }
 
@@ -157,8 +187,7 @@ export async function toggleCustomFieldActive(
 
   if (error) return { error: "updateError" };
 
-  revalidatePath("/dashboard/clients/custom-fields");
-  revalidatePath("/dashboard/clients");
+  revalidateAll();
   return {};
 }
 
@@ -175,8 +204,7 @@ export async function deleteCustomField(id: string): Promise<{ error?: string }>
 
   if (error) return { error: "deleteError" };
 
-  revalidatePath("/dashboard/clients/custom-fields");
-  revalidatePath("/dashboard/clients");
+  revalidateAll();
   return {};
 }
 
@@ -195,6 +223,6 @@ export async function reorderCustomFields(ids: string[]): Promise<{ error?: stri
     )
   );
 
-  revalidatePath("/dashboard/clients/custom-fields");
+  revalidateAll();
   return {};
 }
