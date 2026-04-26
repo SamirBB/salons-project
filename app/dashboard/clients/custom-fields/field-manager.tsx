@@ -246,24 +246,18 @@ export default function FieldManager({ initialFields, entityType = "treatment" }
   }
 
   async function handleDelete(id: string) {
-    // Optimistic update
     setFields((prev) => prev.filter((f) => f.id !== id));
     setConfirmDelete(null);
-    startTransition(async () => {
-      await deleteCustomField(id);
-      router.refresh();
-    });
+    await deleteCustomField(id);
+    router.refresh();
   }
 
   async function handleToggle(id: string, current: boolean) {
-    // Optimistic update
     setFields((prev) =>
       prev.map((f) => (f.id === id ? { ...f, is_active: !current } : f))
     );
-    startTransition(async () => {
-      await toggleCustomFieldActive(id, !current);
-      router.refresh();
-    });
+    await toggleCustomFieldActive(id, !current);
+    router.refresh();
   }
 
   async function handleMove(index: number, direction: "up" | "down") {
