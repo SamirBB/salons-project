@@ -80,6 +80,7 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
             selectedIds={linkedIds}
             onChange={setLinkedIds}
             placeholder="Odaberi povezane usluge..."
+            mode="counted"
           />
         </div>
 

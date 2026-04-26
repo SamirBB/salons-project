@@ -70,6 +70,7 @@ export default function PromotionForm({ services }: { services: ServiceOption[] 
             selectedIds={linkedIds}
             onChange={setLinkedIds}
             placeholder="Odaberi povezane usluge..."
+            mode="counted"
           />
         </div>
 
