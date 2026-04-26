@@ -6,7 +6,7 @@ import PromotionList, { type PromotionListRow } from "./promotion-list";
 import { formatPromotionListDateTime } from "@/lib/promotion-datetime";
 
 const SELECT =
-  "id, tenant_id, name, description, terms, promotion_type, starts_at, ends_at, is_active, display_order, color, service_id, created_at";
+  "id, tenant_id, name, description, terms, promotion_type, starts_at, ends_at, is_active, display_order, color, service_id, linked_service_ids, bonus_service_ids, created_at";
 
 export default async function PromotionsPage() {
   const session = await getSession();
@@ -35,6 +35,8 @@ export default async function PromotionsPage() {
 
   const promotions: PromotionListRow[] = rows.map((r) => ({
     ...r,
+    linked_service_ids: (r.linked_service_ids as string[] | null) ?? [],
+    bonus_service_ids: (r.bonus_service_ids as string[] | null) ?? [],
     services: r.service_id && nameById.has(r.service_id) ? { name: nameById.get(r.service_id)! } : null,
     starts_at_display: formatPromotionListDateTime(r.starts_at, locale),
     ends_at_display: formatPromotionListDateTime(r.ends_at, locale),

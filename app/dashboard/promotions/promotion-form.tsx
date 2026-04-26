@@ -6,8 +6,9 @@ import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ColorPicker from "@/components/color-picker";
 import DateTimePicker from "@/components/date-time-picker";
+import ServiceMultiSelect from "@/components/service-multi-select";
 
-type ServiceOption = { id: string; name: string };
+type ServiceOption = { id: string; name: string; category?: string | null };
 
 export default function PromotionForm({ services }: { services: ServiceOption[] }) {
   const t = useTranslations("promocije");
@@ -15,6 +16,8 @@ export default function PromotionForm({ services }: { services: ServiceOption[] 
   const [state, formAction, pending] = useActionState(createPromotion, null);
   const [color, setColor] = useState("#6366f1");
   const [startsAtIso, setStartsAtIso] = useState<string>("");
+  const [linkedIds, setLinkedIds] = useState<string[]>([]);
+  const [bonusIds, setBonusIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (state && "id" in state && state.id) {
@@ -57,19 +60,31 @@ export default function PromotionForm({ services }: { services: ServiceOption[] 
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">{t("linkedServiceLabel")}</label>
-          <select
-            name="service_id"
-            defaultValue=""
-            className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-          >
-            <option value="">{t("serviceNone")}</option>
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            {t("linkedServiceLabel")}
+          </label>
+          <p className="text-xs text-slate-400 mb-2">Usluge koje klijent kupuje ili na koje se promocija odnosi.</p>
+          <ServiceMultiSelect
+            name="linked_service_ids"
+            services={services}
+            selectedIds={linkedIds}
+            onChange={setLinkedIds}
+            placeholder="Odaberi povezane usluge..."
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            Promotivna usluga
+          </label>
+          <p className="text-xs text-slate-400 mb-2">Usluge koje klijent dobija kroz promociju.</p>
+          <ServiceMultiSelect
+            name="bonus_service_ids"
+            services={services}
+            selectedIds={bonusIds}
+            onChange={setBonusIds}
+            placeholder="Odaberi bonus usluge..."
+          />
         </div>
 
         <div>

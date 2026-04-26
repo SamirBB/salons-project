@@ -6,8 +6,9 @@ import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ColorPicker from "@/components/color-picker";
 import DateTimePicker from "@/components/date-time-picker";
+import ServiceMultiSelect from "@/components/service-multi-select";
 
-type ServiceOption = { id: string; name: string };
+type ServiceOption = { id: string; name: string; category?: string | null };
 
 type Props = {
   promotion: Promotion;
@@ -21,6 +22,8 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
   const [state, formAction, pending] = useActionState(action, null);
   const [color, setColor] = useState(p.color ?? "#6366f1");
   const [startsAtIso, setStartsAtIso] = useState<string>(p.starts_at ?? "");
+  const [linkedIds, setLinkedIds] = useState<string[]>(p.linked_service_ids ?? []);
+  const [bonusIds, setBonusIds] = useState<string[]>(p.bonus_service_ids ?? []);
   const isExpired = !!p.ends_at && new Date(p.ends_at) < new Date();
 
   useEffect(() => {
@@ -67,19 +70,31 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">{t("linkedServiceLabel")}</label>
-          <select
-            name="service_id"
-            defaultValue={p.service_id ?? ""}
-            className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-          >
-            <option value="">{t("serviceNone")}</option>
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            {t("linkedServiceLabel")}
+          </label>
+          <p className="text-xs text-slate-400 mb-2">Usluge koje klijent kupuje ili na koje se promocija odnosi.</p>
+          <ServiceMultiSelect
+            name="linked_service_ids"
+            services={services}
+            selectedIds={linkedIds}
+            onChange={setLinkedIds}
+            placeholder="Odaberi povezane usluge..."
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            Promotivna usluga
+          </label>
+          <p className="text-xs text-slate-400 mb-2">Usluge koje klijent dobija kroz promociju.</p>
+          <ServiceMultiSelect
+            name="bonus_service_ids"
+            services={services}
+            selectedIds={bonusIds}
+            onChange={setBonusIds}
+            placeholder="Odaberi bonus usluge..."
+          />
         </div>
 
         <div>
@@ -130,10 +145,11 @@ export default function PromotionEditForm({ promotion: p, services }: Props) {
         </div>
 
         {isExpired ? (
-          <div className="flex items-center gap-2 text-sm text-slate-500">
-            <input type="checkbox" disabled className="rounded border-slate-300 opacity-50" />
-            <span>{t("isActiveLabel")}</span>
-            <span className="text-xs text-amber-600">— {t("activeExpired")}</span>
+          <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700">
+            <p className="font-medium">Promocija je istekla</p>
+            <p className="text-xs mt-0.5 text-amber-600">
+              Promijenite datum završetka na budući datum — promocija će automatski postati aktivna.
+            </p>
           </div>
         ) : (
           <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">

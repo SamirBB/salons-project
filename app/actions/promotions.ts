@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
-/** Usklađeno sa `public.promotions` u Supabase (uključuje nullable `service_id` → `services`). */
+/** Usklađeno sa `public.promotions` u Supabase. */
 export type Promotion = {
   id: string;
   tenant_id: string;
@@ -17,14 +17,15 @@ export type Promotion = {
   is_active: boolean;
   display_order: number;
   color: string | null;
-  service_id: string | null;
+  service_id: string | null; // legacy — kept for compat
+  linked_service_ids: string[];   // usluge na koje se promocija odnosi
+  bonus_service_ids: string[];    // usluge koje klijent dobija
   created_at: string;
-  /** Kad select uključi `services(name)` i postoji FK (PostgREST ponekad tipizira kao niz). */
   services?: { name: string } | { name: string }[] | null;
 };
 
 const PROMOTION_SELECT =
-  "id, tenant_id, name, description, terms, promotion_type, starts_at, ends_at, is_active, display_order, color, service_id, created_at";
+  "id, tenant_id, name, description, terms, promotion_type, starts_at, ends_at, is_active, display_order, color, service_id, linked_service_ids, bonus_service_ids, created_at";
 
 function parseTs(raw: string | null | undefined): string | null {
   const s = raw?.trim();
@@ -72,8 +73,8 @@ export async function createPromotion(
   const is_active = formData.get("is_active") === "on";
   const display_order = parseInt(String(formData.get("display_order") ?? "0"), 10) || 0;
   const color = (formData.get("color") as string)?.trim() || "#6366f1";
-  const serviceRaw = (formData.get("service_id") as string)?.trim() || "";
-  const service_id = serviceRaw.length > 0 ? serviceRaw : null;
+  const linked_service_ids = (formData.getAll("linked_service_ids") as string[]).filter(Boolean);
+  const bonus_service_ids = (formData.getAll("bonus_service_ids") as string[]).filter(Boolean);
 
   if (!name) return { error: "nameRequired" };
   if (!ends_at) return { error: "endDateRequired" };
@@ -82,9 +83,6 @@ export async function createPromotion(
   }
 
   const supabase = await createClient();
-  if (service_id && !(await assertServiceInTenant(supabase, session.tenantId, service_id))) {
-    return { error: "invalidService" };
-  }
 
   const baseInsert = {
     tenant_id: session.tenantId,
@@ -97,7 +95,10 @@ export async function createPromotion(
     is_active,
     display_order,
     color,
-    ...(service_id ? { service_id } : {}),
+    linked_service_ids,
+    bonus_service_ids,
+    // legacy: set service_id to first linked service if present
+    service_id: linked_service_ids[0] ?? null,
   };
 
   const { data, error } = await supabase.from("promotions").insert(baseInsert).select("id").single();
@@ -130,8 +131,8 @@ export async function updatePromotion(
   const is_active = formData.get("is_active") === "on";
   const display_order = parseInt(String(formData.get("display_order") ?? "0"), 10) || 0;
   const color = (formData.get("color") as string)?.trim() || "#6366f1";
-  const serviceRaw = (formData.get("service_id") as string)?.trim() || "";
-  const service_id = serviceRaw.length > 0 ? serviceRaw : null;
+  const linked_service_ids = (formData.getAll("linked_service_ids") as string[]).filter(Boolean);
+  const bonus_service_ids = (formData.getAll("bonus_service_ids") as string[]).filter(Boolean);
 
   if (!name) return { error: "nameRequired" };
   if (!ends_at) return { error: "endDateRequired" };
@@ -140,9 +141,18 @@ export async function updatePromotion(
   }
 
   const supabase = await createClient();
-  if (service_id && !(await assertServiceInTenant(supabase, session.tenantId, service_id))) {
-    return { error: "invalidService" };
-  }
+
+  // Auto-reactivate: if promotion was expired and new end date is in the future, set active
+  const { data: current } = await supabase
+    .from("promotions")
+    .select("ends_at, is_active")
+    .eq("id", promotionId)
+    .eq("tenant_id", session.tenantId)
+    .single();
+
+  const wasExpired = current?.ends_at && new Date(current.ends_at) < new Date();
+  const newEndsInFuture = ends_at && new Date(ends_at) > new Date();
+  const final_is_active = wasExpired && newEndsInFuture ? true : is_active;
 
   const { error } = await supabase
     .from("promotions")
@@ -153,10 +163,12 @@ export async function updatePromotion(
       promotion_type,
       starts_at,
       ends_at,
-      is_active,
+      is_active: final_is_active,
       display_order,
       color,
-      service_id,
+      linked_service_ids,
+      bonus_service_ids,
+      service_id: linked_service_ids[0] ?? null,
     })
     .eq("id", promotionId)
     .eq("tenant_id", session.tenantId);

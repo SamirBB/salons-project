@@ -9,7 +9,7 @@ import PromotionEditForm from "../promotion-edit-form";
 type Props = { params: Promise<{ id: string }> };
 
 const SELECT =
-  "id, tenant_id, name, description, terms, promotion_type, starts_at, ends_at, is_active, display_order, color, service_id, created_at";
+  "id, tenant_id, name, description, terms, promotion_type, starts_at, ends_at, is_active, display_order, color, service_id, linked_service_ids, bonus_service_ids, created_at";
 
 function formatDateTime(iso: string | null, locale: string): string {
   if (!iso) return "—";
@@ -35,7 +35,7 @@ export default async function PromotionDetailPage({ params }: Props) {
       .single(),
     supabase
       .from("services")
-      .select("id, name")
+      .select("id, name, category")
       .eq("tenant_id", session.tenantId)
       .eq("is_active", true)
       .order("category", { nullsFirst: true })

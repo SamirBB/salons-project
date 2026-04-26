@@ -16,7 +16,7 @@ export default async function NewPromotionPage() {
   const supabase = await createClient();
   const { data: services } = await supabase
     .from("services")
-    .select("id, name")
+    .select("id, name, category")
     .eq("tenant_id", session.tenantId)
     .eq("is_active", true)
     .order("category", { nullsFirst: true })
@@ -39,7 +39,7 @@ export default async function NewPromotionPage() {
         <p className="text-sm text-slate-500 mt-0.5">{t("newPromotionSubtitle")}</p>
       </div>
 
-      <PromotionForm services={(services ?? []) as { id: string; name: string }[]} />
+      <PromotionForm services={(services ?? []) as { id: string; name: string; category?: string | null }[]} />
     </div>
   );
 }
