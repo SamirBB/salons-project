@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
 import SalonSettingsForm from "./salon-settings-form";
 import DevicesSettings from "./devices-settings";
 import ProfileTabs from "./profile-tabs";
@@ -69,7 +70,9 @@ export default async function ProfilPage({
       )}
 
       {activeTab === "polja" && (
-        <CustomFieldsSettings fields={allFields} />
+        <Suspense>
+          <CustomFieldsSettings fields={allFields} />
+        </Suspense>
       )}
     </div>
   );

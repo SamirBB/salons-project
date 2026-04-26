@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import FieldManager from "@/app/dashboard/clients/custom-fields/field-manager";
 import type { CustomField, EntityType } from "@/app/actions/custom-fields";
 
@@ -15,8 +15,22 @@ const ENTITY_TABS: { key: EntityType; label: string }[] = [
   { key: "pricelist", label: "Cjenovnik" },
 ];
 
+const VALID_ENTITIES = new Set<string>(ENTITY_TABS.map((t) => t.key));
+
 export default function CustomFieldsSettings({ fields }: Props) {
-  const [activeEntity, setActiveEntity] = useState<EntityType>("treatment");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const entityParam = searchParams.get("entity") ?? "";
+  const activeEntity: EntityType = VALID_ENTITIES.has(entityParam)
+    ? (entityParam as EntityType)
+    : "treatment";
+
+  function setActiveEntity(key: EntityType) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("entity", key);
+    router.replace(`/dashboard/profile?${params.toString()}`, { scroll: false });
+  }
 
   return (
     <div className="space-y-5">
