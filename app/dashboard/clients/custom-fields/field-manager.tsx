@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   createCustomField,
@@ -202,6 +203,7 @@ function InlineForm({
 
 export default function FieldManager({ initialFields, entityType = "treatment" }: Props) {
   const t = useTranslations("customFields");
+  const router = useRouter();
   const [fields, setFields] = useState<CustomField[]>(initialFields);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -220,7 +222,7 @@ export default function FieldManager({ initialFields, entityType = "treatment" }
       setShowAddForm(false);
       // Refresh via page reload is handled by revalidatePath on server
       // For optimistic update, we'll reload
-      window.location.reload();
+      router.refresh();
     }
   }
 
@@ -228,7 +230,7 @@ export default function FieldManager({ initialFields, entityType = "treatment" }
     const result = await updateCustomField(id, form);
     if (!result.error) {
       setEditingId(null);
-      window.location.reload();
+      router.refresh();
     }
   }
 
@@ -236,14 +238,14 @@ export default function FieldManager({ initialFields, entityType = "treatment" }
     startTransition(async () => {
       await deleteCustomField(id);
       setConfirmDelete(null);
-      window.location.reload();
+      router.refresh();
     });
   }
 
   async function handleToggle(id: string, current: boolean) {
     startTransition(async () => {
       await toggleCustomFieldActive(id, !current);
-      window.location.reload();
+      router.refresh();
     });
   }
 
