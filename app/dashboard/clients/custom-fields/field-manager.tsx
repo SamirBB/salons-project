@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -210,6 +210,11 @@ export default function FieldManager({ initialFields, entityType = "treatment" }
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  // Sync local state when server data arrives after router.refresh()
+  useEffect(() => {
+    setFields(initialFields);
+  }, [initialFields]);
+
   async function handleCreate(form: FormState) {
     const result = await createCustomField({
       label: form.label,
@@ -220,29 +225,41 @@ export default function FieldManager({ initialFields, entityType = "treatment" }
     });
     if (!result.error) {
       setShowAddForm(false);
-      // Refresh via page reload is handled by revalidatePath on server
-      // For optimistic update, we'll reload
-      router.refresh();
+      router.refresh(); // server will send back updated list via useEffect
     }
   }
 
   async function handleUpdate(id: string, form: FormState) {
     const result = await updateCustomField(id, form);
     if (!result.error) {
+      // Optimistic update
+      setFields((prev) =>
+        prev.map((f) =>
+          f.id === id
+            ? { ...f, label: form.label, field_type: form.field_type, options: form.options, is_required: form.is_required, is_active: form.is_active }
+            : f
+        )
+      );
       setEditingId(null);
       router.refresh();
     }
   }
 
   async function handleDelete(id: string) {
+    // Optimistic update
+    setFields((prev) => prev.filter((f) => f.id !== id));
+    setConfirmDelete(null);
     startTransition(async () => {
       await deleteCustomField(id);
-      setConfirmDelete(null);
       router.refresh();
     });
   }
 
   async function handleToggle(id: string, current: boolean) {
+    // Optimistic update
+    setFields((prev) =>
+      prev.map((f) => (f.id === id ? { ...f, is_active: !current } : f))
+    );
     startTransition(async () => {
       await toggleCustomFieldActive(id, !current);
       router.refresh();
