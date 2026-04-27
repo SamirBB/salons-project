@@ -386,34 +386,24 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
 
         return (
           <div className="space-y-4">
-            {/* Header — mirrors TreatmentKarton header style */}
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
+            {/* Header — same structure as TreatmentKarton header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                   <span
                     className="inline-block w-3 h-3 rounded-full shrink-0"
                     style={{ backgroundColor: cp.promotion.color ?? "#94a3b8" }}
                   />
-                  <div className="flex items-center gap-3 text-sm text-slate-600 flex-wrap">
-                    <span>
-                      <span className="text-xs font-medium text-slate-400 uppercase tracking-wide mr-1">Datum:</span>
-                      {formatDate(cp.assigned_at)}
-                    </span>
-                    {cp.promotion.ends_at && (
-                      <span>
-                        <span className="text-xs font-medium text-slate-400 uppercase tracking-wide mr-1">Ističe:</span>
-                        {formatDate(cp.promotion.ends_at)}
-                      </span>
-                    )}
-                    {cp.promotion.description && (
-                      <span>
-                        <span className="text-xs font-medium text-slate-400 uppercase tracking-wide mr-1">Opis:</span>
-                        {cp.promotion.description}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <p className="text-xs text-slate-400 pl-5">
+                  {cp.promotion.name}
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  {[
+                    `Datum: ${formatDate(cp.assigned_at)}`,
+                    cp.promotion.ends_at ? `Ističe: ${formatDate(cp.promotion.ends_at)}` : null,
+                    cp.promotion.description ? `Opis: ${cp.promotion.description}` : null,
+                  ].filter(Boolean).join(" · ")}
+                </p>
+                <p className="text-xs text-slate-400">
                   {pending.length} / {total} preostalo
                 </p>
               </div>
