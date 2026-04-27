@@ -389,13 +389,7 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
             {/* Header — same structure as TreatmentKarton header */}
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                  <span
-                    className="inline-block w-3 h-3 rounded-full shrink-0"
-                    style={{ backgroundColor: cp.promotion.color ?? "#94a3b8" }}
-                  />
-                  {cp.promotion.name}
-                </h2>
+                <h2 className="text-lg font-semibold text-slate-800">{cp.promotion.name}</h2>
                 <p className="text-xs text-slate-400 mt-0.5">
                   {[
                     `Datum: ${formatDate(cp.assigned_at)}`,
