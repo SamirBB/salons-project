@@ -2,8 +2,8 @@
 
 import { useState, useTransition, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { assignPromotion, removeClientPromotion, markPromotionUsed } from "@/app/actions/client-promotions";
-import type { ClientPromotion, AvailablePromotion } from "@/app/actions/client-promotions";
+import { assignPromotion, removeClientPromotion, completePromotionTreatment } from "@/app/actions/client-promotions";
+import type { ClientPromotion, AvailablePromotion, PromotionTreatment } from "@/app/actions/client-promotions";
 
 const MAX_PROMOTIONS = 5;
 const MAX_NOTES = 500;
@@ -274,9 +274,9 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => { setNow(new Date()); }, []);
 
-  const [pendingUsed, setPendingUsed] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
+  const [pendingComplete, setPendingComplete] = useState<string | null>(null);
 
   const alreadyAssigned = new Set(promotions.map((p) => p.promotion_id));
   const unassigned = available.filter((a) => !alreadyAssigned.has(a.id));
@@ -300,12 +300,12 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
     });
   }
 
-  async function handleToggleUsed(id: string, currentlyUsed: boolean) {
-    setPendingUsed(id);
+  async function handleCompleteTreatment(treatment: PromotionTreatment, clientPromotionId: string) {
+    setPendingComplete(treatment.id);
     setPromoError(null);
-    const result = await markPromotionUsed(id, clientId, !currentlyUsed);
-    setPendingUsed(null);
-    if (result.error) setPromoError(tPromo("errorStatus"));
+    const result = await completePromotionTreatment(treatment.id, clientPromotionId, clientId);
+    setPendingComplete(null);
+    if (result.error) setPromoError("Greška pri završavanju tretmana.");
   }
 
   function handleRemove(id: string) {
@@ -381,107 +381,157 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
       {/* Promotion tab content */}
       {activePromotion && (() => {
         const cp = activePromotion;
-        const isExpired = now !== null && !!cp.promotion.ends_at && new Date(cp.promotion.ends_at) < now;
-        const isUsed = cp.status === "completed";
+        const pending = cp.treatments.filter((t) => t.promotion_treatment_status === "pending");
+        const completed = cp.treatments.filter((t) => t.promotion_treatment_status === "completed");
 
         return (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
-            {/* Header */}
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <span
-                  className="inline-block w-4 h-4 rounded-full shrink-0 mt-0.5"
-                  style={{ backgroundColor: cp.promotion.color ?? "#94a3b8" }}
-                />
-                <div>
-                  <h3 className="text-base font-semibold text-slate-800">{cp.promotion.name}</h3>
-                  <span className="text-xs text-slate-400">
-                    {PROMO_TYPE_LABELS[cp.promotion.promotion_type] ?? cp.promotion.promotion_type}
-                  </span>
-                </div>
-              </div>
-
-              {canManage && !isExpired ? (
-                <button
-                  onClick={() => handleToggleUsed(cp.id, isUsed)}
-                  disabled={pendingUsed === cp.id}
-                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors cursor-pointer disabled:opacity-60 ${
-                    isUsed
-                      ? "bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100"
-                      : "bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
-                  }`}
-                >
-                  {pendingUsed === cp.id ? "…" : isUsed
-                    ? tPromo("statusUsed", { date: cp.used_at ? formatDate(cp.used_at) : "" })
-                    : tPromo("statusActive")}
-                </button>
-              ) : isUsed ? (
-                <span className="inline-flex items-center rounded-full bg-violet-50 border border-violet-200 px-3 py-1 text-xs font-medium text-violet-700">
-                  {tPromo("statusUsed", { date: cp.used_at ? formatDate(cp.used_at) : "" })}
-                </span>
-              ) : isExpired ? (
-                <span className="inline-flex items-center rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-medium text-amber-700">
-                  {tPromo("statusExpired")}
-                </span>
-              ) : (
-                <span className="inline-flex items-center rounded-full bg-green-50 border border-green-200 px-3 py-1 text-xs font-medium text-green-700">
-                  {tPromo("statusActive")}
-                </span>
-              )}
-            </div>
-
-            {/* Details */}
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-0.5">{tPromo("colDate")}</p>
-                <p className="text-slate-700">{formatDate(cp.assigned_at)}</p>
-              </div>
-              {cp.promotion.ends_at && (
-                <div>
-                  <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-0.5">Ističe</p>
-                  <p className={isExpired ? "text-amber-600 font-medium" : "text-slate-700"}>
-                    {formatDate(cp.promotion.ends_at)}
-                  </p>
-                </div>
-              )}
-              {cp.notes && (
-                <div className="col-span-2">
-                  <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-0.5">{tPromo("colNotes")}</p>
-                  <p className="text-slate-700">{cp.notes}</p>
-                </div>
-              )}
-            </div>
-
-            {promoError && <p className="text-xs text-red-500">{promoError}</p>}
-
-            {canManage && (
-              <div className="flex justify-end pt-1 border-t border-slate-100">
-                {confirmDelete === cp.id ? (
-                  <div className="flex gap-2 items-center">
-                    <button
-                      onClick={() => handleRemove(cp.id)}
-                      disabled={isPending}
-                      className="rounded-lg px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                    >
-                      {tPromo("confirmYes")}
-                    </button>
-                    <button
-                      onClick={() => setConfirmDelete(null)}
-                      className="rounded-lg px-3 py-1.5 text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
-                    >
-                      {tPromo("confirmNo")}
-                    </button>
+          <div className="space-y-3">
+            {/* Promotion header card */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className="inline-block w-4 h-4 rounded-full shrink-0 mt-0.5"
+                    style={{ backgroundColor: cp.promotion.color ?? "#94a3b8" }}
+                  />
+                  <div>
+                    <h3 className="text-base font-semibold text-slate-800">{cp.promotion.name}</h3>
+                    <span className="text-xs text-slate-400">
+                      {PROMO_TYPE_LABELS[cp.promotion.promotion_type] ?? cp.promotion.promotion_type}
+                    </span>
                   </div>
-                ) : (
-                  <button
-                    onClick={() => setConfirmDelete(cp.id)}
-                    className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Ukloni promociju
-                  </button>
+                </div>
+                <span className="inline-flex items-center rounded-full bg-green-50 border border-green-200 px-3 py-1 text-xs font-medium text-green-700 shrink-0">
+                  {pending.length} / {cp.treatments.length} preostalo
+                </span>
+              </div>
+
+              <div className="flex flex-wrap gap-4 text-sm">
+                <div>
+                  <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-0.5">{tPromo("colDate")}</p>
+                  <p className="text-slate-700">{formatDate(cp.assigned_at)}</p>
+                </div>
+                {cp.promotion.ends_at && (
+                  <div>
+                    <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-0.5">Ističe</p>
+                    <p className="text-slate-700">{formatDate(cp.promotion.ends_at)}</p>
+                  </div>
+                )}
+              </div>
+
+              {cp.notes && (
+                <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-3 py-2">{cp.notes}</p>
+              )}
+
+              {canManage && (
+                <div className="flex justify-end pt-1 border-t border-slate-100">
+                  {confirmDelete === cp.id ? (
+                    <div className="flex gap-2 items-center">
+                      <button
+                        onClick={() => handleRemove(cp.id)}
+                        disabled={isPending}
+                        className="rounded-lg px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                      >
+                        {tPromo("confirmYes")}
+                      </button>
+                      <button
+                        onClick={() => setConfirmDelete(null)}
+                        className="rounded-lg px-3 py-1.5 text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                      >
+                        {tPromo("confirmNo")}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmDelete(cp.id)}
+                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Ukloni promociju
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {promoError && <p className="text-xs text-red-500 px-1">{promoError}</p>}
+
+            {/* Treatments list */}
+            {cp.treatments.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center">
+                <p className="text-sm text-slate-400">Nema tretmana za ovu promociju.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {/* Pending treatments */}
+                {pending.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide px-1 mb-1.5">Na čekanju</p>
+                    <div className="space-y-1.5">
+                      {pending.map((t) => (
+                        <div
+                          key={t.id}
+                          className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 px-4 py-3"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-800 truncate">
+                              {t.service?.name ?? "Nepoznata usluga"}
+                            </p>
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold mt-0.5 ${
+                              t.promotion_service_type === "linked"
+                                ? "bg-indigo-50 text-indigo-600"
+                                : "bg-violet-50 text-violet-600"
+                            }`}>
+                              {t.promotion_service_type === "linked" ? "Povezana usluga" : "Promotivna usluga"}
+                            </span>
+                          </div>
+                          {canManage && (
+                            <button
+                              onClick={() => handleCompleteTreatment(t, cp.id)}
+                              disabled={pendingComplete === t.id}
+                              className="shrink-0 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 px-3 py-1.5 text-xs font-medium text-white transition-colors"
+                            >
+                              {pendingComplete === t.id ? "…" : "Završi"}
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Completed treatments */}
+                {completed.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide px-1 mb-1.5 mt-3">Iskorišteno</p>
+                    <div className="space-y-1.5">
+                      {completed.map((t) => (
+                        <div
+                          key={t.id}
+                          className="flex items-center gap-3 bg-slate-50 rounded-xl border border-slate-100 px-4 py-3"
+                        >
+                          <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-slate-500 line-through truncate">
+                              {t.service?.name ?? "Nepoznata usluga"}
+                            </p>
+                            <p className="text-xs text-slate-400">{formatDate(t.treated_at)}</p>
+                          </div>
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                            t.promotion_service_type === "linked"
+                              ? "bg-indigo-50 text-indigo-400"
+                              : "bg-violet-50 text-violet-400"
+                          }`}>
+                            {t.promotion_service_type === "linked" ? "Povezana" : "Promotivna"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
             )}

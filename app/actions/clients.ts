@@ -371,6 +371,10 @@ export type Treatment = {
   created_at: string;
   employees?: { full_name: string; color: string | null } | null;
   services?: TreatmentService[];
+  // promotion-generated treatment fields
+  client_promotion_id: string | null;
+  promotion_treatment_status: "pending" | "completed" | null;
+  promotion_service_type: "linked" | "bonus" | null;
 };
 
 export type TreatmentData = {

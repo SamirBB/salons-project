@@ -42,6 +42,9 @@ type RawTreatmentRow = {
   custom_data?: Record<string, string | number | boolean | null>;
   employees?: { full_name: string; color: string | null } | null;
   client_treatment_services?: RawTreatmentServiceJoin[] | null;
+  client_promotion_id?: string | null;
+  promotion_treatment_status?: string | null;
+  promotion_service_type?: string | null;
 };
 
 function joinedServiceToTreatmentService(
@@ -70,6 +73,9 @@ function mapRawTreatmentToTreatment(row: RawTreatmentRow): Treatment {
     created_at: row.created_at,
     employees: row.employees ?? undefined,
     services: treatmentServices,
+    client_promotion_id: row.client_promotion_id ?? null,
+    promotion_treatment_status: (row.promotion_treatment_status ?? null) as Treatment["promotion_treatment_status"],
+    promotion_service_type: (row.promotion_service_type ?? null) as Treatment["promotion_service_type"],
   };
 }
 
@@ -122,8 +128,12 @@ export default async function ClientDetailPage({
     getClientSuggestions(id),
   ]);
 
-  const treatments: Treatment[] = (rawTreatments ?? []).map((row) =>
+  const allTreatments: Treatment[] = (rawTreatments ?? []).map((row) =>
     mapRawTreatmentToTreatment(row as RawTreatmentRow)
+  );
+  // Exclude pending promotion treatments — they only appear inside the promotion tab
+  const treatments: Treatment[] = allTreatments.filter(
+    (t) => t.promotion_treatment_status !== "pending"
   );
 
   const kartonEmployees: KartonEmployee[] = (employees ?? []).map((e) => ({
