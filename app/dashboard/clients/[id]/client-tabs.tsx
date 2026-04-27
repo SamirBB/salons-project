@@ -4,11 +4,17 @@ import { useState, useTransition, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { assignPromotion, removeClientPromotion, completePromotionTreatment } from "@/app/actions/client-promotions";
 import type { ClientPromotion, AvailablePromotion, PromotionTreatment } from "@/app/actions/client-promotions";
+import TreatmentForm from "./treatment-form";
+import type { Treatment, TreatmentService } from "@/app/actions/clients";
+import type { CustomField } from "@/app/actions/custom-fields";
 
 const MAX_PROMOTIONS = 5;
 const MAX_NOTES = 500;
 
 type ActiveTab = "prijedlozi" | "karton" | string;
+
+type Employee = { id: string; full_name: string; color: string | null };
+type ServiceOption = { id: string; name: string; price: number; category: string | null; color: string | null };
 
 type Props = {
   karton: React.ReactNode;
@@ -17,11 +23,50 @@ type Props = {
   promotions: ClientPromotion[];
   available: AvailablePromotion[];
   canManage: boolean;
+  employees: Employee[];
+  services: ServiceOption[];
+  customFields: CustomField[];
+  currentEmployeeId: string | null;
 };
+
+/** Convert a PromotionTreatment to the Treatment shape expected by TreatmentForm */
+function promoTreatmentToTreatment(tr: PromotionTreatment, clientId: string): Treatment {
+  const svc = tr.service
+    ? ({ id: tr.service.id, name: tr.service.name, price: 0, color: tr.service.color } as TreatmentService)
+    : null;
+  return {
+    id: tr.id,
+    client_id: clientId,
+    employee_id: null,
+    treated_at: tr.treated_at,
+    notes: tr.notes,
+    amount_charged: tr.amount_charged,
+    invoice_number: tr.invoice_number,
+    custom_data: undefined,
+    created_at: tr.treated_at,
+    services: svc ? [svc] : [],
+    client_promotion_id: null,
+    promotion_treatment_status: tr.promotion_treatment_status,
+    promotion_service_type: tr.promotion_service_type,
+    is_cancelled: false,
+  };
+}
 
 function formatDate(d: string) {
   const [y, m, day] = d.slice(0, 10).split("-");
   return `${day}.${m}.${y}.`;
+}
+
+function formatDateTime(d: string) {
+  const date = new Date(d);
+  if (isNaN(date.getTime())) return d.slice(0, 10);
+  const day = String(date.getDate()).padStart(2, "0");
+  const m   = String(date.getMonth() + 1).padStart(2, "0");
+  const y   = date.getFullYear();
+  const h   = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  if (h === "00" && min === "00") return `${day}.${m}.${y}.`;
+  return `${day}.${m}.${y}. ${h}:${min}`;
 }
 
 // Icons per promotion type
@@ -263,7 +308,7 @@ function AddPromotionDrawer({
   );
 }
 
-export default function ClientTabs({ karton, prijedlozi, clientId, promotions, available, canManage }: Props) {
+export default function ClientTabs({ karton, prijedlozi, clientId, promotions, available, canManage, employees, services, customFields, currentEmployeeId }: Props) {
   const t = useTranslations("klijenti.tabs");
   const tPromo = useTranslations("klijenti.clientPromotions");
 
@@ -277,6 +322,7 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
   const [pendingComplete, setPendingComplete] = useState<string | null>(null);
+  const [editTreatmentId, setEditTreatmentId] = useState<string | null>(null);
 
   const alreadyAssigned = new Set(promotions.map((p) => p.promotion_id));
   const unassigned = available.filter((a) => !alreadyAssigned.has(a.id));
@@ -438,6 +484,24 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
 
             {promoError && <p className="text-xs text-red-500">{promoError}</p>}
 
+            {/* Inline edit form */}
+            {editTreatmentId && (() => {
+              const tr = pending.find((t) => t.id === editTreatmentId);
+              if (!tr) return null;
+              return (
+                <TreatmentForm
+                  key={tr.id}
+                  clientId={clientId}
+                  treatment={promoTreatmentToTreatment(tr, clientId)}
+                  employees={employees}
+                  services={services}
+                  customFields={customFields}
+                  currentEmployeeId={currentEmployeeId}
+                  onClose={() => setEditTreatmentId(null)}
+                />
+              );
+            })()}
+
             {/* Treatment table — identical layout to TreatmentKarton */}
             {pending.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
@@ -455,19 +519,22 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                         <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">Napomena</th>
                         <th className="text-right text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">Iznos</th>
                         <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">Račun</th>
-                        {canManage && <th className="px-4 py-3 w-24" />}
+                        {canManage && <th className="px-4 py-3 w-32" />}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {pending.map((tr, idx) => (
-                        <tr key={tr.id} className="hover:bg-slate-50 transition-colors">
+                        <tr key={tr.id} className={`transition-colors ${editTreatmentId === tr.id ? "bg-indigo-50/40" : "hover:bg-slate-50"}`}>
                           <td className="px-4 py-3 text-xs text-slate-400">
                             {pending.length - idx}
                           </td>
                           <td className="px-4 py-3 max-w-[220px]">
                             {tr.service ? (
                               <div className="flex flex-wrap gap-1">
-                                <span className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                                <span
+                                  className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${tr.service.color ? "" : "bg-indigo-50 border-indigo-100 text-indigo-700"}`}
+                                  style={tr.service.color ? { backgroundColor: `${tr.service.color}18`, borderColor: `${tr.service.color}40`, color: tr.service.color } : undefined}
+                                >
                                   {tr.service.name}
                                 </span>
                               </div>
@@ -476,7 +543,7 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                             )}
                           </td>
                           <td className="px-4 py-3 text-slate-700 whitespace-nowrap">
-                            {formatDate(tr.treated_at)}
+                            {formatDateTime(tr.treated_at)}
                           </td>
                           <td className="px-4 py-3 max-w-[240px]">
                             <div className="text-slate-700 truncate" title={tr.notes ?? ""}>
@@ -493,7 +560,17 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                           </td>
                           {canManage && (
                             <td className="px-4 py-3">
-                              <div className="flex items-center justify-end">
+                              <div className="flex items-center justify-end gap-1.5">
+                                {/* Edit button */}
+                                <button
+                                  onClick={() => setEditTreatmentId(editTreatmentId === tr.id ? null : tr.id)}
+                                  className={`rounded p-1.5 transition-colors ${editTreatmentId === tr.id ? "bg-indigo-100 text-indigo-600" : "text-slate-400 hover:bg-indigo-50 hover:text-indigo-500"}`}
+                                >
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                </button>
+                                {/* Complete button */}
                                 <button
                                   onClick={() => handleCompleteTreatment(tr, cp.id)}
                                   disabled={pendingComplete === tr.id}

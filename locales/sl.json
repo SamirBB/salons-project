@@ -485,12 +485,19 @@
         "services": "Storitve",
         "notes": "Opombe",
         "amount": "Znesek",
-        "invoice": "Račun"
+        "invoice": "Račun",
+        "time": "Čas"
       },
       "errors": {
         "generic": "Napaka pri shranjevanju tretmana.",
         "noPermission": "Nimate dovoljenja za to dejanje."
-      }
+      },
+      "prev": "Prejšnji",
+      "next": "Naslednji",
+      "cancelTreatment": "Prekliči tretma",
+      "restoreTreatment": "Obnovi tretma",
+      "deleteTreatment": "Izbriši tretma",
+      "cancelled": "Preklicano"
     },
     "editButton": "Uredi",
     "editClientTitle": "Uredi stranko",

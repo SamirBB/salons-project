@@ -20,9 +20,9 @@ function dateToInputValue(value: string | null): string {
 }
 
 type KartonEmployee = { id: string; full_name: string; color: string | null };
-type KartonService = { id: string; name: string; price: number; category: string | null };
+type KartonService = { id: string; name: string; price: number; category: string | null; color: string | null };
 
-type NestedServiceRow = { id: string; name: string; price: number };
+type NestedServiceRow = { id: string; name: string; price: number; color?: string | null };
 
 type RawTreatmentServiceJoin = {
   service_id: string;
@@ -45,6 +45,7 @@ type RawTreatmentRow = {
   client_promotion_id?: string | null;
   promotion_treatment_status?: string | null;
   promotion_service_type?: string | null;
+  is_cancelled?: boolean;
 };
 
 function joinedServiceToTreatmentService(
@@ -53,7 +54,7 @@ function joinedServiceToTreatmentService(
   if (svc == null) return null;
   const row = Array.isArray(svc) ? svc[0] : svc;
   if (!row || typeof row.id !== "string") return null;
-  return { id: row.id, name: row.name, price: Number(row.price) };
+  return { id: row.id, name: row.name, price: Number(row.price), color: row.color ?? null };
 }
 
 function mapRawTreatmentToTreatment(row: RawTreatmentRow): Treatment {
@@ -76,6 +77,7 @@ function mapRawTreatmentToTreatment(row: RawTreatmentRow): Treatment {
     client_promotion_id: row.client_promotion_id ?? null,
     promotion_treatment_status: (row.promotion_treatment_status ?? null) as Treatment["promotion_treatment_status"],
     promotion_service_type: (row.promotion_service_type ?? null) as Treatment["promotion_service_type"],
+    is_cancelled: row.is_cancelled ?? false,
   };
 }
 
@@ -105,7 +107,7 @@ export default async function ClientDetailPage({
   const [{ data: rawTreatments }, { data: employees }, { data: services }, customFields, clientPromotions, availablePromotions, clientSuggestions] = await Promise.all([
     supabase
       .from("client_treatments")
-      .select("*, employees(full_name, color), client_treatment_services(service_id, services(id, name, price))")
+      .select("*, employees(full_name, color), client_treatment_services(service_id, services(id, name, price, color))")
       .eq("client_id", id)
       .eq("tenant_id", session.tenantId)
       .order("treated_at", { ascending: false }),
@@ -117,7 +119,7 @@ export default async function ClientDetailPage({
       .order("full_name"),
     supabase
       .from("services")
-      .select("id, name, price, category")
+      .select("id, name, price, category, color")
       .eq("tenant_id", session.tenantId)
       .eq("is_active", true)
       .order("category", { nullsFirst: true })
@@ -147,6 +149,7 @@ export default async function ClientDetailPage({
     name: s.name,
     price: s.price,
     category: s.category,
+    color: s.color,
   }));
 
   const display = clientDisplayName(client);
@@ -202,6 +205,10 @@ export default async function ClientDetailPage({
         promotions={clientPromotions}
         available={availablePromotions}
         canManage={canManage}
+        employees={kartonEmployees}
+        services={kartonServices}
+        customFields={customFields}
+        currentEmployeeId={session.employeeId}
         karton={
           <TreatmentKarton
             clientId={client.id}

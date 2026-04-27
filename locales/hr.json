@@ -485,12 +485,19 @@
         "services": "Usluge",
         "notes": "Napomene",
         "amount": "Iznos",
-        "invoice": "Račun"
+        "invoice": "Račun",
+        "time": "Vrijeme"
       },
       "errors": {
         "generic": "Greška pri spremanju tretmana.",
         "noPermission": "Nemate dozvolu za ovu akciju."
-      }
+      },
+      "prev": "Prethodni",
+      "next": "Sljedeći",
+      "cancelTreatment": "Otkaži tretman",
+      "restoreTreatment": "Vrati tretman",
+      "deleteTreatment": "Obriši tretman",
+      "cancelled": "Otkazano"
     },
     "editButton": "Uredi",
     "editClientTitle": "Uredi klijenta",

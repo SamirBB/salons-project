@@ -485,12 +485,19 @@
         "services": "Services",
         "notes": "Notes",
         "amount": "Amount",
-        "invoice": "Invoice"
+        "invoice": "Invoice",
+        "time": "Time"
       },
       "errors": {
         "generic": "Failed to save treatment.",
         "noPermission": "You do not have permission for this action."
-      }
+      },
+      "prev": "Previous",
+      "next": "Next",
+      "cancelTreatment": "Cancel treatment",
+      "restoreTreatment": "Restore treatment",
+      "deleteTreatment": "Delete treatment",
+      "cancelled": "Cancelled"
     },
     "editButton": "Edit",
     "editClientTitle": "Edit client",

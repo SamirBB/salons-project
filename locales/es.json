@@ -485,12 +485,19 @@
         "services": "Servicios",
         "notes": "Notas",
         "amount": "Importe",
-        "invoice": "Factura"
+        "invoice": "Factura",
+        "time": "Hora"
       },
       "errors": {
         "generic": "Error al guardar el tratamiento.",
         "noPermission": "No tiene permiso para esta acción."
-      }
+      },
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "cancelTreatment": "Cancelar tratamiento",
+      "restoreTreatment": "Restaurar tratamiento",
+      "deleteTreatment": "Eliminar tratamiento",
+      "cancelled": "Cancelado"
     },
     "editButton": "Editar",
     "editClientTitle": "Editar cliente",

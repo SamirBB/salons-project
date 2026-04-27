@@ -12,7 +12,7 @@ export type PromotionTreatment = {
   notes: string | null;
   amount_charged: number | null;
   invoice_number: string | null;
-  service: { id: string; name: string } | null;
+  service: { id: string; name: string; color: string | null } | null;
 };
 
 export type ClientPromotion = {
@@ -65,7 +65,7 @@ function mapTreatments(raw: unknown[]): PromotionTreatment[] {
       notes: (treatment.notes as string | null) ?? null,
       amount_charged: (treatment.amount_charged as number | null) ?? null,
       invoice_number: (treatment.invoice_number as string | null) ?? null,
-      service: svc ? { id: svc.id, name: svc.name } : null,
+      service: svc ? { id: svc.id, name: svc.name, color: (svc as { id: string; name: string; color?: string | null }).color ?? null } : null,
     };
   });
 }
@@ -107,7 +107,7 @@ export async function getClientPromotions(clientId: string): Promise<ClientPromo
       id, client_id, promotion_id, status, assigned_at, used_at, notes,
       promotions(id, name, description, promotion_type, color, ends_at, is_active),
       client_treatments(id, promotion_treatment_status, promotion_service_type, treated_at, notes, amount_charged, invoice_number,
-        client_treatment_services(service_id, services(id, name)))
+        client_treatment_services(service_id, services(id, name, color)))
     `)
     .eq("client_id", clientId)
     .eq("tenant_id", session.tenantId)
@@ -188,6 +188,20 @@ export async function assignPromotion(
   const linkedIds: string[] = (promoData?.linked_service_ids as string[] | null) ?? [];
   const bonusIds: string[] = (promoData?.bonus_service_ids as string[] | null) ?? [];
 
+  // Fetch prices for all involved services in one query
+  const allServiceIds = [...new Set([...linkedIds, ...bonusIds])];
+  const priceMap = new Map<string, number>();
+  if (allServiceIds.length > 0) {
+    const { data: svcRows } = await supabase
+      .from("services")
+      .select("id, price")
+      .in("id", allServiceIds)
+      .eq("tenant_id", session.tenantId);
+    for (const s of svcRows ?? []) {
+      priceMap.set(s.id, Number(s.price));
+    }
+  }
+
   // Insert client_promotion
   const { data: cp, error: cpError } = await supabase
     .from("client_promotions")
@@ -215,6 +229,8 @@ export async function assignPromotion(
   ];
 
   for (const entry of serviceEntries) {
+    const amount_charged = priceMap.get(entry.service_id) ?? null;
+
     const { data: treatment } = await supabase
       .from("client_treatments")
       .insert({
@@ -224,6 +240,7 @@ export async function assignPromotion(
         promotion_treatment_status: "pending",
         promotion_service_type: entry.type,
         treated_at: now,
+        amount_charged,
       })
       .select("id")
       .single();

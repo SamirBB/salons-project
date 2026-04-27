@@ -357,7 +357,7 @@ export async function toggleClientActive(clientId: string, currentStatus: boolea
 
 // ─── TREATMENT KARTON ─────────────────────────────────────────────
 
-export type TreatmentService = { id: string; name: string; price: number };
+export type TreatmentService = { id: string; name: string; price: number; color: string | null };
 
 export type Treatment = {
   id: string;
@@ -375,6 +375,7 @@ export type Treatment = {
   client_promotion_id: string | null;
   promotion_treatment_status: "pending" | "completed" | null;
   promotion_service_type: "linked" | "bonus" | null;
+  is_cancelled: boolean;
 };
 
 export type TreatmentData = {
@@ -503,6 +504,26 @@ export async function deleteClient(clientId: string) {
   }
 
   revalidatePath("/dashboard/clients");
+  return { success: true as const };
+}
+
+export async function toggleTreatmentCancelled(
+  treatmentId: string,
+  clientId: string,
+  cancelled: boolean
+) {
+  const session = await getSession();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("client_treatments")
+    .update({ is_cancelled: cancelled })
+    .eq("id", treatmentId)
+    .eq("tenant_id", session.tenantId);
+
+  if (error) return { error: "updateError" as const };
+
+  revalidatePath(`/dashboard/clients/${clientId}`);
   return { success: true as const };
 }
 

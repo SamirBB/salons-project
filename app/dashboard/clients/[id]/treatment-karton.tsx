@@ -2,14 +2,24 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
-import { deleteTreatment } from "@/app/actions/clients";
+import { deleteTreatment, toggleTreatmentCancelled } from "@/app/actions/clients";
 import TreatmentForm from "./treatment-form";
 import type { Treatment } from "@/app/actions/clients";
 import type { CustomField } from "@/app/actions/custom-fields";
 // useTranslations used twice: "klijenti" + "customFields"
 
 type Employee = { id: string; full_name: string; color: string | null };
-type ServiceOption = { id: string; name: string; price: number; category: string | null };
+type ServiceOption = { id: string; name: string; price: number; category: string | null; color: string | null };
+
+/** Generates chip styles from a hex color. Falls back to indigo if no color set. */
+function serviceChipStyle(color: string | null | undefined, cancelled: boolean): React.CSSProperties {
+  if (cancelled || !color) return {};
+  return {
+    backgroundColor: `${color}18`,
+    borderColor: `${color}40`,
+    color,
+  };
+}
 
 type Props = {
   clientId: string;
@@ -21,9 +31,16 @@ type Props = {
   currentEmployeeId: string | null;
 };
 
-function formatDate(d: string) {
-  const [y, m, day] = d.slice(0, 10).split("-");
-  return `${day}.${m}.${y}.`;
+function formatDateTime(d: string) {
+  const date = new Date(d);
+  if (isNaN(date.getTime())) return d.slice(0, 10);
+  const day = String(date.getDate()).padStart(2, "0");
+  const m   = String(date.getMonth() + 1).padStart(2, "0");
+  const y   = date.getFullYear();
+  const h   = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  if (h === "00" && min === "00") return `${day}.${m}.${y}.`;
+  return `${day}.${m}.${y}. ${h}:${min}`;
 }
 
 function formatPrice(p: number | null) {
@@ -55,6 +72,7 @@ export default function TreatmentKarton({
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
 
   function openEdit(tr: Treatment, idx: number) {
     setEditTreatment(tr);
@@ -73,6 +91,11 @@ export default function TreatmentKarton({
       await deleteTreatment(id, clientId);
       setConfirmDelete(null);
     });
+  }
+
+  function handleCancel(id: string, currentlyCancelled: boolean) {
+    toggleTreatmentCancelled(id, clientId, !currentlyCancelled);
+    setConfirmCancel(null);
   }
 
   const isEditing = editTreatment !== null;
@@ -98,63 +121,25 @@ export default function TreatmentKarton({
       </div>
 
       {(showForm || isEditing) && (
-        <div className="space-y-0">
-          {/* Navigacija između tretmana */}
-          {isEditing && total > 1 && editIndex !== null && (
-            <div className="flex items-center justify-between rounded-t-2xl border border-b-0 border-indigo-200 bg-indigo-50/60 px-4 py-2">
-              <button
-                onClick={() => goToIndex(editIndex - 1)}
-                disabled={editIndex <= 0}
-                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-indigo-600 hover:bg-indigo-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <svg
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-                Prethodni
-              </button>
-              <span className="text-xs font-medium text-indigo-500">
-                {total - editIndex} / {total}
-              </span>
-              <button
-                onClick={() => goToIndex(editIndex + 1)}
-                disabled={editIndex >= total - 1}
-                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-indigo-600 hover:bg-indigo-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                Sljedeći
-                <svg
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          )}
-          <TreatmentForm
-            key={editTreatment?.id ?? "new"}
-            clientId={clientId}
-            treatment={editTreatment ?? undefined}
-            employees={employees}
-            services={services}
-            customFields={customFields}
-            currentEmployeeId={currentEmployeeId}
-            onClose={() => {
-              setShowForm(false);
-              setEditTreatment(null);
-              setEditIndex(null);
-            }}
-            roundedTop={!(isEditing && total > 1)}
-          />
-        </div>
+        <TreatmentForm
+          key={editTreatment?.id ?? "new"}
+          clientId={clientId}
+          treatment={editTreatment ?? undefined}
+          employees={employees}
+          services={services}
+          customFields={customFields}
+          currentEmployeeId={currentEmployeeId}
+          onClose={() => {
+            setShowForm(false);
+            setEditTreatment(null);
+            setEditIndex(null);
+          }}
+          navLabel={isEditing && total > 1 && editIndex !== null ? `${total - editIndex} / ${total}` : undefined}
+          onPrev={editIndex !== null ? () => goToIndex(editIndex - 1) : undefined}
+          onNext={editIndex !== null ? () => goToIndex(editIndex + 1) : undefined}
+          hasPrev={editIndex !== null && editIndex > 0}
+          hasNext={editIndex !== null && editIndex < total - 1}
+        />
       )}
 
       {treatments.length === 0 ? (
@@ -201,43 +186,58 @@ export default function TreatmentKarton({
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {treatments.map((tr, idx) => (
-                  <tr key={tr.id} className="hover:bg-slate-50 transition-colors">
+                  <tr
+                    key={tr.id}
+                    className={`transition-colors ${tr.is_cancelled ? "bg-red-50/60" : "hover:bg-slate-50"}`}
+                  >
                     <td className="px-4 py-3 text-xs text-slate-400">
                       {treatments.length - idx}
                     </td>
                     <td className="px-4 py-3 max-w-[220px]">
-                      {tr.services && tr.services.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                          {tr.services.map((s) => (
+                      <div className="flex flex-wrap items-center gap-1">
+                        {tr.is_cancelled && (
+                          <span className="inline-flex items-center rounded-full bg-red-100 border border-red-200 px-2 py-0.5 text-xs font-semibold text-red-500 uppercase tracking-wide shrink-0">
+                            {t("karton.cancelled")}
+                          </span>
+                        )}
+                        {tr.services && tr.services.length > 0 ? (
+                          tr.services.map((s) => (
                             <span
                               key={s.id}
-                              className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700"
+                              className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${
+                                tr.is_cancelled
+                                  ? "bg-red-50 border-red-100 text-red-300 line-through"
+                                  : s.color
+                                  ? ""
+                                  : "bg-indigo-50 border-indigo-100 text-indigo-700"
+                              }`}
+                              style={serviceChipStyle(s.color, tr.is_cancelled)}
                             >
                               {s.name}
                             </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-slate-400">—</span>
-                      )}
+                          ))
+                        ) : !tr.is_cancelled ? (
+                          <span className="text-slate-400">—</span>
+                        ) : null}
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-slate-700 whitespace-nowrap">
-                      {formatDate(tr.treated_at)}
+                    <td className={`px-4 py-3 whitespace-nowrap ${tr.is_cancelled ? "text-red-300 line-through" : "text-slate-700"}`}>
+                      {formatDateTime(tr.treated_at)}
                     </td>
                     <td className="px-4 py-3 max-w-[240px]">
-                      <div className="text-slate-700 truncate" title={tr.notes ?? ""}>
+                      <div className={`truncate ${tr.is_cancelled ? "text-red-300" : "text-slate-700"}`} title={tr.notes ?? ""}>
                         {tr.notes || "—"}
                       </div>
                     </td>
                     {customFields.map((cf) => (
-                      <td key={cf.id} className="px-4 py-3 text-slate-600 text-sm whitespace-nowrap">
+                      <td key={cf.id} className={`px-4 py-3 text-sm whitespace-nowrap ${tr.is_cancelled ? "text-red-300" : "text-slate-600"}`}>
                         {renderCustomValue(tr.custom_data?.[cf.field_key], cf.field_type, boolTrue, boolFalse)}
                       </td>
                     ))}
-                    <td className="px-4 py-3 text-right font-medium text-slate-800 whitespace-nowrap">
+                    <td className={`px-4 py-3 text-right font-medium whitespace-nowrap ${tr.is_cancelled ? "text-red-300 line-through" : "text-slate-800"}`}>
                       {formatPrice(tr.amount_charged)}
                     </td>
-                    <td className="px-4 py-3 text-slate-500 text-xs">
+                    <td className={`px-4 py-3 text-xs ${tr.is_cancelled ? "text-red-300" : "text-slate-500"}`}>
                       {tr.invoice_number || "—"}
                     </td>
                     {canManage && (
@@ -259,42 +259,61 @@ export default function TreatmentKarton({
                                 {t("karton.no")}
                               </button>
                             </>
+                          ) : confirmCancel === tr.id ? (
+                            <>
+                              <button
+                                onClick={() => handleCancel(tr.id, tr.is_cancelled)}
+                                className="rounded px-2 py-1 text-xs bg-amber-50 text-amber-600 hover:bg-amber-100"
+                              >
+                                {t("karton.yes")}
+                              </button>
+                              <button
+                                onClick={() => setConfirmCancel(null)}
+                                className="rounded px-2 py-1 text-xs bg-slate-100 text-slate-600 hover:bg-slate-200"
+                              >
+                                {t("karton.no")}
+                              </button>
+                            </>
                           ) : (
                             <>
                               <button
                                 onClick={() => openEdit(tr, idx)}
                                 className="rounded p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-500 transition-colors"
+                                title={t("karton.editTreatment")}
                               >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                  />
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                               </button>
+                              {/* Cancel / Restore button */}
+                              {tr.is_cancelled ? (
+                                <button
+                                  onClick={() => handleCancel(tr.id, tr.is_cancelled)}
+                                  className="rounded p-1.5 text-slate-400 hover:bg-green-50 hover:text-green-600 transition-colors"
+                                  title={t("karton.restoreTreatment")}
+                                >
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => setConfirmCancel(tr.id)}
+                                  className="rounded p-1.5 text-slate-400 hover:bg-amber-50 hover:text-amber-500 transition-colors"
+                                  title={t("karton.cancelTreatment")}
+                                >
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                  </svg>
+                                </button>
+                              )}
                               <button
                                 onClick={() => setConfirmDelete(tr.id)}
                                 className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                                title={t("karton.deleteTreatment")}
                               >
-                                <svg
-                                  className="w-3.5 h-3.5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                  />
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                               </button>
                             </>
