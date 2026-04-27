@@ -9,6 +9,9 @@ export type PromotionTreatment = {
   promotion_treatment_status: "pending" | "completed";
   promotion_service_type: "linked" | "bonus";
   treated_at: string;
+  notes: string | null;
+  amount_charged: number | null;
+  invoice_number: string | null;
   service: { id: string; name: string } | null;
 };
 
@@ -59,6 +62,9 @@ function mapTreatments(raw: unknown[]): PromotionTreatment[] {
       promotion_treatment_status: treatment.promotion_treatment_status as "pending" | "completed",
       promotion_service_type: treatment.promotion_service_type as "linked" | "bonus",
       treated_at: treatment.treated_at as string,
+      notes: (treatment.notes as string | null) ?? null,
+      amount_charged: (treatment.amount_charged as number | null) ?? null,
+      invoice_number: (treatment.invoice_number as string | null) ?? null,
       service: svc ? { id: svc.id, name: svc.name } : null,
     };
   });
@@ -100,7 +106,7 @@ export async function getClientPromotions(clientId: string): Promise<ClientPromo
     .select(`
       id, client_id, promotion_id, status, assigned_at, used_at, notes,
       promotions(id, name, description, promotion_type, color, ends_at, is_active),
-      client_treatments(id, promotion_treatment_status, promotion_service_type, treated_at,
+      client_treatments(id, promotion_treatment_status, promotion_service_type, treated_at, notes, amount_charged, invoice_number,
         client_treatment_services(service_id, services(id, name)))
     `)
     .eq("client_id", clientId)

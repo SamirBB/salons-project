@@ -454,7 +454,7 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
 
             {promoError && <p className="text-xs text-red-500">{promoError}</p>}
 
-            {/* Treatment table — same style as TreatmentKarton */}
+            {/* Treatment table — identical layout to TreatmentKarton */}
             {pending.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
                 <p className="text-slate-400 text-sm">Svi tretmani su iskorišteni.</p>
@@ -466,9 +466,11 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50">
                         <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 w-8">#</th>
-                        <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">Usluga</th>
-                        <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">Tip</th>
+                        <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">Usluge</th>
                         <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">Datum</th>
+                        <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">Napomena</th>
+                        <th className="text-right text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">Iznos</th>
+                        <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">Račun</th>
                         {canManage && <th className="px-4 py-3 w-24" />}
                       </tr>
                     </thead>
@@ -480,24 +482,30 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                           </td>
                           <td className="px-4 py-3 max-w-[220px]">
                             {tr.service ? (
-                              <span className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
-                                {tr.service.name}
-                              </span>
+                              <div className="flex flex-wrap gap-1">
+                                <span className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                                  {tr.service.name}
+                                </span>
+                              </div>
                             ) : (
                               <span className="text-slate-400">—</span>
                             )}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                              tr.promotion_service_type === "linked"
-                                ? "bg-indigo-50 text-indigo-600"
-                                : "bg-violet-50 text-violet-600"
-                            }`}>
-                              {tr.promotion_service_type === "linked" ? "Povezana" : "Promotivna"}
-                            </span>
-                          </td>
                           <td className="px-4 py-3 text-slate-700 whitespace-nowrap">
                             {formatDate(tr.treated_at)}
+                          </td>
+                          <td className="px-4 py-3 max-w-[240px]">
+                            <div className="text-slate-700 truncate" title={tr.notes ?? ""}>
+                              {tr.notes || "—"}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-right font-medium text-slate-800 whitespace-nowrap">
+                            {tr.amount_charged != null
+                              ? tr.amount_charged.toFixed(2).replace(".", ",") + " €"
+                              : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-slate-500 text-xs">
+                            {tr.invoice_number || "—"}
                           </td>
                           {canManage && (
                             <td className="px-4 py-3">
