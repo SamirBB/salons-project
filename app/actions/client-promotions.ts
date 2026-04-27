@@ -24,6 +24,7 @@ export type ClientPromotion = {
   promotion: {
     id: string;
     name: string;
+    description: string | null;
     promotion_type: string;
     color: string | null;
     ends_at: string | null;
@@ -98,7 +99,7 @@ export async function getClientPromotions(clientId: string): Promise<ClientPromo
     .from("client_promotions")
     .select(`
       id, client_id, promotion_id, status, assigned_at, used_at, notes,
-      promotions(id, name, promotion_type, color, ends_at, is_active),
+      promotions(id, name, description, promotion_type, color, ends_at, is_active),
       client_treatments(id, promotion_treatment_status, promotion_service_type, treated_at,
         client_treatment_services(service_id, services(id, name)))
     `)

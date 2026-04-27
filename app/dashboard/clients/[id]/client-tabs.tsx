@@ -382,49 +382,45 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
       {activePromotion && (() => {
         const cp = activePromotion;
         const pending = cp.treatments.filter((t) => t.promotion_treatment_status === "pending");
-        const completed = cp.treatments.filter((t) => t.promotion_treatment_status === "completed");
+        const total = cp.treatments.length;
 
         return (
-          <div className="space-y-3">
-            {/* Promotion header card */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-2.5">
+          <div className="space-y-4">
+            {/* Header — mirrors TreatmentKarton header style */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
                   <span
-                    className="inline-block w-4 h-4 rounded-full shrink-0 mt-0.5"
+                    className="inline-block w-3 h-3 rounded-full shrink-0"
                     style={{ backgroundColor: cp.promotion.color ?? "#94a3b8" }}
                   />
-                  <div>
-                    <h3 className="text-base font-semibold text-slate-800">{cp.promotion.name}</h3>
-                    <span className="text-xs text-slate-400">
-                      {PROMO_TYPE_LABELS[cp.promotion.promotion_type] ?? cp.promotion.promotion_type}
+                  <div className="flex items-center gap-3 text-sm text-slate-600 flex-wrap">
+                    <span>
+                      <span className="text-xs font-medium text-slate-400 uppercase tracking-wide mr-1">Datum:</span>
+                      {formatDate(cp.assigned_at)}
                     </span>
+                    {cp.promotion.ends_at && (
+                      <span>
+                        <span className="text-xs font-medium text-slate-400 uppercase tracking-wide mr-1">Ističe:</span>
+                        {formatDate(cp.promotion.ends_at)}
+                      </span>
+                    )}
+                    {cp.promotion.description && (
+                      <span>
+                        <span className="text-xs font-medium text-slate-400 uppercase tracking-wide mr-1">Opis:</span>
+                        {cp.promotion.description}
+                      </span>
+                    )}
                   </div>
                 </div>
-                <span className="inline-flex items-center rounded-full bg-green-50 border border-green-200 px-3 py-1 text-xs font-medium text-green-700 shrink-0">
-                  {pending.length} / {cp.treatments.length} preostalo
-                </span>
+                <p className="text-xs text-slate-400 pl-5">
+                  {pending.length} / {total} preostalo
+                </p>
               </div>
 
-              <div className="flex flex-wrap gap-4 text-sm">
-                <div>
-                  <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-0.5">{tPromo("colDate")}</p>
-                  <p className="text-slate-700">{formatDate(cp.assigned_at)}</p>
-                </div>
-                {cp.promotion.ends_at && (
-                  <div>
-                    <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-0.5">Ističe</p>
-                    <p className="text-slate-700">{formatDate(cp.promotion.ends_at)}</p>
-                  </div>
-                )}
-              </div>
-
-              {cp.notes && (
-                <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-3 py-2">{cp.notes}</p>
-              )}
-
+              {/* Right side: remove button */}
               {canManage && (
-                <div className="flex justify-end pt-1 border-t border-slate-100">
+                <div className="shrink-0">
                   {confirmDelete === cp.id ? (
                     <div className="flex gap-2 items-center">
                       <button
@@ -444,7 +440,7 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                   ) : (
                     <button
                       onClick={() => setConfirmDelete(cp.id)}
-                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors border border-slate-200"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -456,83 +452,71 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
               )}
             </div>
 
-            {promoError && <p className="text-xs text-red-500 px-1">{promoError}</p>}
+            {promoError && <p className="text-xs text-red-500">{promoError}</p>}
 
-            {/* Treatments list */}
-            {cp.treatments.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center">
-                <p className="text-sm text-slate-400">Nema tretmana za ovu promociju.</p>
+            {/* Treatment table — same style as TreatmentKarton */}
+            {pending.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
+                <p className="text-slate-400 text-sm">Svi tretmani su iskorišteni.</p>
               </div>
             ) : (
-              <div className="space-y-2">
-                {/* Pending treatments */}
-                {pending.length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide px-1 mb-1.5">Na čekanju</p>
-                    <div className="space-y-1.5">
-                      {pending.map((t) => (
-                        <div
-                          key={t.id}
-                          className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 px-4 py-3"
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-800 truncate">
-                              {t.service?.name ?? "Nepoznata usluga"}
-                            </p>
-                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold mt-0.5 ${
-                              t.promotion_service_type === "linked"
+              <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50">
+                        <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 w-8">#</th>
+                        <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">Usluga</th>
+                        <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">Tip</th>
+                        <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">Datum</th>
+                        {canManage && <th className="px-4 py-3 w-24" />}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {pending.map((tr, idx) => (
+                        <tr key={tr.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-4 py-3 text-xs text-slate-400">
+                            {pending.length - idx}
+                          </td>
+                          <td className="px-4 py-3 max-w-[220px]">
+                            {tr.service ? (
+                              <span className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                                {tr.service.name}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400">—</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                              tr.promotion_service_type === "linked"
                                 ? "bg-indigo-50 text-indigo-600"
                                 : "bg-violet-50 text-violet-600"
                             }`}>
-                              {t.promotion_service_type === "linked" ? "Povezana usluga" : "Promotivna usluga"}
+                              {tr.promotion_service_type === "linked" ? "Povezana" : "Promotivna"}
                             </span>
-                          </div>
+                          </td>
+                          <td className="px-4 py-3 text-slate-700 whitespace-nowrap">
+                            {formatDate(tr.treated_at)}
+                          </td>
                           {canManage && (
-                            <button
-                              onClick={() => handleCompleteTreatment(t, cp.id)}
-                              disabled={pendingComplete === t.id}
-                              className="shrink-0 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 px-3 py-1.5 text-xs font-medium text-white transition-colors"
-                            >
-                              {pendingComplete === t.id ? "…" : "Završi"}
-                            </button>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center justify-end">
+                                <button
+                                  onClick={() => handleCompleteTreatment(tr, cp.id)}
+                                  disabled={pendingComplete === tr.id}
+                                  className="rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 px-3 py-1.5 text-xs font-medium text-white transition-colors"
+                                >
+                                  {pendingComplete === tr.id ? "…" : "Završi"}
+                                </button>
+                              </div>
+                            </td>
                           )}
-                        </div>
+                        </tr>
                       ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Completed treatments */}
-                {completed.length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide px-1 mb-1.5 mt-3">Iskorišteno</p>
-                    <div className="space-y-1.5">
-                      {completed.map((t) => (
-                        <div
-                          key={t.id}
-                          className="flex items-center gap-3 bg-slate-50 rounded-xl border border-slate-100 px-4 py-3"
-                        >
-                          <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                          </svg>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-slate-500 line-through truncate">
-                              {t.service?.name ?? "Nepoznata usluga"}
-                            </p>
-                            <p className="text-xs text-slate-400">{formatDate(t.treated_at)}</p>
-                          </div>
-                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                            t.promotion_service_type === "linked"
-                              ? "bg-indigo-50 text-indigo-400"
-                              : "bg-violet-50 text-violet-400"
-                          }`}>
-                            {t.promotion_service_type === "linked" ? "Povezana" : "Promotivna"}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
