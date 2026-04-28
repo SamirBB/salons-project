@@ -163,73 +163,125 @@ export default function ClientSuggestionsKarton({ clientId, suggestions, canMana
           )}
         </div>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+        <>
+          {/* ── Mobile cards (< md) ── */}
+          <div className="md:hidden space-y-3">
+            {suggestions.map((s) => (
+              <div key={s.id} className="rounded-2xl border border-slate-200 bg-white shadow-sm p-4">
+                {/* Top row: title + actions */}
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm font-medium text-slate-800 flex-1 min-w-0">{s.title}</p>
+
+                  {canManage && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      {confirmDelete === s.id ? (
+                        <>
+                          <button onClick={() => handleDelete(s.id)} disabled={isPending} className="rounded px-2 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100">
+                            {t("confirmYes")}
+                          </button>
+                          <button onClick={() => setConfirmDelete(null)} className="rounded px-2 py-1 text-xs bg-slate-100 text-slate-600 hover:bg-slate-200">
+                            {t("confirmNo")}
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => openEdit(s)} className="rounded p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-500 transition-colors">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                          <button onClick={() => setConfirmDelete(s.id)} className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Notes */}
+                {s.notes && (
+                  <p className="mt-1.5 text-xs text-slate-500">{s.notes}</p>
+                )}
+
+                {/* Date */}
+                <p className="mt-2 text-xs text-slate-400">{formatDate(s.created_at)}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Desktop table (≥ md) ── */}
+          <div className="hidden md:block rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50">
+                <tr className="border-b border-slate-100 bg-slate-50/80">
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
-                    {t("colName")}
+                    <span className="inline-flex items-center gap-1.5">
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+                      </svg>
+                      {t("colName")}
+                    </span>
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3">
-                    {t("colNotes")}
+                    <span className="inline-flex items-center gap-1.5">
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                      </svg>
+                      {t("colNotes")}
+                    </span>
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">
-                    {t("colDate")}
+                    <span className="inline-flex items-center gap-1.5">
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                      </svg>
+                      {t("colDate")}
+                    </span>
                   </th>
-                  {canManage && <th className="px-4 py-3 w-20" />}
+                  {canManage && <th className="px-4 py-3 w-24" />}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {suggestions.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={s.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-4 py-3 font-medium text-slate-800 max-w-[200px]">
                       <div className="truncate" title={s.title}>
                         {s.title}
                       </div>
                     </td>
                     <td className="px-4 py-3 max-w-[280px]">
-                      <div className="text-slate-600 truncate" title={s.notes ?? ""}>
-                        {s.notes || "—"}
+                      <div className="text-sm text-slate-600 truncate" title={s.notes ?? ""}>
+                        {s.notes || <span className="text-slate-300">—</span>}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">
+                    <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">
                       {formatDate(s.created_at)}
                     </td>
                     {canManage && (
                       <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-end gap-0.5">
                           {confirmDelete === s.id ? (
-                            <>
-                              <button
-                                onClick={() => handleDelete(s.id)}
-                                disabled={isPending}
-                                className="rounded px-2 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100"
-                              >
+                            <div className="flex items-center gap-1">
+                              <button onClick={() => handleDelete(s.id)} disabled={isPending} className="rounded-lg px-2.5 py-1 text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
                                 {t("confirmYes")}
                               </button>
-                              <button
-                                onClick={() => setConfirmDelete(null)}
-                                className="rounded px-2 py-1 text-xs bg-slate-100 text-slate-600 hover:bg-slate-200"
-                              >
+                              <button onClick={() => setConfirmDelete(null)} className="rounded-lg px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
                                 {t("confirmNo")}
                               </button>
-                            </>
+                            </div>
                           ) : (
                             <>
-                              <button
-                                onClick={() => openEdit(s)}
-                                className="rounded p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-500 transition-colors"
-                              >
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <button onClick={() => openEdit(s)} className="rounded-lg p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-500 transition-colors" title={t("colName")}>
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                               </button>
-                              <button
-                                onClick={() => setConfirmDelete(s.id)}
-                                className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
-                              >
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <div className="w-px h-4 bg-slate-200 mx-0.5" />
+                              <button onClick={() => setConfirmDelete(s.id)} className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                               </button>
@@ -243,7 +295,7 @@ export default function ClientSuggestionsKarton({ clientId, suggestions, canMana
               </tbody>
             </table>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

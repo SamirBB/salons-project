@@ -136,17 +136,25 @@ export default function ClientSummary({
         {/* Info grid */}
         <dl className="mt-3 grid grid-cols-1 gap-y-2 sm:grid-cols-2 lg:grid-cols-4 sm:gap-x-6">
           <InfoRow label={t("phoneLabel")} value={initial.phone} />
+
+          {/* Special note — after phone on mobile, half-width last row on lg+ */}
+          {initial.notes && (
+            <div className="sm:col-span-2 lg:col-span-2 sm:order-last min-w-0">
+              <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50/70 px-3.5 py-2.5 border-l-[3px] border-l-red-400">
+                <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-red-400">{t("specialNoteLabel")}</p>
+                  <p className="mt-0.5 text-sm font-medium text-red-700 break-words leading-snug">{initial.notes}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <InfoRow label={t("emailLabel")} value={initial.email} />
           <InfoRow label={t("dateOfBirthLabel")} value={initial.date_of_birth} />
           {address && <InfoRow label={t("streetLabel")} value={address} />}
-          {initial.notes && (
-            <div className="sm:col-span-2 lg:col-span-4 min-w-0">
-              <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                {t("specialNoteLabel")}
-              </dt>
-              <dd className="mt-0.5 text-sm text-slate-600 line-clamp-2">{initial.notes}</dd>
-            </div>
-          )}
         </dl>
 
         {/* Actions — mobile only (below info) */}
