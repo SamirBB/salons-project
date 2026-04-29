@@ -317,7 +317,25 @@
       "invalidDateRange": "Konec mora biti ob istem času ali po začetku.",
       "deleteError": "Napaka pri brisanju promocije.",
       "generic": "Napaka. Poskusite znova."
-    }
+    },
+    "statsTotal": "Skupaj akcij",
+    "statsAllTime": "Skupaj",
+    "statsActive": "Aktivne",
+    "statsCurrently": "Trenutno aktivne",
+    "statsExpired": "Potekle",
+    "statsNoLonger": "Niso več aktivne",
+    "searchPlaceholder": "Išči akcije...",
+    "filterStatus": "Status",
+    "filterType": "Tip",
+    "filterAll": "Vse",
+    "sortBy": "Razvrsti",
+    "sortNewest": "Najnovejše",
+    "sortOldest": "Najstarejše",
+    "sortNameAZ": "Ime A-Ž",
+    "editAria": "Uredi akcijo",
+    "duplicateAria": "Podvoji akcijo",
+    "listActions": "Dejanja",
+    "showing": "Prikazano {count} od {total} akcij"
   },
   "klijenti": {
     "title": "Stranke",

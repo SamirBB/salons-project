@@ -317,7 +317,25 @@
       "invalidDateRange": "La fecha y hora de fin deben ser iguales o posteriores al inicio.",
       "deleteError": "No se pudo eliminar la promoción.",
       "generic": "Error. Inténtalo de nuevo."
-    }
+    },
+    "statsTotal": "Total de promociones",
+    "statsAllTime": "Desde siempre",
+    "statsActive": "Activas",
+    "statsCurrently": "Actualmente activas",
+    "statsExpired": "Expiradas",
+    "statsNoLonger": "Ya no activas",
+    "searchPlaceholder": "Buscar promociones...",
+    "filterStatus": "Estado",
+    "filterType": "Tipo",
+    "filterAll": "Todas",
+    "sortBy": "Ordenar",
+    "sortNewest": "Más recientes",
+    "sortOldest": "Más antiguas",
+    "sortNameAZ": "Nombre A-Z",
+    "editAria": "Editar promoción",
+    "duplicateAria": "Duplicar promoción",
+    "listActions": "Acciones",
+    "showing": "Mostrando {count} de {total} promociones"
   },
   "klijenti": {
     "title": "Clientes",

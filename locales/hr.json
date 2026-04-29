@@ -317,7 +317,25 @@
       "invalidDateRange": "Završetak mora biti u isto vrijeme ili nakon početka.",
       "deleteError": "Greška pri brisanju promocije.",
       "generic": "Greška. Pokušajte ponovo."
-    }
+    },
+    "statsTotal": "Ukupno promocija",
+    "statsAllTime": "Sveukupno",
+    "statsActive": "Aktivne",
+    "statsCurrently": "Trenutno aktivne",
+    "statsExpired": "Istekle",
+    "statsNoLonger": "Više nisu aktivne",
+    "searchPlaceholder": "Pretraži promocije...",
+    "filterStatus": "Status",
+    "filterType": "Tip",
+    "filterAll": "Sve",
+    "sortBy": "Sortiraj",
+    "sortNewest": "Najnovije",
+    "sortOldest": "Najstarije",
+    "sortNameAZ": "Naziv A-Z",
+    "editAria": "Uredi promociju",
+    "duplicateAria": "Dupliciraj promociju",
+    "listActions": "Akcije",
+    "showing": "Prikazano {count} od {total} promocija"
   },
   "klijenti": {
     "title": "Klijenti",

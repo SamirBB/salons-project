@@ -317,7 +317,25 @@
       "invalidDateRange": "End date and time must be on or after the start.",
       "deleteError": "Could not delete the promotion.",
       "generic": "An error occurred. Please try again."
-    }
+    },
+    "statsTotal": "Total promotions",
+    "statsAllTime": "All time",
+    "statsActive": "Active",
+    "statsCurrently": "Currently running",
+    "statsExpired": "Expired",
+    "statsNoLonger": "No longer active",
+    "searchPlaceholder": "Search promotions...",
+    "filterStatus": "Status",
+    "filterType": "Type",
+    "filterAll": "All",
+    "sortBy": "Sort by",
+    "sortNewest": "Newest",
+    "sortOldest": "Oldest",
+    "sortNameAZ": "Name A-Z",
+    "editAria": "Edit promotion",
+    "duplicateAria": "Duplicate promotion",
+    "listActions": "Actions",
+    "showing": "Showing {count} of {total} promotions"
   },
   "klijenti": {
     "title": "Clients",

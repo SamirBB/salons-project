@@ -205,6 +205,32 @@ export async function deletePromotion(promotionId: string): Promise<{ error?: st
   return {};
 }
 
+export async function duplicatePromotion(promotionId: string): Promise<{ error?: string; id?: string }> {
+  const session = await getSession();
+  if (!["owner", "manager"].includes(session.role)) return { error: "noPermission" };
+
+  const supabase = await createClient();
+  const { data: src } = await supabase
+    .from("promotions")
+    .select("name, description, terms, promotion_type, starts_at, ends_at, is_active, display_order, color, service_id, linked_service_ids, bonus_service_ids")
+    .eq("id", promotionId)
+    .eq("tenant_id", session.tenantId)
+    .single();
+
+  if (!src) return { error: "generic" };
+
+  const { data, error } = await supabase
+    .from("promotions")
+    .insert({ ...src, tenant_id: session.tenantId, name: `${src.name} (kopija)`, is_active: false })
+    .select("id")
+    .single();
+
+  if (error) return { error: "createError" };
+
+  revalidatePath("/dashboard/promotions");
+  return { id: data.id };
+}
+
 export async function getPromotionById(id: string): Promise<Promotion | null> {
   const session = await getSession();
   const supabase = await createClient();
