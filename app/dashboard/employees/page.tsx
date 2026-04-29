@@ -2,7 +2,6 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
 import Link from "next/link";
-import InviteList from "./invite-list";
 import EmployeeList from "./employee-list";
 
 export default async function UposleniciPage() {
@@ -15,12 +14,6 @@ export default async function UposleniciPage() {
     .select("id, full_name, email, job_title, color, is_active")
     .eq("tenant_id", session.tenantId)
     .order("full_name");
-
-  const { data: invitations } = await supabase
-    .from("invitations")
-    .select("id, token, full_name, email, role, status, created_at, expires_at")
-    .eq("tenant_id", session.tenantId)
-    .order("created_at", { ascending: false });
 
   const canManage = session.role === "owner" || session.role === "manager";
 
@@ -50,10 +43,6 @@ export default async function UposleniciPage() {
         employees={employees ?? []}
         canManage={canManage}
       />
-
-      {canManage && invitations && invitations.length > 0 && (
-        <InviteList invitations={invitations} />
-      )}
     </div>
   );
 }

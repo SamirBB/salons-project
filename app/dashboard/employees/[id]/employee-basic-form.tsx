@@ -11,6 +11,7 @@ type Props = {
   employeeId: string;
   profileId: string | null;
   canManage: boolean;
+  noCard?: boolean;
   initialData: {
     full_name: string;
     email: string;
@@ -22,7 +23,7 @@ type Props = {
   };
 };
 
-export default function EmployeeBasicForm({ employeeId, profileId, canManage, initialData }: Props) {
+export default function EmployeeBasicForm({ employeeId, profileId, canManage, noCard, initialData }: Props) {
   const t = useTranslations("employeeDetail");
   const tRoles = useTranslations("roles");
   const [isPending, startTransition] = useTransition();
@@ -76,8 +77,8 @@ export default function EmployeeBasicForm({ employeeId, profileId, canManage, in
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-5">
-      <h3 className="text-sm font-semibold text-slate-700">{t("basicInfo")}</h3>
+    <div className={noCard ? "space-y-5" : "bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-5"}>
+      {!noCard && <h3 className="text-sm font-semibold text-slate-700">{t("basicInfo")}</h3>}
 
       <div className="grid gap-4 sm:grid-cols-2">
         {/* First name */}

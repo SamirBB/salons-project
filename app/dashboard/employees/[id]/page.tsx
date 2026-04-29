@@ -3,10 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import EmployeeBasicForm from "./employee-basic-form";
-import EmployeeScheduleForm from "./employee-schedule-form";
-import EmployeeServicesForm from "./employee-services-form";
-import EmployeeDevicesForm from "./employee-devices-form";
+import EmployeeSummary from "./employee-summary";
+import EmployeeTabs from "./employee-tabs";
 import { getDevices, getEmployeeDeviceIds } from "@/app/actions/devices";
 import type { WorkingHours } from "@/app/actions/employees";
 
@@ -19,7 +17,6 @@ export default async function EmployeeDetailPage({
   const session = await getSession();
   const supabase = await createClient();
   const t = await getTranslations("uposlenici");
-  const tDetail = await getTranslations("employeeDetail");
 
   const { data: employee } = await supabase
     .from("employees")
@@ -79,8 +76,8 @@ export default async function EmployeeDetailPage({
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
-      {/* Back navigation */}
+    <div className="space-y-5">
+      {/* Breadcrumb */}
       <div className="flex items-center gap-3">
         <Link
           href="/dashboard/employees"
@@ -93,63 +90,32 @@ export default async function EmployeeDetailPage({
         </Link>
       </div>
 
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white"
-          style={{ backgroundColor: employee.color ?? "#6366f1" }}
-        >
-          {employee.full_name[0]}
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900">{employee.full_name}</h2>
-          <p className="text-sm text-slate-500">
-            {employee.job_title ?? tDetail("employeeDetails")}
-          </p>
-        </div>
-      </div>
-
-      {/* Section A: Basic info */}
-      <EmployeeBasicForm
+      {/* Summary card */}
+      <EmployeeSummary
         employeeId={employee.id}
         profileId={employee.profile_id}
+        fullName={employee.full_name}
+        email={employee.email}
+        phone={employee.phone}
+        jobTitle={employee.job_title}
+        bio={employee.bio}
+        color={employee.color ?? "#6366f1"}
+        isActive={employee.is_active}
+        role={employeeRole}
         canManage={canManage}
-        initialData={{
-          full_name: employee.full_name,
-          email: employee.email,
-          phone: employee.phone,
-          job_title: employee.job_title,
-          color: employee.color,
-          bio: employee.bio,
-          role: employeeRole,
-        }}
       />
 
-      {/* Section B: Work schedule */}
-      <EmployeeScheduleForm
+      {/* Tabs: Work schedule | Services | Allowed devices */}
+      <EmployeeTabs
         employeeId={employee.id}
         canManage={canManage}
         employeeSchedule={employeeSchedule}
         salonSchedule={salonSchedule}
+        allServices={allServices}
+        assignedServiceIds={assignedServiceIds}
+        allDevices={allDevices}
+        assignedDeviceIds={assignedDeviceIds}
       />
-
-      {/* Section C: Services */}
-      {canManage && (
-        <EmployeeServicesForm
-          employeeId={employee.id}
-          allServices={allServices}
-          assignedIds={assignedServiceIds}
-        />
-      )}
-
-      {/* Section D: Devices */}
-      {canManage && (
-        <EmployeeDevicesForm
-          employeeId={employee.id}
-          allDevices={allDevices}
-          assignedDeviceIds={assignedDeviceIds}
-        />
-      )}
     </div>
   );
 }
