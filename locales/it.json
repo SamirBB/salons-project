@@ -517,7 +517,8 @@
       "colNotes": "Nota",
       "colDate": "Data",
       "confirmYes": "Sì",
-      "confirmNo": "No"
+      "confirmNo": "No",
+      "deleteAria": "Elimina suggerimento"
     },
     "karton": {
       "title": "Scheda cliente",

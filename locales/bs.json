@@ -551,7 +551,8 @@
       "colNotes": "Napomena",
       "colDate": "Datum",
       "confirmYes": "Da",
-      "confirmNo": "Ne"
+      "confirmNo": "Ne",
+      "deleteAria": "Obriši prijedlog"
     },
     "karton": {
       "title": "Karton klijenta",

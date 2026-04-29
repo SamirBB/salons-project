@@ -52,6 +52,17 @@ function promoTreatmentToTreatment(tr: PromotionTreatment, clientId: string): Tr
   };
 }
 
+function Tip({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="relative group/tip">
+      {children}
+      <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-800 px-2 py-1 text-xs font-medium text-white opacity-0 group-hover/tip:opacity-100 transition-opacity duration-150 z-30 shadow-sm">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 function formatDate(d: string) {
   const [y, m, day] = d.slice(0, 10).split("-");
   return `${day}.${m}.${y}.`;
@@ -668,23 +679,26 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                             {canManage && (
                               <td className="px-4 py-3">
                                 <div className="flex items-center justify-end gap-0.5">
-                                  <button
-                                    onClick={() => setEditTreatmentId(editTreatmentId === tr.id ? null : tr.id)}
-                                    className={`rounded-lg p-1.5 transition-colors ${editTreatmentId === tr.id ? "bg-indigo-100 text-indigo-600" : "text-slate-400 hover:bg-indigo-50 hover:text-indigo-500"}`}
-                                    title="Uredi tretman"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                  </button>
+                                  <Tip label="Uredi tretman">
+                                    <button
+                                      onClick={() => setEditTreatmentId(editTreatmentId === tr.id ? null : tr.id)}
+                                      className={`rounded-lg p-1.5 transition-colors ${editTreatmentId === tr.id ? "bg-indigo-100 text-indigo-600" : "text-slate-400 hover:bg-indigo-50 hover:text-indigo-500"}`}
+                                    >
+                                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                      </svg>
+                                    </button>
+                                  </Tip>
                                   <div className="w-px h-4 bg-slate-200 mx-0.5" />
-                                  <button
-                                    onClick={() => handleCompleteTreatment(tr, cp.id)}
-                                    disabled={pendingComplete === tr.id}
-                                    className="rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 px-3 py-1.5 text-xs font-medium text-white transition-colors"
-                                  >
-                                    {pendingComplete === tr.id ? "…" : "Završi"}
-                                  </button>
+                                  <Tip label="Završi tretman">
+                                    <button
+                                      onClick={() => handleCompleteTreatment(tr, cp.id)}
+                                      disabled={pendingComplete === tr.id}
+                                      className="rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 px-3 py-1.5 text-xs font-medium text-white transition-colors"
+                                    >
+                                      {pendingComplete === tr.id ? "…" : "Završi"}
+                                    </button>
+                                  </Tip>
                                 </div>
                               </td>
                             )}

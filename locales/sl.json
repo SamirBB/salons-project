@@ -517,7 +517,8 @@
       "colNotes": "Opomba",
       "colDate": "Datum",
       "confirmYes": "Da",
-      "confirmNo": "Ne"
+      "confirmNo": "Ne",
+      "deleteAria": "Izbriši predlog"
     },
     "karton": {
       "title": "Karton stranke",
