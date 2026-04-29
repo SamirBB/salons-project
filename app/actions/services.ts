@@ -163,6 +163,35 @@ export async function deleteService(
   return {};
 }
 
+// ─── DUPLICATE SERVICE ───────────────────────────────────────────
+export async function duplicateService(
+  serviceId: string
+): Promise<{ error?: string; id?: string }> {
+  const session = await getSession();
+  if (!["owner", "manager"].includes(session.role)) return { error: "noPermission" };
+
+  const supabase = await createClient();
+  const { data: src } = await supabase
+    .from("services")
+    .select("name, description, duration_minutes, price, category, color, is_active, display_order, internal_note")
+    .eq("id", serviceId)
+    .eq("tenant_id", session.tenantId)
+    .single();
+
+  if (!src) return { error: "generic" };
+
+  const { data, error } = await supabase
+    .from("services")
+    .insert({ ...src, tenant_id: session.tenantId, name: `${src.name} (kopija)`, is_active: false })
+    .select("id")
+    .single();
+
+  if (error) return { error: "createError" };
+
+  revalidatePath("/dashboard/price-list");
+  return { id: data.id };
+}
+
 // ─── GET SERVICES FOR TENANT ──────────────────────────────────────
 export async function getServices(): Promise<Service[]> {
   const session = await getSession();
