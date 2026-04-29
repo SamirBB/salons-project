@@ -438,8 +438,9 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
       {/* Promotion tab content */}
       {activePromotion && (() => {
         const cp = activePromotion;
-        const pending = cp.treatments.filter((t) => t.promotion_treatment_status === "pending");
-        const total = cp.treatments.length;
+        const allTreatments = cp.treatments;
+        const pending = allTreatments.filter((t) => t.promotion_treatment_status === "pending");
+        const total = allTreatments.length;
 
         return (
           <div className="space-y-4">
@@ -514,79 +515,92 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
             })()}
 
             {/* Treatment list */}
-            {pending.length === 0 ? (
+            {allTreatments.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
-                <p className="text-slate-400 text-sm">Svi tretmani su iskorišteni.</p>
+                <p className="text-slate-400 text-sm">Nema tretmana u ovoj promociji.</p>
               </div>
             ) : (
               <>
                 {/* ── Mobile cards (< md) ── */}
                 <div className="md:hidden space-y-3">
-                  {pending.map((tr, idx) => (
-                    <div
-                      key={tr.id}
-                      className={`rounded-2xl border p-4 shadow-sm ${editTreatmentId === tr.id ? "bg-indigo-50/40 border-indigo-200" : "bg-white border-slate-200"}`}
-                    >
-                      {/* Top row: number + chip + actions */}
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-start gap-2 flex-1 min-w-0">
-                          <span className="text-xs text-slate-400 shrink-0 mt-0.5 w-5 tabular-nums">
-                            {idx + 1}
-                          </span>
-                          {tr.service ? (
-                            <span
-                              className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${tr.service.color ? "" : "bg-indigo-50 border-indigo-100 text-indigo-700"}`}
-                              style={tr.service.color ? { backgroundColor: `${tr.service.color}18`, borderColor: `${tr.service.color}40`, color: tr.service.color } : undefined}
-                            >
-                              {tr.service.name}
+                  {allTreatments.map((tr, idx) => {
+                    const isDone = tr.promotion_treatment_status !== "pending";
+                    return (
+                      <div
+                        key={tr.id}
+                        className={`rounded-2xl border p-4 shadow-sm ${
+                          isDone
+                            ? "bg-slate-50 border-slate-200 opacity-70"
+                            : editTreatmentId === tr.id
+                            ? "bg-indigo-50/40 border-indigo-200"
+                            : "bg-white border-slate-200"
+                        }`}
+                      >
+                        {/* Top row: number + chip + actions */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-start gap-2 flex-1 min-w-0">
+                            <span className="text-xs text-slate-400 shrink-0 mt-0.5 w-5 tabular-nums">
+                              {idx + 1}
                             </span>
-                          ) : (
-                            <span className="text-slate-400 text-xs">—</span>
+                            {tr.service ? (
+                              <span
+                                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${isDone ? "opacity-60 " : ""}${tr.service.color ? "" : "bg-indigo-50 border-indigo-100 text-indigo-700"}`}
+                                style={tr.service.color ? { backgroundColor: `${tr.service.color}18`, borderColor: `${tr.service.color}40`, color: tr.service.color } : undefined}
+                              >
+                                {tr.service.name}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 text-xs">—</span>
+                            )}
+                          </div>
+
+                          {isDone ? (
+                            <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 shrink-0">
+                              Završeno
+                            </span>
+                          ) : canManage && (
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <button
+                                onClick={() => setEditTreatmentId(editTreatmentId === tr.id ? null : tr.id)}
+                                className={`rounded p-1.5 transition-colors ${editTreatmentId === tr.id ? "bg-indigo-100 text-indigo-600" : "text-slate-400 hover:bg-indigo-50 hover:text-indigo-500"}`}
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => handleCompleteTreatment(tr, cp.id)}
+                                disabled={pendingComplete === tr.id}
+                                className="rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 px-3 py-1.5 text-xs font-medium text-white transition-colors"
+                              >
+                                {pendingComplete === tr.id ? "…" : "Završi"}
+                              </button>
+                            </div>
                           )}
                         </div>
 
-                        {canManage && (
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <button
-                              onClick={() => setEditTreatmentId(editTreatmentId === tr.id ? null : tr.id)}
-                              className={`rounded p-1.5 transition-colors ${editTreatmentId === tr.id ? "bg-indigo-100 text-indigo-600" : "text-slate-400 hover:bg-indigo-50 hover:text-indigo-500"}`}
-                            >
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => handleCompleteTreatment(tr, cp.id)}
-                              disabled={pendingComplete === tr.id}
-                              className="rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 px-3 py-1.5 text-xs font-medium text-white transition-colors"
-                            >
-                              {pendingComplete === tr.id ? "…" : "Završi"}
-                            </button>
-                          </div>
+                        {/* Date */}
+                        <div className="mt-2 text-sm font-medium text-slate-700">
+                          {formatDateTime(tr.treated_at)}
+                        </div>
+
+                        {/* Notes */}
+                        {tr.notes && (
+                          <div className="mt-1 text-xs text-slate-500">{tr.notes}</div>
                         )}
-                      </div>
 
-                      {/* Date */}
-                      <div className="mt-2 text-sm font-medium text-slate-700">
-                        {formatDateTime(tr.treated_at)}
+                        {/* Amount + Invoice */}
+                        <div className="mt-2 flex items-center justify-between">
+                          <span className="text-xs text-slate-400">{tr.invoice_number || "—"}</span>
+                          <span className="text-sm font-semibold text-slate-800">
+                            {tr.amount_charged != null
+                              ? tr.amount_charged.toFixed(2).replace(".", ",") + " €"
+                              : "—"}
+                          </span>
+                        </div>
                       </div>
-
-                      {/* Notes */}
-                      {tr.notes && (
-                        <div className="mt-1 text-xs text-slate-500">{tr.notes}</div>
-                      )}
-
-                      {/* Amount + Invoice */}
-                      <div className="mt-2 flex items-center justify-between">
-                        <span className="text-xs text-slate-400">{tr.invoice_number || "—"}</span>
-                        <span className="text-sm font-semibold text-slate-800">
-                          {tr.amount_charged != null
-                            ? tr.amount_charged.toFixed(2).replace(".", ",") + " €"
-                            : "—"}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* ── Desktop table (≥ md) ── */}
@@ -641,8 +655,10 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
-                        {pending.map((tr, idx) => (
-                          <tr key={tr.id} className={`transition-colors ${editTreatmentId === tr.id ? "bg-indigo-50/40" : "hover:bg-slate-50/70"}`}>
+                        {allTreatments.map((tr, idx) => {
+                          const isDone = tr.promotion_treatment_status !== "pending";
+                          return (
+                          <tr key={tr.id} className={`transition-colors ${isDone ? "bg-slate-50/60" : editTreatmentId === tr.id ? "bg-indigo-50/40" : "hover:bg-slate-50/70"}`}>
                             <td className="px-4 py-3 text-xs text-slate-400 tabular-nums">
                               {idx + 1}
                             </td>
@@ -650,7 +666,7 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                               {tr.service ? (
                                 <div className="flex flex-wrap gap-1">
                                   <span
-                                    className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${tr.service.color ? "" : "bg-indigo-50 border-indigo-100 text-indigo-700"}`}
+                                    className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${isDone ? "opacity-50 " : ""}${tr.service.color ? "" : "bg-indigo-50 border-indigo-100 text-indigo-700"}`}
                                     style={tr.service.color ? { backgroundColor: `${tr.service.color}18`, borderColor: `${tr.service.color}40`, color: tr.service.color } : undefined}
                                   >
                                     {tr.service.name}
@@ -660,50 +676,59 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                                 <span className="text-slate-300">—</span>
                               )}
                             </td>
-                            <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">
+                            <td className={`px-4 py-3 text-sm whitespace-nowrap ${isDone ? "text-slate-400" : "text-slate-600"}`}>
                               {formatDateTime(tr.treated_at)}
                             </td>
                             <td className="px-4 py-3 max-w-[240px]">
-                              <div className="text-sm text-slate-600 truncate" title={tr.notes ?? ""}>
+                              <div className={`text-sm truncate ${isDone ? "text-slate-400" : "text-slate-600"}`} title={tr.notes ?? ""}>
                                 {tr.notes || <span className="text-slate-300">—</span>}
                               </div>
                             </td>
-                            <td className="px-4 py-3 text-right text-sm font-semibold text-slate-800 whitespace-nowrap tabular-nums">
+                            <td className={`px-4 py-3 text-right text-sm whitespace-nowrap tabular-nums ${isDone ? "font-normal text-slate-400" : "font-semibold text-slate-800"}`}>
                               {tr.amount_charged != null
                                 ? tr.amount_charged.toFixed(2).replace(".", ",") + " €"
                                 : <span className="font-normal text-slate-300">—</span>}
                             </td>
-                            <td className="px-4 py-3 text-xs text-slate-500">
+                            <td className={`px-4 py-3 text-xs ${isDone ? "text-slate-400" : "text-slate-500"}`}>
                               {tr.invoice_number || <span className="text-slate-300">—</span>}
                             </td>
                             {canManage && (
                               <td className="px-4 py-3">
-                                <div className="flex items-center justify-end gap-0.5">
-                                  <Tip label="Uredi tretman">
-                                    <button
-                                      onClick={() => setEditTreatmentId(editTreatmentId === tr.id ? null : tr.id)}
-                                      className={`rounded-lg p-1.5 transition-colors ${editTreatmentId === tr.id ? "bg-indigo-100 text-indigo-600" : "text-slate-400 hover:bg-indigo-50 hover:text-indigo-500"}`}
-                                    >
-                                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                      </svg>
-                                    </button>
-                                  </Tip>
-                                  <div className="w-px h-4 bg-slate-200 mx-0.5" />
-                                  <Tip label="Završi tretman">
-                                    <button
-                                      onClick={() => handleCompleteTreatment(tr, cp.id)}
-                                      disabled={pendingComplete === tr.id}
-                                      className="rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 px-3 py-1.5 text-xs font-medium text-white transition-colors"
-                                    >
-                                      {pendingComplete === tr.id ? "…" : "Završi"}
-                                    </button>
-                                  </Tip>
-                                </div>
+                                {isDone ? (
+                                  <div className="flex justify-end">
+                                    <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                                      Završeno
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center justify-end gap-0.5">
+                                    <Tip label="Uredi tretman">
+                                      <button
+                                        onClick={() => setEditTreatmentId(editTreatmentId === tr.id ? null : tr.id)}
+                                        className={`rounded-lg p-1.5 transition-colors ${editTreatmentId === tr.id ? "bg-indigo-100 text-indigo-600" : "text-slate-400 hover:bg-indigo-50 hover:text-indigo-500"}`}
+                                      >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                      </button>
+                                    </Tip>
+                                    <div className="w-px h-4 bg-slate-200 mx-0.5" />
+                                    <Tip label="Završi tretman">
+                                      <button
+                                        onClick={() => handleCompleteTreatment(tr, cp.id)}
+                                        disabled={pendingComplete === tr.id}
+                                        className="rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 px-3 py-1.5 text-xs font-medium text-white transition-colors"
+                                      >
+                                        {pendingComplete === tr.id ? "…" : "Završi"}
+                                      </button>
+                                    </Tip>
+                                  </div>
+                                )}
                               </td>
                             )}
                           </tr>
-                        ))}
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>

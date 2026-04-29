@@ -250,17 +250,24 @@ export async function uploadClientPhoto(clientId: string, formData: FormData) {
         ? "image/svg+xml"
         : `image/${ext}`);
 
+  // Remove any existing file at the target path first.
+  // This avoids needing an UPDATE policy (upsert:true requires INSERT+SELECT+UPDATE).
+  // .remove() is a no-op if the file doesn't exist, so it's safe to always call.
+  await supabase.storage.from(CLIENT_PHOTO_BUCKET).remove([path]);
+
+  // Also clean up old path if the extension changed
+  if (oldPath && oldPath !== path) {
+    await supabase.storage.from(CLIENT_PHOTO_BUCKET).remove([oldPath]);
+  }
+
   const { error: uploadError } = await supabase.storage.from(CLIENT_PHOTO_BUCKET).upload(path, file, {
-    upsert: true,
+    upsert: false,
     contentType: mime,
   });
 
   if (uploadError) {
+    console.error("[uploadClientPhoto] Storage upload failed:", uploadError.message, "| path:", path);
     return { error: "uploadError" as const };
-  }
-
-  if (oldPath && oldPath !== path) {
-    await supabase.storage.from(CLIENT_PHOTO_BUCKET).remove([oldPath]);
   }
 
   const { data: urlData } = supabase.storage.from(CLIENT_PHOTO_BUCKET).getPublicUrl(path);
