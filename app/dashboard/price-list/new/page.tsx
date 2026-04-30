@@ -26,7 +26,7 @@ export default async function NovaUslugaPage() {
       </Link>
 
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">{t("newService")}</h1>
+        <h2 className="text-lg font-semibold text-slate-900">{t("newService")}</h2>
         <p className="text-sm text-slate-500 mt-0.5">{t("newServiceSubtitle")}</p>
       </div>
 

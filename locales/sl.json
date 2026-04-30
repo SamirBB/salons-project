@@ -148,6 +148,7 @@
     "listActions": "Dejanja",
     "colName": "Ime in priimek",
     "colEmail": "Email",
+    "colRole": "Vloga",
     "colJobTitle": "Delovno mesto",
     "colStatus": "Status",
     "showing": "Prikazano {count} od {total} zaposlenih"
@@ -211,10 +212,15 @@
     "appName": "Salon App"
   },
   "salon": {
+    "devicesTab": "Naprave",
+    "workingHoursTab": "Delovni čas",
+    "customFieldsTab": "Prilagojena polja",
+    "editButton": "Uredi",
+    "editDrawerTitle": "Uredi salon",
     "settings": "Nastavitve salona",
     "settingsSubtitle": "Uredite podatke in delovni čas vašega salona",
     "basicInfo": "Osnovni podatki",
-    "saveButton": "Shrani spremembe",
+    "saveButton": "Shrani",
     "saving": "Shranjevanje...",
     "saveSuccess": "Podatki so bili uspešno shranjeni.",
     "editTooltip": "Uredi nastavitve salona",
@@ -247,7 +253,9 @@
     "internalNoteLabel": "Interna opomba",
     "internalNotePlaceholder": "Vidljivo samo zaposlenim...",
     "createButton": "Ustvari storitev",
-    "saveButton": "Shrani spremembe",
+    "saveButton": "Shrani",
+    "editButton": "Uredi",
+    "editServiceTitle": "Uredi storitev",
     "creating": "Ustvarjanje...",
     "saving": "Shranjevanje...",
     "cancel": "Prekliči",
@@ -263,6 +271,7 @@
     "assignedEmployees": "Dodeljeni zaposleni",
     "assignedCount": "{count} izbrano",
     "assignedHint": "Izberite zaposlene, ki izvajajo to storitev.",
+    "noEmployeesForAssignment": "Ni aktivnih zaposlenih za dodelitev.",
     "savedChanges": "Spremembe shranjene.",
     "errors": {
       "nameRequired": "Ime storitve je obvezno.",

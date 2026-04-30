@@ -182,6 +182,7 @@
     "listActions": "Akcije",
     "colName": "Ime i prezime",
     "colEmail": "Email",
+    "colRole": "Uloga",
     "colJobTitle": "Pozicija",
     "colStatus": "Status",
     "showing": "Prikazano {count} od {total} uposlenika"
@@ -245,10 +246,15 @@
     "appName": "Salon App"
   },
   "salon": {
+    "devicesTab": "Uređaji",
+    "workingHoursTab": "Radno vrijeme",
+    "customFieldsTab": "Prilagođena polja",
+    "editButton": "Uredi",
+    "editDrawerTitle": "Uredi salon",
     "settings": "Postavke salona",
     "settingsSubtitle": "Uredite podatke i radno vrijeme vašeg salona",
     "basicInfo": "Osnovni podaci",
-    "saveButton": "Spremi promjene",
+    "saveButton": "Spremi",
     "saving": "Spremanje...",
     "saveSuccess": "Podaci su uspješno spremljeni.",
     "editTooltip": "Uredi postavke salona",
@@ -281,7 +287,9 @@
     "internalNoteLabel": "Interna napomena",
     "internalNotePlaceholder": "Vidljivo samo zaposlenima...",
     "createButton": "Kreiraj uslugu",
-    "saveButton": "Spremi promjene",
+    "saveButton": "Spremi",
+    "editButton": "Uredi",
+    "editServiceTitle": "Uredi uslugu",
     "creating": "Kreiranje...",
     "saving": "Spremanje...",
     "cancel": "Otkaži",
@@ -297,6 +305,7 @@
     "assignedEmployees": "Dodijeljeni uposlenici",
     "assignedCount": "{count} odabrano",
     "assignedHint": "Odaberite uposlenike koji izvode ovu uslugu.",
+    "noEmployeesForAssignment": "Nema aktivnih uposlenika za dodjelu.",
     "savedChanges": "Promjene spremljene.",
     "errors": {
       "nameRequired": "Naziv usluge je obavezan.",

@@ -148,6 +148,7 @@
     "listActions": "Actions",
     "colName": "Full name",
     "colEmail": "Email",
+    "colRole": "Role",
     "colJobTitle": "Position",
     "colStatus": "Status",
     "showing": "Showing {count} of {total} employees"
@@ -211,10 +212,15 @@
     "appName": "Salon App"
   },
   "salon": {
+    "devicesTab": "Devices",
+    "workingHoursTab": "Opening hours",
+    "customFieldsTab": "Custom fields",
+    "editButton": "Edit",
+    "editDrawerTitle": "Edit salon",
     "settings": "Salon settings",
     "settingsSubtitle": "Edit your salon's details and working hours",
     "basicInfo": "Basic information",
-    "saveButton": "Save changes",
+    "saveButton": "Save",
     "saving": "Saving...",
     "saveSuccess": "Changes saved successfully.",
     "editTooltip": "Edit salon settings",
@@ -247,7 +253,9 @@
     "internalNoteLabel": "Internal note",
     "internalNotePlaceholder": "Visible to staff only...",
     "createButton": "Create service",
-    "saveButton": "Save changes",
+    "saveButton": "Save",
+    "editButton": "Edit",
+    "editServiceTitle": "Edit service",
     "creating": "Creating...",
     "saving": "Saving...",
     "cancel": "Cancel",
@@ -263,6 +271,7 @@
     "assignedEmployees": "Assigned employees",
     "assignedCount": "{count} selected",
     "assignedHint": "Select employees who perform this service.",
+    "noEmployeesForAssignment": "No active employees to assign.",
     "savedChanges": "Changes saved.",
     "errors": {
       "nameRequired": "Service name is required.",

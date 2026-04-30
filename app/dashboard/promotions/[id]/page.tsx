@@ -95,7 +95,7 @@ export default async function PromotionDetailPage({ params }: Props) {
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-bold text-slate-800">{p.name}</h1>
+            <h2 className="text-lg font-semibold text-slate-900">{p.name}</h2>
             {(() => {
               const isExpired = !!p.ends_at && new Date(p.ends_at) < new Date();
               if (isExpired) {

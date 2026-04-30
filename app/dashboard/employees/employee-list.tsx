@@ -4,6 +4,9 @@ import { useState, useTransition, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { removeEmployee } from "@/app/actions/employees";
+import { employeeAvatarAccent } from "@/lib/avatar-accent";
+import type { Role } from "@/lib/roles";
+import { isValidRole } from "@/lib/roles";
 
 type Employee = {
   id: string;
@@ -12,6 +15,7 @@ type Employee = {
   job_title: string | null;
   color: string | null;
   is_active: boolean;
+  role: string;
 };
 
 function Tip({ label, children }: { label: string; children: React.ReactNode }) {
@@ -44,10 +48,11 @@ function StatCard({ icon, count, label, sub, accent }: {
 
 export default function EmployeeList({ employees, canManage }: { employees: Employee[]; canManage: boolean }) {
   const t = useTranslations("uposlenici");
+  const tRoles = useTranslations("roles");
   const router = useRouter();
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
@@ -61,16 +66,22 @@ export default function EmployeeList({ employees, canManage }: { employees: Empl
     let list = [...employees];
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter((e) =>
-        e.full_name.toLowerCase().includes(q) ||
-        e.email.toLowerCase().includes(q) ||
-        (e.job_title ?? "").toLowerCase().includes(q)
-      );
+      list = list.filter((e) => {
+        const roleLabel =
+          isValidRole(e.role) ? tRoles(e.role as Role) : (e.role ?? "");
+        return (
+          e.full_name.toLowerCase().includes(q) ||
+          e.email.toLowerCase().includes(q) ||
+          (e.job_title ?? "").toLowerCase().includes(q) ||
+          e.role.toLowerCase().includes(q) ||
+          roleLabel.toLowerCase().includes(q)
+        );
+      });
     }
     if (statusFilter === "active") list = list.filter((e) => e.is_active);
     if (statusFilter === "inactive") list = list.filter((e) => !e.is_active);
     return list.sort((a, b) => a.full_name.localeCompare(b.full_name));
-  }, [employees, search, statusFilter]);
+  }, [employees, search, statusFilter, tRoles]);
 
   function handleDeleteConfirm(e: React.MouseEvent, empId: string) {
     e.stopPropagation();
@@ -162,16 +173,29 @@ export default function EmployeeList({ employees, canManage }: { employees: Empl
 
           {/* ── Mobile cards (< md) ── */}
           <div className="md:hidden divide-y divide-slate-100">
-            {filtered.map((emp) => (
+            {filtered.map((emp) => {
+              const avatar = employeeAvatarAccent(emp.color);
+              return (
               <div key={emp.id} onClick={() => router.push(`/dashboard/employees/${emp.id}`)}
                 className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer hover:bg-slate-50/70 transition-colors ${!emp.is_active ? "opacity-60" : ""}`}>
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
-                  style={{ backgroundColor: emp.color ?? "#6366f1" }}>
+                <div
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                  style={{ backgroundColor: avatar.background, color: avatar.foreground }}
+                >
                   {emp.full_name[0]}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-slate-900">{emp.full_name}</p>
                   <p className="text-xs text-slate-500 truncate">{emp.email}</p>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    {isValidRole(emp.role) ? (
+                      <span className="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 font-medium text-indigo-800">
+                        {tRoles(emp.role as Role)}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400">{emp.role || "—"}</span>
+                    )}
+                  </p>
                   {emp.job_title && <p className="text-xs text-slate-400 mt-0.5">{emp.job_title}</p>}
                 </div>
                 <span className={`shrink-0 inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${emp.is_active ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-slate-50 text-slate-500"}`}>
@@ -181,12 +205,13 @@ export default function EmployeeList({ employees, canManage }: { employees: Empl
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                 </svg>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* ── Desktop table (≥ md) ── */}
           <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[calc(100vh-22rem)]">
-            <table className="w-full text-sm min-w-[600px]">
+            <table className="w-full text-sm min-w-[720px]">
               <thead className="sticky top-0 z-10">
                 <tr className="border-b border-slate-100 bg-white text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
                   <th className="px-4 py-3 w-10" aria-hidden />
@@ -202,6 +227,25 @@ export default function EmployeeList({ employees, canManage }: { employees: Empl
                       {t("colEmail")}
                     </span>
                   </th>
+                  <th className="px-4 py-3 whitespace-nowrap">
+                    <span className="inline-flex items-center gap-1.5">
+                      <svg
+                        className="h-3.5 w-3.5 text-slate-400 shrink-0"
+                        aria-hidden
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                        />
+                      </svg>
+                      {t("colRole")}
+                    </span>
+                  </th>
                   <th className="px-4 py-3">
                     <span className="inline-flex items-center gap-1.5">
                       <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" /></svg>
@@ -213,7 +257,9 @@ export default function EmployeeList({ employees, canManage }: { employees: Empl
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filtered.map((emp) => (
+                {filtered.map((emp) => {
+                  const avatar = employeeAvatarAccent(emp.color);
+                  return (
                   <tr key={emp.id} role="button" tabIndex={0}
                     onClick={() => router.push(`/dashboard/employees/${emp.id}`)}
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/dashboard/employees/${emp.id}`); } }}
@@ -221,8 +267,10 @@ export default function EmployeeList({ employees, canManage }: { employees: Empl
                   >
                     {/* Avatar */}
                     <td className="px-4 py-3.5">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-white shrink-0"
-                        style={{ backgroundColor: emp.color ?? "#6366f1" }}>
+                      <div
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold shrink-0"
+                        style={{ backgroundColor: avatar.background, color: avatar.foreground }}
+                      >
                         {emp.full_name[0]}
                       </div>
                     </td>
@@ -235,6 +283,17 @@ export default function EmployeeList({ employees, canManage }: { employees: Empl
                     {/* Email */}
                     <td className="px-4 py-3.5 text-sm text-slate-600 max-w-[14rem] truncate">
                       {emp.email || <span className="text-slate-300">—</span>}
+                    </td>
+
+                    {/* Role */}
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      {isValidRole(emp.role) ? (
+                        <span className="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-800">
+                          {tRoles(emp.role as Role)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-slate-400">{emp.role || "—"}</span>
+                      )}
                     </td>
 
                     {/* Job title */}
@@ -305,7 +364,8 @@ export default function EmployeeList({ employees, canManage }: { employees: Empl
                       </td>
                     )}
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

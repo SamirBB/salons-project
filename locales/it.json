@@ -148,6 +148,7 @@
     "listActions": "Azioni",
     "colName": "Nome completo",
     "colEmail": "Email",
+    "colRole": "Ruolo",
     "colJobTitle": "Posizione",
     "colStatus": "Stato",
     "showing": "Visualizzazione {count} di {total} dipendenti"
@@ -206,10 +207,15 @@
     "joinError": "Errore nell'accesso al salone."
   },
   "salon": {
+    "devicesTab": "Dispositivi",
+    "workingHoursTab": "Orari di apertura",
+    "customFieldsTab": "Campi personalizzati",
+    "editButton": "Modifica",
+    "editDrawerTitle": "Modifica salone",
     "settings": "Impostazioni salone",
     "settingsSubtitle": "Modifica i dati e gli orari del tuo salone",
     "basicInfo": "Informazioni di base",
-    "saveButton": "Salva modifiche",
+    "saveButton": "Salva",
     "saving": "Salvataggio...",
     "saveSuccess": "Modifiche salvate con successo.",
     "editTooltip": "Modifica impostazioni salone",
@@ -247,7 +253,9 @@
     "internalNoteLabel": "Nota interna",
     "internalNotePlaceholder": "Visibile solo al personale...",
     "createButton": "Crea servizio",
-    "saveButton": "Salva modifiche",
+    "saveButton": "Salva",
+    "editButton": "Modifica",
+    "editServiceTitle": "Modifica servizio",
     "creating": "Creazione...",
     "saving": "Salvataggio...",
     "cancel": "Annulla",
@@ -263,6 +271,7 @@
     "assignedEmployees": "Dipendenti assegnati",
     "assignedCount": "{count} selezionati",
     "assignedHint": "Seleziona i dipendenti che eseguono questo servizio.",
+    "noEmployeesForAssignment": "Nessun dipendente attivo da assegnare.",
     "savedChanges": "Modifiche salvate.",
     "errors": {
       "nameRequired": "Il nome del servizio è obbligatorio.",

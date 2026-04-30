@@ -35,7 +35,7 @@ export default async function NewPromotionPage() {
       </Link>
 
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">{t("newPromotion")}</h1>
+        <h2 className="text-lg font-semibold text-slate-900">{t("newPromotion")}</h2>
         <p className="text-sm text-slate-500 mt-0.5">{t("newPromotionSubtitle")}</p>
       </div>
 

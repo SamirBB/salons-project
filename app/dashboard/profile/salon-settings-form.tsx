@@ -1,50 +1,19 @@
 "use client";
 
-import { useActionState, useState, useRef } from "react";
+import { useEffect, useActionState, useState, useRef } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { updateSalon } from "@/app/actions/salon";
+import { mergeWithDefaults } from "@/lib/salon-working-hours";
 
-type DayHours = { open: string; close: string; closed: boolean };
-type WorkingHours = Record<string, DayHours>;
-
-const DAY_KEYS = [
-  { key: "1", t: "monday" },
-  { key: "2", t: "tuesday" },
-  { key: "3", t: "wednesday" },
-  { key: "4", t: "thursday" },
-  { key: "5", t: "friday" },
-  { key: "6", t: "saturday" },
-  { key: "0", t: "sunday" },
-] as const;
-
-const DEFAULT_HOURS: WorkingHours = {
-  "1": { open: "09:00", close: "18:00", closed: false },
-  "2": { open: "09:00", close: "18:00", closed: false },
-  "3": { open: "09:00", close: "18:00", closed: false },
-  "4": { open: "09:00", close: "18:00", closed: false },
-  "5": { open: "09:00", close: "18:00", closed: false },
-  "6": { open: "09:00", close: "14:00", closed: false },
-  "0": { open: "09:00", close: "18:00", closed: true },
-};
-
-function mergeWithDefaults(raw: Record<string, unknown>): WorkingHours {
-  const result: WorkingHours = { ...DEFAULT_HOURS };
-  for (const key of Object.keys(DEFAULT_HOURS)) {
-    const val = raw[key] as Partial<DayHours> | undefined;
-    if (val && typeof val === "object") {
-      result[key] = {
-        open: val.open ?? DEFAULT_HOURS[key].open,
-        close: val.close ?? DEFAULT_HOURS[key].close,
-        closed: val.closed ?? DEFAULT_HOURS[key].closed,
-      };
-    }
-  }
-  return result;
-}
+const WORKING_HOURS_READONLY_JSON = (hw: Record<string, unknown>) =>
+  JSON.stringify(mergeWithDefaults(hw));
 
 export default function SalonSettingsForm({
   initialData,
+  drawer = false,
+  onCloseDrawer,
 }: {
   initialData: {
     name: string;
@@ -54,13 +23,15 @@ export default function SalonSettingsForm({
     workingHours: Record<string, unknown>;
     logoUrl: string | null;
   };
+  drawer?: boolean;
+  onCloseDrawer?: () => void;
 }) {
   const t = useTranslations("salon");
   const tSetup = useTranslations("setup");
+  const router = useRouter();
   const [state, action, pending] = useActionState(updateSalon, undefined);
-  const [hours, setHours] = useState<WorkingHours>(() =>
-    mergeWithDefaults(initialData.workingHours)
-  );
+
+  const preservedWorkingHoursJson = WORKING_HOURS_READONLY_JSON(initialData.workingHours);
   const [logoPreview, setLogoPreview] = useState<string | null>(
     state?.logoUrl ?? initialData.logoUrl
   );
@@ -74,12 +45,13 @@ export default function SalonSettingsForm({
     reader.readAsDataURL(file);
   }
 
-  function updateDay(key: string, field: keyof DayHours, value: string | boolean) {
-    setHours((prev) => ({
-      ...prev,
-      [key]: { ...prev[key], [field]: value },
-    }));
-  }
+  useEffect(() => {
+    if (!state?.success) return;
+    if (drawer && onCloseDrawer) {
+      router.refresh();
+      onCloseDrawer();
+    }
+  }, [state, drawer, onCloseDrawer, router]);
 
   return (
     <form action={action} className="space-y-5">
@@ -198,65 +170,7 @@ export default function SalonSettingsForm({
         </div>
       </div>
 
-      {/* Radno vrijeme */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-3">
-        <h3 className="text-sm font-semibold text-slate-700">{tSetup("step2Title")}</h3>
-
-        <div className="divide-y divide-slate-100">
-          {DAY_KEYS.map(({ key, t: dayKey }) => {
-            const day = hours[key];
-            return (
-              <div key={key} className="flex items-center gap-3 py-3">
-                {/* Toggle */}
-                <button
-                  type="button"
-                  onClick={() => updateDay(key, "closed", !day.closed)}
-                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 ${
-                    day.closed ? "bg-slate-200" : "bg-indigo-600"
-                  }`}
-                >
-                  <span
-                    className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                      day.closed ? "translate-x-0" : "translate-x-4"
-                    }`}
-                  />
-                </button>
-
-                {/* Day name */}
-                <span className="w-28 text-sm font-medium text-slate-700">
-                  {tSetup(`workingHours.${dayKey}` as "workingHours.monday")}
-                </span>
-
-                {day.closed ? (
-                  <span className="text-sm text-slate-400">
-                    {tSetup("workingHours.closed")}
-                  </span>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500">{tSetup("workingHours.from")}</span>
-                    <input
-                      type="time"
-                      value={day.open}
-                      onChange={(e) => updateDay(key, "open", e.target.value)}
-                      className="rounded-md border border-slate-300 px-2 py-1 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/20"
-                    />
-                    <span className="text-xs text-slate-500">{tSetup("workingHours.to")}</span>
-                    <input
-                      type="time"
-                      value={day.close}
-                      onChange={(e) => updateDay(key, "close", e.target.value)}
-                      className="rounded-md border border-slate-300 px-2 py-1 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/20"
-                    />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Hidden working hours */}
-      <input type="hidden" name="working_hours" value={JSON.stringify(hours)} />
+      <input type="hidden" name="working_hours" value={preservedWorkingHoursJson} />
 
       {/* Feedback */}
       {state?.error && (
@@ -264,19 +178,21 @@ export default function SalonSettingsForm({
           {state.error}
         </p>
       )}
-      {state?.success && (
+      {state?.success && !drawer && (
         <p className="rounded-lg bg-green-50 border border-green-200 px-3.5 py-2.5 text-sm text-green-700">
           {t("saveSuccess")}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
-      >
-        {pending ? t("saving") : t("saveButton")}
-      </button>
+      <div className="flex justify-start">
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+        >
+          {pending ? t("saving") : t("saveButton")}
+        </button>
+      </div>
     </form>
   );
 }

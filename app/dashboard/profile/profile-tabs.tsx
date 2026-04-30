@@ -1,18 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
-type Tab = "salon" | "uredaji" | "polja";
+type Tab = "radno_vrijeme" | "uredaji" | "polja";
 
 type Props = {
   activeTab: Tab;
 };
 
 export default function ProfileTabs({ activeTab }: Props) {
+  const t = useTranslations("salon");
+
   const tabs: { key: Tab; label: string; href: string }[] = [
-    { key: "salon", label: "Postavke salona", href: "/dashboard/profile" },
-    { key: "uredaji", label: "Uređaji", href: "/dashboard/profile?tab=uredaji" },
-    { key: "polja", label: "Prilagođena polja", href: "/dashboard/profile?tab=polja" },
+    { key: "radno_vrijeme", label: t("workingHoursTab"), href: "/dashboard/profile" },
+    { key: "uredaji", label: t("devicesTab"), href: "/dashboard/profile?tab=uredaji" },
+    { key: "polja", label: t("customFieldsTab"), href: "/dashboard/profile?tab=polja" },
   ];
 
   return (

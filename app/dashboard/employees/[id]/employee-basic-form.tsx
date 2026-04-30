@@ -25,6 +25,7 @@ type Props = {
 
 export default function EmployeeBasicForm({ employeeId, profileId, canManage, noCard, initialData }: Props) {
   const t = useTranslations("employeeDetail");
+  const tList = useTranslations("uposlenici");
   const tRoles = useTranslations("roles");
   const [isPending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
@@ -174,10 +175,26 @@ export default function EmployeeBasicForm({ employeeId, profileId, canManage, no
           )}
         </div>
 
-        {/* Role */}
+        {/* Role — label aligned with employee list column (colRole) */}
         <div>
           <label className="block text-xs font-medium text-slate-700 mb-1.5">
-            Rola *
+            <span className="inline-flex items-center gap-1.5">
+              <svg
+                className="h-3.5 w-3.5 text-slate-500 shrink-0"
+                aria-hidden
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                />
+              </svg>
+              {canManage ? `${tList("colRole")} *` : tList("colRole")}
+            </span>
           </label>
           {canManage ? (
             <select

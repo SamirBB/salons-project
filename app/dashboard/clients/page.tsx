@@ -22,7 +22,7 @@ export default async function ClientsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">{t("title")}</h2>
           <p className="text-sm text-slate-500 mt-0.5">{t("subtitle", { count: clients?.length ?? 0 })}</p>
@@ -45,9 +45,7 @@ export default async function ClientsPage() {
               href="/dashboard/clients/new"
               className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
+              <span className="text-lg leading-none">+</span>
               {t("addClient")}
             </Link>
           )}

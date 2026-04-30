@@ -148,6 +148,7 @@
     "listActions": "Acciones",
     "colName": "Nombre completo",
     "colEmail": "Email",
+    "colRole": "Rol",
     "colJobTitle": "Puesto",
     "colStatus": "Estado",
     "showing": "Mostrando {count} de {total} empleados"
@@ -206,10 +207,15 @@
     "joinError": "Error al unirse al salón."
   },
   "salon": {
+    "devicesTab": "Dispositivos",
+    "workingHoursTab": "Horario de apertura",
+    "customFieldsTab": "Campos personalizados",
+    "editButton": "Editar",
+    "editDrawerTitle": "Editar salón",
     "settings": "Configuración del salón",
     "settingsSubtitle": "Edita los datos y el horario de tu salón",
     "basicInfo": "Información básica",
-    "saveButton": "Guardar cambios",
+    "saveButton": "Guardar",
     "saving": "Guardando...",
     "saveSuccess": "Cambios guardados correctamente.",
     "editTooltip": "Editar configuración del salón",
@@ -247,7 +253,9 @@
     "internalNoteLabel": "Nota interna",
     "internalNotePlaceholder": "Visible solo para el personal...",
     "createButton": "Crear servicio",
-    "saveButton": "Guardar cambios",
+    "saveButton": "Guardar",
+    "editButton": "Editar",
+    "editServiceTitle": "Editar servicio",
     "creating": "Creando...",
     "saving": "Guardando...",
     "cancel": "Cancelar",
@@ -263,6 +271,7 @@
     "assignedEmployees": "Empleados asignados",
     "assignedCount": "{count} seleccionados",
     "assignedHint": "Selecciona los empleados que realizan este servicio.",
+    "noEmployeesForAssignment": "No hay empleados activos para asignar.",
     "savedChanges": "Cambios guardados.",
     "errors": {
       "nameRequired": "El nombre del servicio es obligatorio.",

@@ -1,11 +1,11 @@
 import { getSession } from "@/lib/session";
 import { createClient } from "@/lib/supabase/server";
-import { getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import ServiceForm from "../service-form";
-import ServiceEmployees from "./service-employees";
+import ServiceDetailTabs from "./service-detail-tabs";
+import ServiceSummary from "./service-summary";
 import type { Service } from "@/app/actions/services";
+import { getTranslations } from "next-intl/server";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -15,7 +15,6 @@ export default async function ServiceDetailPage({ params }: Props) {
   const t = await getTranslations("cjenovnik");
   const supabase = await createClient();
 
-  // Fetch service
   const { data: service } = await supabase
     .from("services")
     .select("*")
@@ -28,7 +27,6 @@ export default async function ServiceDetailPage({ params }: Props) {
   const canManage = ["owner", "manager"].includes(session.role);
   if (!canManage) redirect("/dashboard/price-list");
 
-  // Fetch all employees for assignment
   const { data: employees } = await supabase
     .from("employees")
     .select("id, full_name, color, is_active")
@@ -36,7 +34,6 @@ export default async function ServiceDetailPage({ params }: Props) {
     .eq("is_active", true)
     .order("full_name");
 
-  // Fetch which employees are already assigned
   const { data: assigned } = await supabase
     .from("employee_services")
     .select("employee_id")
@@ -45,37 +42,22 @@ export default async function ServiceDetailPage({ params }: Props) {
   const assignedIds = (assigned ?? []).map((r) => r.employee_id);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Back */}
-      <Link
-        href="/dashboard/price-list"
-        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors"
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        {t("backToList")}
-      </Link>
-
-      {/* Header */}
+    <div className="space-y-5">
       <div className="flex items-center gap-3">
-        <div
-          className="w-4 h-4 rounded-full flex-shrink-0"
-          style={{ backgroundColor: service.color ?? "#6366f1" }}
-        />
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">{service.name}</h1>
-          {service.category && (
-            <p className="text-sm text-slate-400">{service.category}</p>
-          )}
-        </div>
+        <Link
+          href="/dashboard/price-list"
+          className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          {t("title")}
+        </Link>
       </div>
 
-      {/* Edit form */}
-      <ServiceForm mode="edit" service={service as Service} />
+      <ServiceSummary service={service as Service} />
 
-      {/* Employee assignment */}
-      <ServiceEmployees
+      <ServiceDetailTabs
         serviceId={id}
         employees={(employees ?? []) as { id: string; full_name: string; color: string | null; is_active: boolean }[]}
         assignedIds={assignedIds}
