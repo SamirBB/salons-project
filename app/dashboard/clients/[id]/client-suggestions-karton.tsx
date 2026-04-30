@@ -217,6 +217,11 @@ export default function ClientSuggestionsKarton({ clientId, suggestions, canMana
                   <p className="mt-1.5 text-xs text-slate-500">{s.notes}</p>
                 )}
 
+                {/* Kreirao */}
+                {s.created_by_name && (
+                  <p className="mt-1 text-xs text-slate-400">{t("colCreatedBy")}: {s.created_by_name}</p>
+                )}
+
                 {/* Date */}
                 <p className="mt-2 text-xs text-slate-400">{formatDate(s.created_at)}</p>
               </div>
@@ -252,6 +257,14 @@ export default function ClientSuggestionsKarton({ clientId, suggestions, canMana
                       {t("colDate")}
                     </span>
                   </th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">
+                    <span className="inline-flex items-center gap-1.5">
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                      </svg>
+                      {t("colCreatedBy")}
+                    </span>
+                  </th>
                   {canManage && <th className="px-4 py-3 w-24" />}
                 </tr>
               </thead>
@@ -270,6 +283,9 @@ export default function ClientSuggestionsKarton({ clientId, suggestions, canMana
                     </td>
                     <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">
                       {formatDate(s.created_at)}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">
+                      {s.created_by_name ?? <span className="text-slate-300">—</span>}
                     </td>
                     {canManage && (
                       <td className="px-4 py-3">

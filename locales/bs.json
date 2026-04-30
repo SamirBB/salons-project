@@ -552,7 +552,8 @@
       "colDate": "Datum",
       "confirmYes": "Da",
       "confirmNo": "Ne",
-      "deleteAria": "Obriši prijedlog"
+      "deleteAria": "Obriši prijedlog",
+      "colCreatedBy": "Kreirao"
     },
     "karton": {
       "title": "Karton klijenta",
@@ -581,7 +582,8 @@
         "notes": "Napomene",
         "amount": "Iznos",
         "invoice": "Račun",
-        "time": "Vrijeme"
+        "time": "Vrijeme",
+        "createdBy": "Kreirao"
       },
       "errors": {
         "generic": "Greška pri čuvanju tretmana.",

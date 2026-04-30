@@ -518,7 +518,8 @@
       "colDate": "Data",
       "confirmYes": "Sì",
       "confirmNo": "No",
-      "deleteAria": "Elimina suggerimento"
+      "deleteAria": "Elimina suggerimento",
+      "colCreatedBy": "Creato da"
     },
     "karton": {
       "title": "Scheda cliente",
@@ -547,7 +548,8 @@
         "notes": "Note",
         "amount": "Importo",
         "invoice": "Fattura",
-        "time": "Ora"
+        "time": "Ora",
+        "createdBy": "Creato da"
       },
       "errors": {
         "generic": "Errore nel salvataggio del trattamento.",

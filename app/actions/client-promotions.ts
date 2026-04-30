@@ -12,6 +12,8 @@ export type PromotionTreatment = {
   notes: string | null;
   amount_charged: number | null;
   invoice_number: string | null;
+  created_by: string | null;
+  created_by_name?: string | null;
   service: { id: string; name: string; color: string | null } | null;
 };
 
@@ -23,6 +25,8 @@ export type ClientPromotion = {
   assigned_at: string;
   used_at: string | null;
   notes: string | null;
+  created_by: string | null;
+  created_by_name?: string | null;
   treatments: PromotionTreatment[];
   promotion: {
     id: string;
@@ -65,6 +69,7 @@ function mapTreatments(raw: unknown[]): PromotionTreatment[] {
       notes: (treatment.notes as string | null) ?? null,
       amount_charged: (treatment.amount_charged as number | null) ?? null,
       invoice_number: (treatment.invoice_number as string | null) ?? null,
+      created_by: (treatment.created_by as string | null) ?? null,
       service: svc ? { id: svc.id, name: svc.name, color: (svc as { id: string; name: string; color?: string | null }).color ?? null } : null,
     };
   });
@@ -104,9 +109,9 @@ export async function getClientPromotions(clientId: string): Promise<ClientPromo
   const { data } = await supabase
     .from("client_promotions")
     .select(`
-      id, client_id, promotion_id, status, assigned_at, used_at, notes,
+      id, client_id, promotion_id, status, assigned_at, used_at, notes, created_by,
       promotions(id, name, description, promotion_type, color, ends_at, is_active),
-      client_treatments(id, promotion_treatment_status, promotion_service_type, treated_at, notes, amount_charged, invoice_number,
+      client_treatments(id, promotion_treatment_status, promotion_service_type, treated_at, notes, amount_charged, invoice_number, created_by,
         client_treatment_services(service_id, services(id, name, color)))
     `)
     .eq("client_id", clientId)
@@ -135,9 +140,34 @@ export async function getClientPromotions(clientId: string): Promise<ClientPromo
     await cleanupExpired(supabase, expiredIds);
   }
 
+  // Collect all created_by user IDs (from promotions + their treatments)
+  const allCreatorIds = new Set<string>();
+  for (const row of active) {
+    if (row.created_by) allCreatorIds.add(row.created_by as string);
+    const rawTreatments = Array.isArray(row.client_treatments) ? row.client_treatments : [];
+    for (const t of rawTreatments) {
+      const tr = t as Record<string, unknown>;
+      if (tr.created_by) allCreatorIds.add(tr.created_by as string);
+    }
+  }
+
+  // Resolve creator names via DB function (checks profiles → auth metadata → email)
+  const profileIdToName = new Map<string, string>();
+  if (allCreatorIds.size > 0) {
+    const { data: nameRows } = await supabase.rpc("resolve_user_names", { user_ids: [...allCreatorIds] });
+    for (const row of nameRows ?? []) {
+      if (row.id && row.full_name) profileIdToName.set(row.id, row.full_name);
+    }
+  }
+
   return active.map((row) => {
     const promo = Array.isArray(row.promotions) ? row.promotions[0] : row.promotions;
     const rawTreatments = Array.isArray(row.client_treatments) ? row.client_treatments : [];
+    const createdBy = (row.created_by as string | null) ?? null;
+    const treatments = mapTreatments(rawTreatments).map((t) => ({
+      ...t,
+      created_by_name: t.created_by ? (profileIdToName.get(t.created_by) ?? null) : null,
+    }));
     return {
       id: row.id,
       client_id: row.client_id,
@@ -146,7 +176,9 @@ export async function getClientPromotions(clientId: string): Promise<ClientPromo
       assigned_at: row.assigned_at,
       used_at: row.used_at ?? null,
       notes: row.notes,
-      treatments: mapTreatments(rawTreatments),
+      created_by: createdBy,
+      created_by_name: createdBy ? (profileIdToName.get(createdBy) ?? null) : null,
+      treatments,
       promotion: promo as ClientPromotion["promotion"],
     };
   });
@@ -212,6 +244,7 @@ export async function assignPromotion(
       status: "active",
       notes: notes || null,
       used_units: 0,
+      created_by: session.userId,
     })
     .select("id")
     .single();
@@ -241,6 +274,7 @@ export async function assignPromotion(
         promotion_service_type: entry.type,
         treated_at: now,
         amount_charged,
+        created_by: session.userId,
       })
       .select("id")
       .single();

@@ -518,7 +518,8 @@
       "colDate": "Date",
       "confirmYes": "Yes",
       "confirmNo": "No",
-      "deleteAria": "Delete suggestion"
+      "deleteAria": "Delete suggestion",
+      "colCreatedBy": "Created by"
     },
     "karton": {
       "title": "Client Card",
@@ -547,7 +548,8 @@
         "notes": "Notes",
         "amount": "Amount",
         "invoice": "Invoice",
-        "time": "Time"
+        "time": "Time",
+        "createdBy": "Created by"
       },
       "errors": {
         "generic": "Failed to save treatment.",

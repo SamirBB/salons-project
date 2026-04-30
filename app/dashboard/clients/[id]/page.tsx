@@ -39,6 +39,7 @@ type RawTreatmentRow = {
   amount_charged: number | null;
   invoice_number: string | null;
   created_at: string;
+  created_by: string | null;
   custom_data?: Record<string, string | number | boolean | null>;
   employees?: { full_name: string; color: string | null } | null;
   client_treatment_services?: RawTreatmentServiceJoin[] | null;
@@ -72,6 +73,7 @@ function mapRawTreatmentToTreatment(row: RawTreatmentRow): Treatment {
     invoice_number: row.invoice_number,
     custom_data: row.custom_data,
     created_at: row.created_at,
+    created_by: row.created_by ?? null,
     employees: row.employees ?? undefined,
     services: treatmentServices,
     client_promotion_id: row.client_promotion_id ?? null,
@@ -113,7 +115,7 @@ export default async function ClientDetailPage({
       .order("treated_at", { ascending: false }),
     supabase
       .from("employees")
-      .select("id, full_name, color")
+      .select("id, full_name, color, profile_id")
       .eq("tenant_id", session.tenantId)
       .eq("is_active", true)
       .order("full_name"),
@@ -130,9 +132,25 @@ export default async function ClientDetailPage({
     getClientSuggestions(id),
   ]);
 
-  const allTreatments: Treatment[] = (rawTreatments ?? []).map((row) =>
-    mapRawTreatmentToTreatment(row as RawTreatmentRow)
-  );
+  // Resolve created_by names via DB function (checks profiles → auth metadata → email)
+  const profileIdToName = new Map<string, string>();
+  const creatorUids = [...new Set(
+    (rawTreatments ?? [])
+      .map((r) => (r as RawTreatmentRow).created_by)
+      .filter((uid): uid is string => !!uid)
+  )];
+  if (creatorUids.length > 0) {
+    const { data: nameRows } = await supabase.rpc("resolve_user_names", { user_ids: creatorUids });
+    for (const row of nameRows ?? []) {
+      if (row.id && row.full_name) profileIdToName.set(row.id, row.full_name);
+    }
+  }
+
+  const allTreatments: Treatment[] = (rawTreatments ?? []).map((row) => {
+    const t = mapRawTreatmentToTreatment(row as RawTreatmentRow);
+    t.created_by_name = t.created_by ? (profileIdToName.get(t.created_by) ?? null) : null;
+    return t;
+  });
   // Exclude pending promotion treatments — they only appear inside the promotion tab
   const treatments: Treatment[] = allTreatments.filter(
     (t) => t.promotion_treatment_status !== "pending"
@@ -211,6 +229,7 @@ export default async function ClientDetailPage({
         currentEmployeeId={session.employeeId}
         karton={
           <TreatmentKarton
+            key="karton"
             clientId={client.id}
             treatments={treatments}
             employees={kartonEmployees}
@@ -222,6 +241,7 @@ export default async function ClientDetailPage({
         }
         prijedlozi={
           <ClientSuggestionsKarton
+            key="prijedlozi"
             clientId={client.id}
             suggestions={clientSuggestions}
             canManage={canManage}

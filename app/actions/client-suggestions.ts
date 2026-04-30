@@ -10,6 +10,8 @@ export type ClientSuggestion = {
   title: string;
   notes: string | null;
   created_at: string;
+  created_by: string | null;
+  created_by_name?: string | null;
 };
 
 export async function getClientSuggestions(clientId: string): Promise<ClientSuggestion[]> {
@@ -18,12 +20,27 @@ export async function getClientSuggestions(clientId: string): Promise<ClientSugg
 
   const { data } = await supabase
     .from("client_suggestions")
-    .select("id, client_id, title, notes, created_at")
+    .select("id, client_id, title, notes, created_at, created_by")
     .eq("client_id", clientId)
     .eq("tenant_id", session.tenantId)
     .order("created_at", { ascending: false });
 
-  return (data ?? []) as ClientSuggestion[];
+  const rows = (data ?? []) as ClientSuggestion[];
+
+  // Resolve creator names
+  const creatorIds = [...new Set(rows.map((r) => r.created_by).filter((id): id is string => !!id))];
+  const nameMap = new Map<string, string>();
+  if (creatorIds.length > 0) {
+    const { data: nameRows } = await supabase.rpc("resolve_user_names", { user_ids: creatorIds });
+    for (const row of nameRows ?? []) {
+      if (row.id && row.full_name) nameMap.set(row.id, row.full_name);
+    }
+  }
+
+  return rows.map((r) => ({
+    ...r,
+    created_by_name: r.created_by ? (nameMap.get(r.created_by) ?? null) : null,
+  }));
 }
 
 export async function addClientSuggestion(
@@ -41,6 +58,7 @@ export async function addClientSuggestion(
     client_id: clientId,
     title: title.trim(),
     notes: notes || null,
+    created_by: session.userId,
   });
 
   if (error) {

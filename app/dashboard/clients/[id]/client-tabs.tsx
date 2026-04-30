@@ -44,6 +44,8 @@ function promoTreatmentToTreatment(tr: PromotionTreatment, clientId: string): Tr
     invoice_number: tr.invoice_number,
     custom_data: undefined,
     created_at: tr.treated_at,
+    created_by: tr.created_by ?? null,
+    created_by_name: tr.created_by_name ?? null,
     services: svc ? [svc] : [],
     client_promotion_id: null,
     promotion_treatment_status: tr.promotion_treatment_status,
@@ -457,6 +459,9 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                 </p>
                 <p className="text-xs text-slate-400">
                   {pending.length} / {total} preostalo
+                  {cp.created_by_name && (
+                    <> · Dodijelio: <span className="text-slate-600">{cp.created_by_name}</span></>
+                  )}
                 </p>
               </div>
 
@@ -598,6 +603,13 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                               : "—"}
                           </span>
                         </div>
+
+                        {/* Created by */}
+                        {tr.created_by_name && (
+                          <div className="mt-1.5 text-xs text-slate-400">
+                            Kreirao: <span className="text-slate-600">{tr.created_by_name}</span>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -651,6 +663,14 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                               Račun
                             </span>
                           </th>
+                          <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1.5">
+                              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                              </svg>
+                              Kreirao
+                            </span>
+                          </th>
                           {canManage && <th className="px-4 py-3 w-32" />}
                         </tr>
                       </thead>
@@ -691,6 +711,9 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                             </td>
                             <td className={`px-4 py-3 text-xs ${isDone ? "text-slate-400" : "text-slate-500"}`}>
                               {tr.invoice_number || <span className="text-slate-300">—</span>}
+                            </td>
+                            <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">
+                              {tr.created_by_name || <span className="text-slate-300">—</span>}
                             </td>
                             {canManage && (
                               <td className="px-4 py-3">

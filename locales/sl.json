@@ -518,7 +518,8 @@
       "colDate": "Datum",
       "confirmYes": "Da",
       "confirmNo": "Ne",
-      "deleteAria": "Izbriši predlog"
+      "deleteAria": "Izbriši predlog",
+      "colCreatedBy": "Ustvaril"
     },
     "karton": {
       "title": "Karton stranke",
@@ -547,7 +548,8 @@
         "notes": "Opombe",
         "amount": "Znesek",
         "invoice": "Račun",
-        "time": "Čas"
+        "time": "Čas",
+        "createdBy": "Ustvaril"
       },
       "errors": {
         "generic": "Napaka pri shranjevanju tretmana.",

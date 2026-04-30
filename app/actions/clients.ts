@@ -376,6 +376,8 @@ export type Treatment = {
   invoice_number: string | null;
   custom_data?: Record<string, string | number | boolean | null>;
   created_at: string;
+  created_by: string | null;
+  created_by_name?: string | null;
   employees?: { full_name: string; color: string | null } | null;
   services?: TreatmentService[];
   // promotion-generated treatment fields
@@ -404,7 +406,7 @@ export async function createTreatment(
 
   const { data: created, error } = await supabase
     .from("client_treatments")
-    .insert({ tenant_id: session.tenantId, client_id: clientId, ...data })
+    .insert({ tenant_id: session.tenantId, client_id: clientId, created_by: session.userId, ...data })
     .select("id")
     .single();
 

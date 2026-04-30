@@ -518,7 +518,8 @@
       "colDate": "Fecha",
       "confirmYes": "Sí",
       "confirmNo": "No",
-      "deleteAria": "Eliminar sugerencia"
+      "deleteAria": "Eliminar sugerencia",
+      "colCreatedBy": "Creado por"
     },
     "karton": {
       "title": "Ficha del cliente",
@@ -547,7 +548,8 @@
         "notes": "Notas",
         "amount": "Importe",
         "invoice": "Factura",
-        "time": "Hora"
+        "time": "Hora",
+        "createdBy": "Creado por"
       },
       "errors": {
         "generic": "Error al guardar el tratamiento.",
