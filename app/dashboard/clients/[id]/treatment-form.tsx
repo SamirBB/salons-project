@@ -8,7 +8,7 @@ import type { CustomField } from "@/app/actions/custom-fields";
 import DateTimePicker from "@/components/date-time-picker";
 
 type Employee = { id: string; full_name: string; color: string | null };
-type ServiceOption = { id: string; name: string; price: number; category: string | null; color: string | null };
+type ServiceOption = { id: string; name: string; price: number; duration_minutes: number | null; category: string | null; color: string | null };
 
 type Props = {
   clientId: string;
@@ -116,18 +116,17 @@ export default function TreatmentForm({
     });
   }
 
-  const servicesTotal = services
-    .filter((s) => form.service_ids.includes(s.id))
-    .reduce((sum, s) => sum + s.price, 0);
+  const selectedServices = services.filter((s) => form.service_ids.includes(s.id));
+  const servicesTotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
+  const totalDurationMinutes = selectedServices.reduce(
+    (sum, s) => sum + (s.duration_minutes ?? 0), 0
+  );
   const amountMatchesTotal =
     servicesTotal > 0 &&
     form.amount_charged !== "" &&
     Math.abs(parseFloat(form.amount_charged) - servicesTotal) < 0.001;
 
-  const selectedLabels = services
-    .filter((s) => form.service_ids.includes(s.id))
-    .map((s) => s.name)
-    .join(", ");
+  const selectedLabels = selectedServices.map((s) => s.name).join(", ");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -137,6 +136,7 @@ export default function TreatmentForm({
       employee_id: form.employee_id || null,
       notes: form.notes || null,
       amount_charged: form.amount_charged ? parseFloat(form.amount_charged) : null,
+      duration_minutes: totalDurationMinutes > 0 ? totalDurationMinutes : null,
       invoice_number: form.invoice_number || null,
       custom_data: customData,
     };
@@ -198,6 +198,14 @@ export default function TreatmentForm({
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
+                {totalDurationMinutes > 0 && (
+                  <p className="mt-1 text-[11px] text-indigo-500 flex items-center gap-1">
+                    <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {t("karton.totalDuration", { minutes: totalDurationMinutes })}
+                  </p>
+                )}
                 {servicesOpen && (
                   <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden max-h-60 overflow-y-auto">
                     {services.map((s) => {
@@ -217,7 +225,12 @@ export default function TreatmentForm({
                             )}
                             <span className="text-sm text-slate-700 truncate">{s.name}</span>
                           </div>
-                          <span className="text-xs text-slate-400 shrink-0 tabular-nums">{s.price.toFixed(2).replace(".", ",") + " €"}</span>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {s.duration_minutes != null && (
+                              <span className="text-xs text-slate-400 tabular-nums">{s.duration_minutes} min</span>
+                            )}
+                            <span className="text-xs text-slate-400 tabular-nums">{s.price.toFixed(2).replace(".", ",") + " €"}</span>
+                          </div>
                         </label>
                       );
                     })}

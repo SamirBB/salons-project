@@ -20,7 +20,7 @@ function dateToInputValue(value: string | null): string {
 }
 
 type KartonEmployee = { id: string; full_name: string; color: string | null };
-type KartonService = { id: string; name: string; price: number; category: string | null; color: string | null };
+type KartonService = { id: string; name: string; price: number; duration_minutes: number | null; category: string | null; color: string | null };
 
 type NestedServiceRow = { id: string; name: string; price: number; color?: string | null };
 
@@ -37,6 +37,7 @@ type RawTreatmentRow = {
   treated_at: string;
   notes: string | null;
   amount_charged: number | null;
+  duration_minutes: number | null;
   invoice_number: string | null;
   created_at: string;
   created_by: string | null;
@@ -70,6 +71,7 @@ function mapRawTreatmentToTreatment(row: RawTreatmentRow): Treatment {
     treated_at: row.treated_at,
     notes: row.notes,
     amount_charged: row.amount_charged,
+    duration_minutes: row.duration_minutes ?? null,
     invoice_number: row.invoice_number,
     custom_data: row.custom_data,
     created_at: row.created_at,
@@ -110,6 +112,7 @@ export default async function ClientDetailPage({
     supabase
       .from("client_treatments")
       .select("*, employees(full_name, color), client_treatment_services(service_id, services(id, name, price, color))")
+      // duration_minutes is now a column on client_treatments, fetched via *
       .eq("client_id", id)
       .eq("tenant_id", session.tenantId)
       .order("treated_at", { ascending: false }),
@@ -121,7 +124,7 @@ export default async function ClientDetailPage({
       .order("full_name"),
     supabase
       .from("services")
-      .select("id, name, price, category, color")
+      .select("id, name, price, duration_minutes, category, color")
       .eq("tenant_id", session.tenantId)
       .eq("is_active", true)
       .order("category", { nullsFirst: true })
@@ -166,6 +169,7 @@ export default async function ClientDetailPage({
     id: s.id,
     name: s.name,
     price: s.price,
+    duration_minutes: s.duration_minutes ?? null,
     category: s.category,
     color: s.color,
   }));

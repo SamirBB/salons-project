@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   createAppointment,
@@ -79,6 +80,7 @@ export default function AppointmentForm({
   canManage,
 }: Props) {
   const t = useTranslations("kalendar");
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -187,6 +189,7 @@ export default function AppointmentForm({
         );
         return;
       }
+      router.refresh();
       onClose();
     });
   }
@@ -207,6 +210,7 @@ export default function AppointmentForm({
         setError(t("errorDelete"));
         return;
       }
+      router.refresh();
       onClose();
     });
   }

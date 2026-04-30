@@ -14,7 +14,7 @@ const MAX_NOTES = 500;
 type ActiveTab = "prijedlozi" | "karton" | string;
 
 type Employee = { id: string; full_name: string; color: string | null };
-type ServiceOption = { id: string; name: string; price: number; category: string | null; color: string | null };
+type ServiceOption = { id: string; name: string; price: number; duration_minutes: number | null; category: string | null; color: string | null };
 
 type Props = {
   karton: React.ReactNode;
@@ -41,6 +41,7 @@ function promoTreatmentToTreatment(tr: PromotionTreatment, clientId: string): Tr
     treated_at: tr.treated_at,
     notes: tr.notes,
     amount_charged: tr.amount_charged,
+    duration_minutes: tr.duration_minutes,
     invoice_number: tr.invoice_number,
     custom_data: undefined,
     created_at: tr.treated_at,
@@ -589,11 +590,21 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                         {/* Amount + Invoice */}
                         <div className="mt-2 flex items-center justify-between">
                           <span className="text-xs text-slate-400">{tr.invoice_number || "—"}</span>
-                          <span className="text-sm font-semibold text-slate-800">
-                            {tr.amount_charged != null
-                              ? tr.amount_charged.toFixed(2).replace(".", ",") + " €"
-                              : "—"}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {tr.duration_minutes != null && (
+                              <span className="inline-flex items-center gap-1 text-xs text-slate-400">
+                                <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {tr.duration_minutes} min
+                              </span>
+                            )}
+                            <span className="text-sm font-semibold text-slate-800">
+                              {tr.amount_charged != null
+                                ? tr.amount_charged.toFixed(2).replace(".", ",") + " €"
+                                : "—"}
+                            </span>
+                          </div>
                         </div>
 
                         {/* Created by */}
@@ -621,6 +632,14 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
                               </svg>
                               Usluge
+                            </span>
+                          </th>
+                          <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1.5">
+                              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              Trajanje
                             </span>
                           </th>
                           <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 whitespace-nowrap">
@@ -684,6 +703,18 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
                                     {tr.service.name}
                                   </span>
                                 </div>
+                              ) : (
+                                <span className="text-slate-300">—</span>
+                              )}
+                            </td>
+                            <td className={`px-4 py-3 whitespace-nowrap text-xs tabular-nums ${isDone ? "text-slate-400" : "text-slate-500"}`}>
+                              {tr.duration_minutes != null ? (
+                                <span className="inline-flex items-center gap-1">
+                                  <svg className="w-3 h-3 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                  {tr.duration_minutes} min
+                                </span>
                               ) : (
                                 <span className="text-slate-300">—</span>
                               )}

@@ -11,6 +11,7 @@ export type PromotionTreatment = {
   treated_at: string;
   notes: string | null;
   amount_charged: number | null;
+  duration_minutes: number | null;
   invoice_number: string | null;
   created_by: string | null;
   created_by_name?: string | null;
@@ -68,6 +69,7 @@ function mapTreatments(raw: unknown[]): PromotionTreatment[] {
       treated_at: treatment.treated_at as string,
       notes: (treatment.notes as string | null) ?? null,
       amount_charged: (treatment.amount_charged as number | null) ?? null,
+      duration_minutes: (treatment.duration_minutes as number | null) ?? null,
       invoice_number: (treatment.invoice_number as string | null) ?? null,
       created_by: (treatment.created_by as string | null) ?? null,
       service: svc ? { id: svc.id, name: svc.name, color: (svc as { id: string; name: string; color?: string | null }).color ?? null } : null,
@@ -111,7 +113,7 @@ export async function getClientPromotions(clientId: string): Promise<ClientPromo
     .select(`
       id, client_id, promotion_id, status, assigned_at, used_at, notes, created_by,
       promotions(id, name, description, promotion_type, color, ends_at, is_active),
-      client_treatments(id, promotion_treatment_status, promotion_service_type, treated_at, notes, amount_charged, invoice_number, created_by,
+      client_treatments(id, promotion_treatment_status, promotion_service_type, treated_at, notes, amount_charged, duration_minutes, invoice_number, created_by,
         client_treatment_services(service_id, services(id, name, color)))
     `)
     .eq("client_id", clientId)

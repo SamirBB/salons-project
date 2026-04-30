@@ -373,6 +373,7 @@ export type Treatment = {
   treated_at: string;
   notes: string | null;
   amount_charged: number | null;
+  duration_minutes: number | null;
   invoice_number: string | null;
   custom_data?: Record<string, string | number | boolean | null>;
   created_at: string;
@@ -392,6 +393,7 @@ export type TreatmentData = {
   treated_at: string;
   notes: string | null;
   amount_charged: number | null;
+  duration_minutes: number | null;
   invoice_number: string | null;
   custom_data?: Record<string, string | number | boolean | null>;
 };
@@ -428,7 +430,73 @@ export async function createTreatment(
     .eq("id", clientId)
     .eq("tenant_id", session.tenantId);
 
+  // ── Mirror into appointments so it shows on the calendar ──
+  {
+    // Fetch service details for duration + price
+    let svcRows: { id: string; price: number; duration_minutes: number | null }[] = [];
+    if (serviceIds.length > 0) {
+      const { data: svcs, error: svcsErr } = await supabase
+        .from("services")
+        .select("id, price, duration_minutes")
+        .in("id", serviceIds)
+        .eq("tenant_id", session.tenantId);
+      if (svcsErr) console.error("[createTreatment] fetch services:", svcsErr.message);
+      svcRows = svcs ?? [];
+    }
+
+    const totalDuration = svcRows.reduce((s, sv) => s + (sv.duration_minutes ?? 30), 0) || 30;
+    const totalPrice = data.amount_charged ?? svcRows.reduce((s, sv) => s + sv.price, 0);
+    const startsAt = data.treated_at;
+    const endsAt = new Date(new Date(startsAt).getTime() + totalDuration * 60000).toISOString();
+
+    const { data: appt, error: apptErr } = await supabase
+      .from("appointments")
+      .insert({
+        tenant_id: session.tenantId,
+        client_id: clientId,
+        employee_id: data.employee_id || null,
+        starts_at: startsAt,
+        ends_at: endsAt,
+        status: "completed",
+        notes: data.notes || null,
+        total_price: totalPrice,
+        total_final_price: totalPrice,
+        completed_at: startsAt,
+        created_by: session.userId,
+        appointment_source: "treatment_form",
+      })
+      .select("id")
+      .single();
+
+    if (apptErr) {
+      console.error("[createTreatment] appointment mirror:", apptErr.message);
+    } else if (appt) {
+      if (svcRows.length > 0) {
+        const { error: itemsErr } = await supabase.from("appointment_items").insert(
+          svcRows.map((sv, idx) => ({
+            tenant_id: session.tenantId,
+            appointment_id: appt.id,
+            service_id: sv.id,
+            employee_id: data.employee_id || null,
+            sort_order: idx,
+            duration_minutes: sv.duration_minutes ?? 30,
+            price: sv.price,
+            final_price: sv.price,
+            status: "completed",
+          }))
+        );
+        if (itemsErr) console.error("[createTreatment] appointment_items:", itemsErr.message);
+      }
+      // Link appointment back to the treatment
+      await supabase
+        .from("client_treatments")
+        .update({ appointment_id: appt.id })
+        .eq("id", created.id);
+    }
+  }
+
   revalidatePath(`/dashboard/clients/${clientId}`);
+  revalidatePath("/dashboard/calendar");
   return { success: true as const };
 }
 

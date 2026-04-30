@@ -175,6 +175,43 @@ export async function createAppointment(data: AppointmentData): Promise<{ error?
     );
   }
 
+  // ── Mirror into client_treatments so it shows on the client karton ──
+  if (data.client_id) {
+    const { data: treatment } = await supabase
+      .from("client_treatments")
+      .insert({
+        tenant_id: session.tenantId,
+        client_id: data.client_id,
+        employee_id: data.employee_id || null,
+        treated_at: data.starts_at,
+        notes: data.notes || null,
+        amount_charged: totalPrice > 0 ? totalPrice : null,
+        created_by: session.userId,
+        appointment_id: appt.id,
+      })
+      .select("id")
+      .single();
+
+    if (treatment && data.items.length > 0) {
+      await supabase.from("client_treatment_services").insert(
+        data.items.map((item) => ({
+          tenant_id: session.tenantId,
+          treatment_id: treatment.id,
+          service_id: item.service_id,
+        }))
+      );
+    }
+
+    // Update last_visit_at on client
+    await supabase
+      .from("clients")
+      .update({ last_visit_at: data.starts_at, updated_by: session.userId, updated_at: new Date().toISOString() })
+      .eq("id", data.client_id)
+      .eq("tenant_id", session.tenantId);
+
+    revalidatePath(`/dashboard/clients/${data.client_id}`);
+  }
+
   revalidatePath("/dashboard/calendar");
   return { id: appt.id };
 }
