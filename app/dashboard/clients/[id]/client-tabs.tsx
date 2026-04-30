@@ -159,12 +159,9 @@ function AddPromotionDrawer({
 
   // Focus search when opened
   useEffect(() => {
-    if (open) {
-      setTimeout(() => searchRef.current?.focus(), 80);
-      setSearch("");
-      setSelectedId("");
-      setNotes("");
-    }
+    if (!open) return;
+    const timer = setTimeout(() => searchRef.current?.focus(), 80);
+    return () => clearTimeout(timer);
   }, [open]);
 
   // Close on Escape
@@ -327,10 +324,8 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
 
   const [activeTab, setActiveTab] = useState<ActiveTab>("prijedlozi");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerInstance, setDrawerInstance] = useState(0);
   const [isPending, startTransition] = useTransition();
-
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => { setNow(new Date()); }, []);
 
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
@@ -343,11 +338,17 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
 
   const activePromotion = promotions.find((p) => p.id === activeTab);
 
-  useEffect(() => {
-    if (activeTab !== "prijedlozi" && activeTab !== "karton" && !activePromotion) {
-      setActiveTab("prijedlozi");
-    }
-  }, [activeTab, activePromotion]);
+  const resolvedActiveTab =
+    activeTab !== "prijedlozi" && activeTab !== "karton" && !activePromotion
+      ? "prijedlozi"
+      : activeTab;
+
+  const resolvedActivePromotion = promotions.find((p) => p.id === resolvedActiveTab);
+
+  function handleOpenDrawer() {
+    setDrawerInstance((value) => value + 1);
+    setDrawerOpen(true);
+  }
 
   function handleAddPromo(promoId: string, notes: string) {
     if (!promoId) return;
@@ -383,24 +384,15 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
         : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
     }`;
 
-  const PROMO_TYPE_LABELS: Record<string, string> = {
-    discount: tPromo("typeDiscount"),
-    loyalty: tPromo("typeLoyalty"),
-    package: tPromo("typePackage"),
-    gift: tPromo("typeGift"),
-    referral: tPromo("typeReferral"),
-    bundle: tPromo("typeBundle"),
-  };
-
   return (
     <div className="space-y-4">
       {/* Tab bar */}
       <div className="flex items-end border-b border-slate-200 overflow-x-auto">
-        <button onClick={() => setActiveTab("prijedlozi")} className={tabStyle(activeTab === "prijedlozi")}>
+        <button onClick={() => setActiveTab("prijedlozi")} className={tabStyle(resolvedActiveTab === "prijedlozi")}>
           {t("prijedlozi")}
         </button>
 
-        <button onClick={() => setActiveTab("karton")} className={tabStyle(activeTab === "karton")}>
+        <button onClick={() => setActiveTab("karton")} className={tabStyle(resolvedActiveTab === "karton")}>
           {t("tretman")}
         </button>
 
@@ -408,7 +400,7 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
           <button
             key={cp.id}
             onClick={() => setActiveTab(cp.id)}
-            className={tabStyle(activeTab === cp.id)}
+            className={tabStyle(resolvedActiveTab === cp.id)}
           >
             <span className="flex items-center gap-1.5">
               <span
@@ -422,7 +414,7 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
 
         {canManage && canAddMore && (
           <button
-            onClick={() => setDrawerOpen(true)}
+            onClick={handleOpenDrawer}
             className="flex items-center gap-1 px-4 py-2.5 text-sm font-medium text-indigo-500 border-b-2 border-transparent -mb-px hover:text-indigo-700 hover:border-indigo-300 transition-colors whitespace-nowrap"
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -434,12 +426,12 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
       </div>
 
       {/* Tab content */}
-      {activeTab === "prijedlozi" && prijedlozi}
-      {activeTab === "karton" && karton}
+      {resolvedActiveTab === "prijedlozi" && prijedlozi}
+      {resolvedActiveTab === "karton" && karton}
 
       {/* Promotion tab content */}
-      {activePromotion && (() => {
-        const cp = activePromotion;
+      {resolvedActivePromotion && (() => {
+        const cp = resolvedActivePromotion;
         const allTreatments = cp.treatments;
         const pending = allTreatments.filter((t) => t.promotion_treatment_status === "pending");
         const total = allTreatments.length;
@@ -764,6 +756,7 @@ export default function ClientTabs({ karton, prijedlozi, clientId, promotions, a
 
       {/* Add promotion drawer */}
       <AddPromotionDrawer
+        key={drawerInstance}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         available={unassigned}
